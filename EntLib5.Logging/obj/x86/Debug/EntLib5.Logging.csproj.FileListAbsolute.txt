@@ -1,0 +1,5 @@
+E:\My Projects\Examples\EntLib5.Logging\bin\Debug\EntLib5.Logging.exe
+E:\My Projects\Examples\EntLib5.Logging\bin\Debug\EntLib5.Logging.pdb
+E:\My Projects\Examples\EntLib5.Logging\obj\x86\Debug\ResolveAssemblyReference.cache
+E:\My Projects\Examples\EntLib5.Logging\obj\x86\Debug\EntLib5.Logging.exe
+E:\My Projects\Examples\EntLib5.Logging\obj\x86\Debug\EntLib5.Logging.pdb
