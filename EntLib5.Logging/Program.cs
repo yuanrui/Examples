@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.Practices.EnterpriseLibrary.Logging;
 
 namespace EntLib5.Logging
 {
@@ -9,6 +10,9 @@ namespace EntLib5.Logging
     {
         static void Main(string[] args)
         {
+            Logger.Write("Test wirte Log" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadLine();
         }
     }
 }
