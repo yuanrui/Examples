@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntLib5.Logging", "EntLib5.Logging\EntLib5.Logging.csproj", "{3FB70A58-375C-4DA2-B881-B9545F1BB059}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Study.Linq", "Study.Linq\Study.Linq.csproj", "{62EA7075-F5CE-4DB6-A389-81627B702E5E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -13,6 +15,10 @@ Global
 		{3FB70A58-375C-4DA2-B881-B9545F1BB059}.Debug|x86.Build.0 = Debug|x86
 		{3FB70A58-375C-4DA2-B881-B9545F1BB059}.Release|x86.ActiveCfg = Release|x86
 		{3FB70A58-375C-4DA2-B881-B9545F1BB059}.Release|x86.Build.0 = Release|x86
+		{62EA7075-F5CE-4DB6-A389-81627B702E5E}.Debug|x86.ActiveCfg = Debug|x86
+		{62EA7075-F5CE-4DB6-A389-81627B702E5E}.Debug|x86.Build.0 = Debug|x86
+		{62EA7075-F5CE-4DB6-A389-81627B702E5E}.Release|x86.ActiveCfg = Release|x86
+		{62EA7075-F5CE-4DB6-A389-81627B702E5E}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
