@@ -8,10 +8,6 @@ using System.Windows.Forms;
 
 namespace Study.CodeGenerator.Core
 {
-    class CodeEntity
-    {
-    }
-
     /// <summary>
     /// 实体所需要的参数
     /// </summary>
