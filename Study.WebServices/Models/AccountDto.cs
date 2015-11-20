@@ -1,13 +1,4 @@
-﻿//------------------------------------------------------------------------------
-// <copyright file="AccountDto.cs" company="CQ Ebos Co., Ltd.">
-//    Copyright (c) 2015, CQ Ebos Co., Ltd. All rights reserved.
-// </copyright>
-// <author>Yuan Rui</author>
-// <email>yuanrui@live.cn</email>
-// <date>2015-11-20 17:15:39</date>
-//------------------------------------------------------------------------------
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;

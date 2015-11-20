@@ -1,13 +1,4 @@
-﻿//------------------------------------------------------------------------------
-// <copyright file="AccountCollection.cs" company="CQ Ebos Co., Ltd.">
-//    Copyright (c) 2015, CQ Ebos Co., Ltd. All rights reserved.
-// </copyright>
-// <author>Yuan Rui</author>
-// <email>yuanrui@live.cn</email>
-// <date>2015-11-20 15:08:34</date>
-//------------------------------------------------------------------------------
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
