@@ -1,9 +1,9 @@
-body
-{
-    font-size: 75%;
-    font-family: Verdana, Tahoma, Arial, "Helvetica Neue", Helvetica, Sans-Serif;
-    color: #232323;
-    background-color: #fff;
+body {
+    padding: 0px;
+	margin: 0px;
+}
+::-webkit-scrollbar { 
+    display: none; 
 }
 
 /* Styles for basic forms
@@ -65,4 +65,133 @@ textarea
 .validation-summary-valid
 {
     display: none;
+}
+
+.rui-form {
+    padding: 0px;
+	margin: 0px;
+}
+.rui-control{
+    
+}
+.field-title {
+    
+}
+/*
+    Copy from bootstrap.css
+*/
+.text-left {
+  text-align: left;
+}
+.text-right {
+  text-align: right;
+}
+.text-center {
+  text-align: center;
+}
+.pull-right {
+  float: right !important;
+}
+.pull-left {
+  float: left !important;
+}
+.hide {
+  display: none !important;
+}
+.show {
+  display: block !important;
+}
+.invisible {
+  visibility: hidden;
+}
+.text-hide {
+  font: 0/0 a;
+  color: transparent;
+  text-shadow: none;
+  background-color: transparent;
+  border: 0;
+}
+.hidden {
+  display: none !important; 
+  visibility: hidden;
+}
+
+/*
+    表单表格样式
+*/
+
+.rui-table {
+	border-collapse: collapse;
+	border-spacing: 0;
+	margin:0 auto;
+    width: 100%;
+}
+
+.rui-table th,.rui-table td {
+	border: 1px solid #8CACBB;
+	padding: 0.3em 0.7em;
+}
+
+.rui-table th {
+	background: #F8F8F8;
+	text-align: center;
+    font-weight: bolder;
+}
+
+.rui-table thead th {
+	text-align: center;
+}
+
+.rui-table tbody th {
+	text-align: right;
+}
+
+.rui-table tr:hover {
+	background-color: #f6fafd;
+}
+
+.rui-table td:hover {
+	background-color: #f9feff;
+}
+
+.rui-form th {
+	text-align: right;
+}
+
+.rui-form th,.form td {
+	padding: 0.1em 0.3em;
+	border: 1px solid #D1D7DC;
+}
+
+.rui-form input,.form select,.form textarea {
+	width: 150px;
+}
+
+.rui-form input[type='checkbox'],.form input[type='radio'] {
+	width: 20px;
+}
+
+.rui-fieldset {
+	border: 1px dotted #D1D7DC;
+}
+
+.rui-legend {
+	border: 1px dotted #D1D7DC;
+	font-size: small;
+}
+
+form .rui-table td.text-right {
+    /*Fix .text-right font color*/
+    font-weight: bolder;
+    background: #F8F8F8;
+}
+
+/*
+    搜索框样式
+*/
+.rui-search {
+    width: 100%;
+    width: 100% !important;
+    height: 100%;
+    height: 100% !important;
 }
