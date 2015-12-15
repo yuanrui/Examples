@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Study.CodeGenerator", "Stud
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Study.WebServices", "Study.WebServices\Study.WebServices.csproj", "{B06B603C-2974-4ACF-BC73-ED50A09ED48F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Learn.AngularJS", "Learn.AngularJS\Learn.AngularJS.csproj", "{2B5BC7C9-7CE9-49A1-BA29-640364CA9C99}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,6 +61,16 @@ Global
 		{B06B603C-2974-4ACF-BC73-ED50A09ED48F}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{B06B603C-2974-4ACF-BC73-ED50A09ED48F}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{B06B603C-2974-4ACF-BC73-ED50A09ED48F}.Release|x86.ActiveCfg = Release|Any CPU
+		{2B5BC7C9-7CE9-49A1-BA29-640364CA9C99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B5BC7C9-7CE9-49A1-BA29-640364CA9C99}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B5BC7C9-7CE9-49A1-BA29-640364CA9C99}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{2B5BC7C9-7CE9-49A1-BA29-640364CA9C99}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{2B5BC7C9-7CE9-49A1-BA29-640364CA9C99}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2B5BC7C9-7CE9-49A1-BA29-640364CA9C99}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B5BC7C9-7CE9-49A1-BA29-640364CA9C99}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B5BC7C9-7CE9-49A1-BA29-640364CA9C99}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{2B5BC7C9-7CE9-49A1-BA29-640364CA9C99}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{2B5BC7C9-7CE9-49A1-BA29-640364CA9C99}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
