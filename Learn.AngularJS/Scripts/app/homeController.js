@@ -1,4 +1,17 @@
-﻿angular.module("myApp", [])
+﻿angular.module("emailParser", [])
+.config(["$interpolateProvider", function ($interpolate) {
+    $interpolate.startSymbol("__");
+    $interpolate.endSymbol("__");
+} ])
+.factory("EmailParser", ["$interpolate", function ($interpolate) {
+    return { parse: function (text, context) {
+        var template = $interpolate(text);
+        return template(context);
+    }
+    };
+} ]);
+
+angular.module("myApp", [])
 .controller('MyController', function ($scope, $timeout) {
     var updateClock = function () {
         var dateObj = new Date();
@@ -27,3 +40,12 @@
         $scope.count -= inputCount;
     };
 });
+
+angular.module("myApp2", ['emailParser'])
+.controller("WriteEmailController", ["$scope", "EmailParser", function ($scope, EmailParser) {
+    $scope.$watch("emailBody", function (body) {
+        if (body) {
+            $scope.previewText = EmailParser.parse(body, { to : $scope.to });
+        }
+    });
+} ]);

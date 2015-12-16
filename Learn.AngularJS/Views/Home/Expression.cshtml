@@ -1,0 +1,31 @@
+﻿@{
+    ViewBag.Title = "Learn Expression";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<table class="table rui-table" ng-app="myApp2">
+    <tbody ng-controller="WriteEmailController">
+        <tr>
+            <th>收件人</th>
+            <td>
+                <input type="email" ng-model="to" />
+            </td>
+        </tr>
+        <tr>
+            <th>正文</th>
+            <td>
+                <textarea ng-model="emailBody" style="width:100%"></textarea>
+            </td>
+        </tr>
+        <tr>
+            <th>预览</th>
+            <td>
+                <pre>
+                __previewText__
+                </pre>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<script src="../../Scripts/app/homeController.js" type="text/javascript"></script>

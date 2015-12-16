@@ -26,5 +26,9 @@ namespace Learn.AngularJS.Controllers
             return View();
         }
 
+        public ActionResult Expression()
+        {
+            return View();
+        }
     }
 }
