@@ -1,0 +1,29 @@
+﻿@{
+    ViewBag.Title = "Learn Scope";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Learn Scope</h2>
+@*<div ng-app="myApp">
+    <h3>当前时间 {{ Time }}</h3>
+</div>
+*@
+<div ng-app="myApp">
+    <div ng-controller="MyController2">
+        <h3>你好 {{Name}}</h3>
+    </div>
+    <div ng-controller="CountController">
+        <h3>当前数量 {{count}}</h3>
+        <a ng-click="up(1)" class="btn btn-default">加+1</a>
+
+        <a ng-click="down(1)" class="btn btn-default">减-1</a>
+        
+    </div>
+</div>
+<script src="../../Scripts/app/homeController.js" type="text/javascript"></script>
+<script type="text/javascript">
+    angular.module("myApp1", [])
+    .run(function ($rootScope) {
+        $rootScope.Time = "" + new Date();
+    });
+</script>

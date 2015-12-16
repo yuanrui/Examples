@@ -20,6 +20,11 @@ namespace Learn.AngularJS.Controllers
         {
             return View();
         }
+        
+        public ActionResult Scope()
+        {
+            return View();
+        }
 
     }
 }

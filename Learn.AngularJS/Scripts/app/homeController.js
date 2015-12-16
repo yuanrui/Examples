@@ -14,4 +14,16 @@
     };
 
     updateClock();
+})
+.controller("MyController2", function ($scope) {
+    $scope.Name = "Mei";
+})
+.controller("CountController", function ($scope) {
+    $scope.count = 0;
+    $scope.up = function (inputCount) {
+        $scope.count += inputCount;
+    };
+    $scope.down = function (inputCount) {
+        $scope.count -= inputCount;
+    };
 });
