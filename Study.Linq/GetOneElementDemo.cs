@@ -1,13 +1,4 @@
-﻿//------------------------------------------------------------------------------
-// <copyright file="GetOneElementDemo.cs" company="CQ Ebos Co., Ltd.">
-//    Copyright (c) 2016, CQ Ebos Co., Ltd. All rights reserved.
-// </copyright>
-// <author>Yuan Rui</author>
-// <email>yuanrui@live.cn</email>
-// <date>2016-01-08 14:17:22</date>
-//------------------------------------------------------------------------------
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

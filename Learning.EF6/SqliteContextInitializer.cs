@@ -1,13 +1,4 @@
-﻿//------------------------------------------------------------------------------
-// <copyright file="SqliteContextInitializer.cs" company="CQ Ebos Co., Ltd.">
-//    Copyright (c) 2016, CQ Ebos Co., Ltd. All rights reserved.
-// </copyright>
-// <author>Yuan Rui</author>
-// <email>yuanrui@live.cn</email>
-// <date>2016-01-08 16:09:10</date>
-//------------------------------------------------------------------------------
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,7 +9,11 @@ using System.Data.Entity.Infrastructure.Annotations;
 
 namespace Learning.EF6
 {
-    class SqliteContextInitializer<T> : IDatabaseInitializer<T>
+    /// <summary>
+    /// copy from https://gist.github.com/flaub/1968486e1b3f2b9fddaf
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class SqliteContextInitializer<T> : IDatabaseInitializer<T>
         where T : DbContext
     {
         Database _db;
