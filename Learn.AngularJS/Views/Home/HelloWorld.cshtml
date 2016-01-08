@@ -8,7 +8,7 @@
     <tbody>
         <tr ng-controller="MyController">
             <th>当前时间</th>
-            <td>{{clock}}</td>
+            <td>{{ today | date:'yyyy-MM-dd HH:mm:ss'}}{{clock}}</td>
         </tr>
         <tr>
             <th>用户名称</th>

@@ -15,7 +15,8 @@ angular.module("myApp", [])
 .controller('MyController', function ($scope, $timeout) {
     var updateClock = function () {
         var dateObj = new Date();
-        $scope.clock = "" + dateObj.getHours() + ":" + dateObj.getMinutes() + ":" + dateObj.getSeconds();
+        $scope.today = dateObj;
+        $scope.clock = "." + dateObj.getMilliseconds();
 
         //        setInterval(function () {
         //            updateClock();
@@ -45,7 +46,15 @@ angular.module("myApp2", ['emailParser'])
 .controller("WriteEmailController", ["$scope", "EmailParser", function ($scope, EmailParser) {
     $scope.$watch("emailBody", function (body) {
         if (body) {
-            $scope.previewText = EmailParser.parse(body, { to : $scope.to });
+            $scope.previewText = EmailParser.parse(body, { to: $scope.to });
         }
     });
-} ]);
+} ])
+.controller("register", function ($scope) {
+    $scope.Name = "Hao";
+
+    $scope.submit = function () {
+        console.log("submit");
+        $scope.postData = "abcd2";
+    }
+});
