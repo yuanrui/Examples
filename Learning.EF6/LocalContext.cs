@@ -10,6 +10,8 @@ namespace Learning.EF6
     public class LocalContext : DbContext
     {
         public DbSet<Category> Categories { get; set; }
+        
+        public DbSet<Joke> Jokes { get; set; }
 
         public LocalContext()
             : base("DefaultConnectionString")

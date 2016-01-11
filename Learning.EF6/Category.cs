@@ -9,7 +9,7 @@ namespace Learning.EF6
 {
     public class Category
     {
-        public Guid Id { get; set; }
+        public string Id { get; set; }
 
         public string Name { get; set; }
 
@@ -17,9 +17,9 @@ namespace Learning.EF6
 
         public int SortId { get; set; }
 
-        public override string ToString()
+        public Category()
         {
-            return string.Format("Id:{0} Name:{1} Remark:{2} SortId:{3}", Id, Name, Remark, SortId);
+            Id = Guid.NewGuid().ToString();
         }
     }
 }
