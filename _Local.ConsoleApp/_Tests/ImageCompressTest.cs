@@ -1,13 +1,4 @@
-﻿//------------------------------------------------------------------------------
-// <copyright file="ImageCompressTest.cs" company="CQ Ebos Co., Ltd.">
-//    Copyright (c) 2016, CQ Ebos Co., Ltd. All rights reserved.
-// </copyright>
-// <author>Yuan Rui</author>
-// <email>yuanrui@live.cn</email>
-// <date>2016-03-08 13:13:51</date>
-//------------------------------------------------------------------------------
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
