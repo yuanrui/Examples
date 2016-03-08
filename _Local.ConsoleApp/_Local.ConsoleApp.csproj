@@ -53,6 +53,7 @@
     <Compile Include="ImageUtils.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="_Tests\ImageCompressTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

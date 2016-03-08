@@ -103,7 +103,7 @@ namespace _Local.ConsoleApp
             var newBitmap = new BitmapImage();
             newBitmap.BeginInit();
             newBitmap.StreamSource = new MemoryStream(bytes);
-            newBitmap.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
+            newBitmap.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
             newBitmap.CacheOption = BitmapCacheOption.Default;
             newBitmap.EndInit();
             return newBitmap;
