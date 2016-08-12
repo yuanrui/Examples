@@ -79,6 +79,9 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AppCode\HtmlHelperExtension.cs" />
+    <Compile Include="AppCode\UrlHelperExtension.cs" />
+    <Compile Include="AppCode\VersionUtils.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
