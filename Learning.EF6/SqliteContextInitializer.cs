@@ -61,7 +61,7 @@ namespace Learning.EF6
             const string primaryKeyTmpl = "    PRIMARY KEY ({0})";
             const string foreignKeyTmpl = "    FOREIGN KEY ({0}) REFERENCES {1} ({2})";
             const string indexTmpl = "CREATE INDEX {0} ON {1} ({2});";
-
+            
             var indicies = new Dictionary<string, Index>();
 
             foreach (var type in model.StoreModel.EntityTypes)
@@ -142,5 +142,6 @@ namespace Learning.EF6
                 db.ExecuteSqlCommand(sql);
             }
         }
+
     }
 }

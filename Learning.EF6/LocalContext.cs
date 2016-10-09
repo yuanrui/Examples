@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Data.Entity;
 using System.Data.Entity.ModelConfiguration.Conventions;
+using System.Data.Entity.ModelConfiguration;
 
 namespace Learning.EF6
 {
@@ -25,6 +26,5 @@ namespace Learning.EF6
             
             modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
         }
-
     }
 }

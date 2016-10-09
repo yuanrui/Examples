@@ -53,7 +53,7 @@ namespace Learning.EF6
             //{
             //    Console.WriteLine(item.Id);
             //}
-
+            
             Console.WriteLine("Press any key to exit...");
             Console.ReadLine();
         }
