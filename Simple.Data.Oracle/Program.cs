@@ -33,6 +33,17 @@ namespace Simple.Data.Oracle
                 list.Add(ent);
             }
 
+            WatchExecute(() =>
+            {
+                Console.WriteLine("Insert one by one with connection open and close");
+                Insert(sqlList.Take(totalCount));
+            });
+
+            WatchExecute(() =>
+            {
+                Console.WriteLine("Insert one by one with connection openning in long time");
+                Insert2(sqlList.Skip(totalCount));
+            });
 
             WatchExecute(() =>
             {
