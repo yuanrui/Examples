@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Data.Common;
 using System.Diagnostics;
@@ -15,10 +16,11 @@ namespace Simple.Data.Oracle
     {
         static void Main(string[] args)
         {
-            const int totalCount = 100000;
+            const int totalCount = 5000;
+            SaveConfig();
             DropTable();
             CreateTable();
-
+            
             var list = new List<Employee>();
             var sqlList = new List<string>();
 
@@ -51,21 +53,43 @@ namespace Simple.Data.Oracle
                 Insert(list);
             });
             
+            var dataTable = DbUtils.QueryDataTable("SELECT * FROM EMP");
+            Console.WriteLine(dataTable.Rows.Count);
+
             Console.WriteLine("\nPress Any Key To Exit...");
             Console.ReadLine();
         }
 
+        static void SaveConfig()
+        {
+            //TODO: Lock
+            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            config.ConnectionStrings
+                .ConnectionStrings.Add(new ConnectionStringSettings("MyConnectionString", GetBuilder().ToString()));
+            config.ConnectionStrings
+                .ConnectionStrings["DefaultConnectionString"].ConnectionString = GetBuilder().ToString();
+            config.Save(ConfigurationSaveMode.Modified, true);
+            ConfigurationManager.RefreshSection("connectionStrings");
+        }
+
+        static OracleConnectionStringBuilder GetBuilder()
+        {
+            var builder = new OracleConnectionStringBuilder();
+            builder.UserID = "scott";
+            builder.Password = "tiger";
+            builder.DataSource = "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.1.173)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=ebos0)))";
+            builder.Pooling = true;
+            builder.ConnectionTimeout = 5;
+
+            //Console.WriteLine(builder.ToString());
+            return builder;
+        }
+
         static DbConnection CreateConnection()
         {
-            var buider = new OracleConnectionStringBuilder();
-            buider.UserID = "scott";
-            buider.Password = "tiger";
-            buider.DataSource = "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.1.173)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=ebos0)))";
-            buider.Pooling = true;
-            buider.ConnectionTimeout = 5;
-            //Console.WriteLine(buider.ToString());
+            var builder = GetBuilder();
 
-            return new OracleConnection(buider.ToString());
+            return new OracleConnection(builder.ToString());
         }
 
         static OracleCommand CreateCommand()
