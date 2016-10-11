@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Diagnostics.Contracts;
+using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.IO;
 
-namespace _Local.ConsoleApp
+namespace Simple.Common.Utility
 {
     public class ImageResizer : IDisposable
     {
@@ -85,7 +85,7 @@ namespace _Local.ConsoleApp
 
             BitmapSource bitmapSource;
             ImageSize imageSize;
-            
+
             if (heightRatio > widthRatio)
             {
                 bitmapSource = ResizeImageByHeight(_imageBytes, height);

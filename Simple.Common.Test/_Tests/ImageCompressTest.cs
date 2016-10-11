@@ -2,16 +2,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Diagnostics;
 using System.IO;
-using System.Drawing;
 using System.Drawing.Imaging;
+using System.Drawing;
+using System.Diagnostics;
 using System.Net;
 
-namespace _Local.ConsoleApp._Tests
+namespace Simple.Common.Test._Tests
 {
     public static class ImageCompressTest
     {
+        //http://www.codeproject.com/Articles/1047753/Using-Chain-Of-Responsibility-Instead-of-if-else-S
+        private readonly static byte[] _jpgHeader = { 0xff, 0xd8 };
+        private readonly static byte[] _pngHeader = { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
+        private readonly static byte[] _bmpHeader = { 0x42, 0x4D };
+
         private static readonly string _imgUrlSetting = Path.Combine(Environment.CurrentDirectory, "url.txt");
         private static readonly string _imgSource = Path.Combine(Environment.CurrentDirectory, "Images");
         private static readonly string _imgResult = Path.Combine(Environment.CurrentDirectory, "Results");
@@ -206,3 +211,4 @@ namespace _Local.ConsoleApp._Tests
         #endregion
     }
 }
+
