@@ -23,17 +23,33 @@ namespace Simple.Data.Oracle
             
             var list = new List<Employee>();
             var sqlList = new List<string>();
-
+            
             for (int i = 0; i < totalCount; i++)
             {
                 var ent = new Employee();
-                ent.Id = Guid.NewGuid().ToString();
-                ent.Name = "Test-" + i.ToString().PadLeft(4, '0');
-                ent.DeptId = i;
-                sqlList.Add(string.Format("INSERT INTO emp (id, name, job, deptid) values ('{0}', '{1}', '{2}', {3})", Guid.NewGuid().ToString(), "A-" + ent.Name, ent.Job, ent.DeptId));
-                sqlList.Add(string.Format("INSERT INTO emp (id, name, job, deptid) values ('{0}', '{1}', '{2}', {3})", Guid.NewGuid().ToString(), "B-" + ent.Name, ent.Job, ent.DeptId));
+                ent.EmpNo = Guid.NewGuid().ToString();
+                ent.EName = "Test-" + i.ToString().PadLeft(4, '0');
+                ent.DeptNo = i;
+                ent.Hiredate = DateTime.Now.AddDays((0 - i) * 1.5);
+                ent.Sal = ent.EName.GetHashCode() / 100000;
+                ent.Comm = ent.EName.GetHashCode() / 100000;
+                
+                sqlList.Add(string.Format("insert into emp (EMPNO, ENAME, JOB, MGR, HIREDATE, SAL, COMM, DEPTNO) values ('{0}', '{1}', '{2}', {3}, to_date('{4}', 'yyyy-mm-dd'), {5}, {6}, {7})", Guid.NewGuid().ToString(), "A-" + ent.EName, ent.Job, ent.Mgr, ent.Hiredate.ToString("yyyy-MM-dd"), ent.Sal, ent.Comm, ent.DeptNo));
+                sqlList.Add(string.Format("insert into emp (EMPNO, ENAME, JOB, MGR, HIREDATE, SAL, COMM, DEPTNO) values ('{0}', '{1}', '{2}', {3}, to_date('{4}', 'yyyy-mm-dd'), {5}, {6}, {7})", Guid.NewGuid().ToString(), "A-" + ent.EName, ent.Job, ent.Mgr, ent.Hiredate.ToString("yyyy-MM-dd"), ent.Sal, ent.Comm, ent.DeptNo));
                 list.Add(ent);
             }
+
+            WatchExecute(() =>
+            {
+                Console.WriteLine("Insert use bind array with transaction");
+                Insert(list);
+            });
+
+            WatchExecute(() =>
+            {
+                Console.WriteLine("Insert one by one with connection(transaction) openning in long time");
+                Insert2(sqlList.Skip(totalCount));
+            });
 
             WatchExecute(() =>
             {
@@ -41,20 +57,8 @@ namespace Simple.Data.Oracle
                 Insert(sqlList.Take(totalCount));
             });
 
-            WatchExecute(() =>
-            {
-                Console.WriteLine("Insert one by one with connection openning in long time");
-                Insert2(sqlList.Skip(totalCount));
-            });
-
-            WatchExecute(() =>
-            {
-                Console.WriteLine("Insert use bind array");
-                Insert(list);
-            });
-            
-            var dataTable = DbUtils.QueryDataTable("SELECT * FROM EMP");
-            Console.WriteLine(dataTable.Rows.Count);
+            var empCount = DbUtils.Query<Int32>("SELECT COUNT(*) FROM EMP").FirstOrDefault();
+            Console.WriteLine("EMP table count:{0}", empCount);
 
             Console.WriteLine("\nPress Any Key To Exit...");
             Console.ReadLine();
@@ -77,7 +81,7 @@ namespace Simple.Data.Oracle
             var builder = new OracleConnectionStringBuilder();
             builder.UserID = "scott";
             builder.Password = "tiger";
-            builder.DataSource = "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.1.173)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=ebos0)))";
+            builder.DataSource = "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.1.170)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=orcl.Router)))";
             builder.Pooling = true;
             builder.ConnectionTimeout = 5;
 
@@ -138,10 +142,14 @@ namespace Simple.Data.Oracle
             ExecuteNonQuery(@"
 CREATE TABLE EMP
 (
-       id varchar2(36) not null primary key,
-       name nvarchar2(20),
-       job nvarchar2(20),
-       deptid number(9)
+  empno    varchar2(36) not null primary key,
+  ename    nvarchar2(20),
+  job      nvarchar2(20),
+  mgr      NUMBER(9),
+  hiredate DATE,
+  sal      NUMBER(7,2),
+  comm     NUMBER(7,2),
+  deptno   NUMBER(9)
 )"
                 );
 
@@ -150,20 +158,28 @@ CREATE TABLE EMP
 
         public class Employee 
         {
-            public string Id { get; set; }
+            public string EmpNo { get; set; }
 
-            public string Name { get; set; }
+            public string EName { get; set; }
 
             public string Job { get; set; }
 
-            public Int32 DeptId { get; set; }
+            public Int32 Mgr { get; set; }
+
+            public DateTime Hiredate { get; set; }
+
+            public decimal Sal { get; set; }
+
+            public decimal Comm { get; set; }
+
+            public Int32 DeptNo { get; set; }
         }
 
         static void Insert(IEnumerable<Employee> list)
         {
-            const string cmdText = "INSERT INTO emp (id, name, job, deptid) values (:id, :name, :job, :deptid)";
+            const string cmdText = "insert into emp (EMPNO, ENAME, JOB, MGR, HIREDATE, SAL, COMM, DEPTNO) values (:EMPNO, :ENAME, :JOB, :MGR, :HIREDATE, :SAL, :COMM, :DEPTNO)";
 
-            using (var conn = GetOpenConnection())
+            using (var conn = CreateConnection())
             {
                 using (var cmd = CreateCommand())
                 {
@@ -172,16 +188,22 @@ CREATE TABLE EMP
                     cmd.CommandType = CommandType.Text;
 
                     cmd.ArrayBindCount = list.Count();
-                    cmd.Parameters.Add("id", OracleDbType.Varchar2, list.Select(c => c.Id).ToArray(), ParameterDirection.Input);
-                    cmd.Parameters.Add("name", OracleDbType.Varchar2, list.Select(c => c.Name).ToArray(), ParameterDirection.Input);
-                    cmd.Parameters.Add("job", OracleDbType.Varchar2, list.Select(c => c.Job).ToArray(), ParameterDirection.Input);
-                    cmd.Parameters.Add("deptid", OracleDbType.Decimal, list.Select(c => c.DeptId).ToArray(), ParameterDirection.Input);
-                    //cmd.Parameters.Add("id", list.Select(c => c.Id).ToArray());
-                    //cmd.Parameters.Add("name", list.Select(c => c.Name).ToArray());
-                    //cmd.Parameters.Add("job", list.Select(c => c.Job).ToArray());
-                    //cmd.Parameters.Add("deptid", list.Select(c => c.DeptId).ToArray());
-
-                    cmd.ExecuteNonQuery();
+                    cmd.Parameters.Add("EMPNO", OracleDbType.Varchar2, list.Select(c => c.EmpNo).ToArray(), ParameterDirection.Input);
+                    cmd.Parameters.Add("ENAME", OracleDbType.Varchar2, list.Select(c => c.EName).ToArray(), ParameterDirection.Input);
+                    cmd.Parameters.Add("JOB", OracleDbType.Varchar2, list.Select(c => c.Job).ToArray(), ParameterDirection.Input);
+                    cmd.Parameters.Add("MGR", OracleDbType.Int32, list.Select(c => c.Mgr).ToArray(), ParameterDirection.Input);
+                    cmd.Parameters.Add("HIREDATE", OracleDbType.Date, list.Select(c => c.Hiredate).ToArray(), ParameterDirection.Input);
+                    cmd.Parameters.Add("SAL", OracleDbType.Decimal, list.Select(c => c.Sal).ToArray(), ParameterDirection.Input);
+                    cmd.Parameters.Add("COMM", OracleDbType.Decimal, list.Select(c => c.Comm).ToArray(), ParameterDirection.Input);
+                    cmd.Parameters.Add("DEPTNO", OracleDbType.Int32, list.Select(c => c.DeptNo).ToArray(), ParameterDirection.Input);
+                    
+                    conn.Open();
+                    using (var tran = conn.BeginTransaction())
+                    {
+                        cmd.Transaction = (OracleTransaction)tran;
+                        cmd.ExecuteNonQuery();
+                        tran.Commit();
+                    }
                 }
             }
         }
@@ -196,18 +218,24 @@ CREATE TABLE EMP
 
         static void Insert2(IEnumerable<string> sqlList)
         {
-            using (var conn = GetOpenConnection())
+            using (var conn = CreateConnection())
             {
                 using (var cmd = CreateCommand())
                 {
                     cmd.Connection = (OracleConnection)conn;
                     cmd.CommandType = CommandType.Text;
-                    
-                    foreach (var sql in sqlList)
+                    conn.Open();
+
+                    using (var tran = conn.BeginTransaction())
                     {
-                        cmd.CommandText = sql;
-                        cmd.ExecuteNonQuery();
-                    }                    
+                        foreach (var sql in sqlList)
+                        {
+                            cmd.CommandText = sql;
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        tran.Commit();
+                    }                                   
                 }
             }
         }
