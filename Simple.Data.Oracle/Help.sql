@@ -1,8 +1,10 @@
-﻿--1、解除scott账户锁定
+﻿--1、设置密码永不过期
+ALTER PROFILE DEFAULT LIMIT PASSWORD_LIFE_TIME UNLIMITED;
+--2、解除scott账户锁定
 alter user scott account unlock;
---2、修改scott账户密码
+--3、修改scott账户密码
 alter user scott identified by tiger;
---3、授予scott账户权限
+--4、授予scott账户权限
 GRANT 
 CREATE SESSION, CREATE ANY TABLE, CREATE ANY VIEW ,CREATE ANY INDEX, CREATE ANY PROCEDURE,
 ALTER ANY TABLE, ALTER ANY INDEX, ALTER ANY PROCEDURE,
