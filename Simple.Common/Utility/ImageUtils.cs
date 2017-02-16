@@ -21,16 +21,16 @@ namespace Simple.Common
             int newHeight = (int)(image.Height * scale);
 
             Bitmap result = new Bitmap(image, newWidth, newHeight);
-            //result.SetResolution(image.HorizontalResolution, image.VerticalResolution);
+            //builder.SetResolution(image.HorizontalResolution, image.VerticalResolution);
 
-            //using (Graphics g = Graphics.FromImage(result))
+            //using (Graphics g = Graphics.FromImage(builder))
             //{
             //    g.InterpolationMode = InterpolationMode.HighQualityBicubic;
             //    g.CompositingQuality = CompositingQuality.HighQuality;
             //    g.SmoothingMode = SmoothingMode.HighQuality;
             //    g.PixelOffsetMode = PixelOffsetMode.HighQuality;
 
-            //    g.DrawImage(image, 0, 0, result.Width, result.Height);
+            //    g.DrawImage(image, 0, 0, builder.Width, builder.Height);
             //}
             return result;
         }
