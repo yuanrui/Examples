@@ -9,6 +9,7 @@ namespace Simple.Common.Test
     {
         static void Main(string[] args)
         {
+
             Console.WriteLine("\nPress Any Key To Exit...");
             Console.ReadLine();
         }
