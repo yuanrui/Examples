@@ -21,6 +21,29 @@ namespace _Local.ConsoleApp
 
         static void Main(string[] args)
         {
+            var input = @"2#9#爱情篇#1205@3#10#恐怖篇#818@4#11#家庭篇#644@5#12#校园篇#1464@6#13#儿童篇#1759@7#14#医疗篇#734@8#15#愚人篇#958@9#16#交往篇#289@10#17#动物篇#168@11#18#军事篇#483@12#19#民间篇#937@13#21#经营篇#994@14#22#名人篇#1285@15#24#搞笑歌词#54@16#25#体育篇#417@18#27#宗教篇#497@19#28#文艺篇#216@20#29#电脑篇#611@22#31#司法篇#339@23#32#交通篇#644@24#33#顺口溜篇#53@25#34#名著爆笑#48@26#35#古代篇#1250@27#36#幽默篇#739@28#37#恋爱必读#241@29#38#哈哈趣闻#198@30#39#综合篇#494@31#40#国外笑话#47";
+            var cates = input.Split('@');
+
+            var dic = new Dictionary<string, Tuple<string, string>>();
+
+            foreach (var item in cates)
+            {
+                Console.WriteLine(item);
+                var ids = item.Split('#');
+                
+            }
+
+            foreach (var item in dic)
+            {
+                Console.WriteLine("{0}:{1}", item.Key, item.Value);
+            }
+            
+            Console.WriteLine("\nPress Any Key To Exit...");
+            Console.ReadLine();
+        }
+
+        static void Run(string[] args)
+        { 
             if (args == null || (args.Length > 0 && args[0] == "s"))
             {
                 Server();
@@ -29,9 +52,6 @@ namespace _Local.ConsoleApp
             {
                 Client();
             }
-
-            Console.WriteLine("\nPress Any Key To Exit...");
-            Console.ReadLine();
         }
 
         static void Server()

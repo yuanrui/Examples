@@ -89,7 +89,7 @@ namespace Learning.EF6
                     var request = WebRequest.Create(url);
                     using (var response = request.GetResponse())
                     {
-                        using (var reader = new StreamReader(response.GetResponseStream(), Encoding.UTF8))
+                        using (var reader = new StreamReader(response.GetResponseStream(), Encoding.GetEncoding("gb2312")))
                         {
                             html = reader.ReadToEnd();
                         }
@@ -99,7 +99,7 @@ namespace Learning.EF6
                     if (!string.IsNullOrEmpty(html) && !string.IsNullOrEmpty(url))
                     {
                         Trace.WriteLine(string.Format("Thread:{0} Request Url:{1} Complete", Thread.CurrentThread.ManagedThreadId, url));
-
+                        
                         _urlResponses.Enqueue(new KeyValuePair<string, string>(url, html));
                     }
                 }

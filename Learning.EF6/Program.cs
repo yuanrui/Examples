@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Net;
-using System.IO;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Text;
+using System.Threading;
 
 namespace Learning.EF6
 {
@@ -13,47 +14,41 @@ namespace Learning.EF6
         static void Main(string[] args)
         {
             Trace.Listeners.Add(new ConsoleTraceListener());
-            var list = new List<Category>();
             var ctx = new LocalContext();
+            var list = GetCategories(ctx);
+
             const string urlFormat = "";
-
+            //ctx.Database.Initialize(true);
+            
             var urlList = new List<string>();
-
-            for (int i = 0; i < 2000; i++)
+            foreach (var cate in list)
             {
-                urlList.Add(string.Format(urlFormat, i, ToTimestamp(DateTime.Now.AddSeconds(i))));
+                foreach (var id in cate.RawIds)
+                {
+                    urlList.Add(string.Format(urlFormat, id));
+                }                
             }
+            
             SimpleSpider spider = new SimpleSpider(5, urlList);
 
             spider.Start();
+            KeyValuePair<string, string> kv;
 
             while (true)
             {
                 Console.WriteLine("Queue Count:{0}", spider.UrlResponses.Count);
-                var input = Console.ReadLine();
-                if (input == "Q")
+
+                var isDeqed = spider.UrlResponses.TryDequeue(out kv);
+
+                if (! isDeqed)
                 {
-                    break;
+                    Thread.Sleep(1000);
+                    continue;
                 }
+
+                AddJoke(kv, ctx);
             }
 
-            //for (int i = 0; i < 10; i++)
-            //{
-            //    var category = new Category();
-            //    category.Name = "Test" + i + category.Id;
-            //    category.SortId = i;
-            //    ctx.Categories.Add(category);
-                
-            //}
-            //ctx.SaveChanges();
-
-            //ctx.Categories.RemoveRange(ctx.Categories);
-            //ctx.SaveChanges();
-            //foreach (var item in ctx.Categories)
-            //{
-            //    Console.WriteLine(item.Id);
-            //}
-            
             Console.WriteLine("Press any key to exit...");
             Console.ReadLine();
         }
@@ -67,6 +62,50 @@ namespace Learning.EF6
         public static double ToTimestamp(DateTime time)
         {
             return time.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds;
+        }
+
+        static List<Category> GetCategories(LocalContext ctx)
+        {
+            return ctx.Categories.ToList();
+        }
+
+        static void AddJoke(KeyValuePair<string, string> kv, LocalContext ctx)
+        {
+            string content = kv.Value;
+
+            if (content == "no")
+            {
+                return;
+            }
+
+            var jokes = content.Split('@');
+
+            foreach (var joke in jokes)
+            {
+                var ent = new Joke();
+                var jokeArray = joke.Split('#');
+                if (jokeArray != null && jokeArray.Length >= 3)
+                {
+                    ent.Id = jokeArray[0];
+                    ent.Title = jokeArray[1];
+                    ent.Content = jokeArray[2];
+                    ent.OriginalUrl = kv.Key;
+                    ent.Valid = true;
+                    ent.GrabTime = Convert.ToInt64(ToTimestamp(DateTime.Now));
+                }
+
+                if (string.IsNullOrEmpty(ent.Id))
+                {
+                    continue;
+                }
+
+                if (ctx.Jokes.All(m => m.Id != ent.Id))
+                {
+                    ctx.Jokes.Add(ent);
+                }
+            }
+
+            ctx.SaveChanges();
         }
     }
 }
