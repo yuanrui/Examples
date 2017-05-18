@@ -55,6 +55,7 @@
     <Compile Include="Utility\MachineInfoUtils.cs" />
     <Compile Include="Utility\SHA1Utils.cs" />
     <Compile Include="Utility\StructureConverter.cs" />
+    <Compile Include="Validation\Argument.cs" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />

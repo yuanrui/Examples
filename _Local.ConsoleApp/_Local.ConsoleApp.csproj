@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TcpDemo1.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
