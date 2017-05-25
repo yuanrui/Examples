@@ -1,0 +1,79 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<section class="content-header">
+    <h1>
+        用户管理
+        <small>列表</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href=""><i class="fa fa-dashboard"></i>首页</a></li>
+        <li><a href="#">系统管理</a></li>
+        <li class="active">用户管理</li>
+    </ol>
+</section>
+
+<div id="toolbar">
+    <a id="create" class="btn btn-info" href="/Admin/Account/Create">
+        <i class="glyphicon glyphicon-plus"></i> 创建
+    </a>
+    <a id="Edit" class="btn btn-info" href="/Admin/Account/Edit/">
+        <i class="glyphicon glyphicon-pencil" ></i> 编辑
+    </a>
+    <a id="Delete" class="btn btn-info" href="#">
+        <i class="glyphicon glyphicon-remove"></i> 删除
+    </a>
+    <a id="Reset" class="btn btn-info" >
+        <i class="glyphicon glyphicon-reset"></i> 重置密码
+    </a>
+    <a id="SetRole" class="btn btn-info" href="/Admin/Account/BindRole">
+        <i class="glyphicon glyphicon-reset"></i> 分配角色
+    </a>
+    <a id="Authorize" class="btn btn-info" href="#"><i class="glyphicon glyphicon-certificate">
+        </i>授特殊权限 </a>
+</div>
+<table data-toggle="table"
+    data-toolbar="#toolbar"
+    data-search="false"
+    data-show-refresh="true"
+    data-show-columns="true"
+    data-show-export="true"
+    data-minimum-count-columns="2"
+    data-show-pagination-switch="true"
+    data-pagination="true"
+    data-id-field="Id"
+    data-page-list="[10, 25, 50, 100, ALL]"
+    data-show-footer="false"
+    data-side-pagination="server"
+    data-method="post"
+    data-url="/Admin/Account/Index">
+    <thead>
+        <tr>
+            <th data-field="Id">编号</th>
+            <th data-field="Name">用户名</th>
+            <th data-field="UserName">用户姓名</th>
+            <th data-field="Enabled" data-formatter="enabledFormatter" >是否启用</th>
+            <th data-field="Email" data-visible="false">电子邮箱</th>
+            <th data-field="Telephone" data-visible="false">座机电话</th>
+            <th data-field="Mobile" data-visible="false">移动电话</th>
+        </tr>
+    </thead>
+</table>
+@section header{
+    <link href="../../../../Scripts/AdminLTE/plugins/bootstrap-table/bootstrap-table.css" rel="stylesheet" type="text/css" />
+}
+@section footer{
+    <script src="../../../../Scripts/AdminLTE/plugins/bootstrap-table/bootstrap-table.js"
+        type="text/javascript"></script>
+    <script src="../../../../Scripts/AdminLTE/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.js"
+        type="text/javascript"></script>
+    <script type="text/javascript">
+        function enabledFormatter(value, row, index) {
+            if (value) { 
+                return "是"
+            }
+            return "否"
+        }
+    </script>
+}
