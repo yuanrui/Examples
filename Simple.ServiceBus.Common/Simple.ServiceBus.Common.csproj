@@ -48,6 +48,7 @@
     <Compile Include="Impl\PublishingService.cs" />
     <Compile Include="Impl\SubscriptionClient.cs" />
     <Compile Include="Impl\SubscriptionService.cs" />
+    <Compile Include="OperationContextExtension.cs" />
     <Compile Include="Test.cs" />
     <Compile Include="IPublishing.cs" />
     <Compile Include="ISubscription.cs" />

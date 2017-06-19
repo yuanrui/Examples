@@ -14,5 +14,8 @@ namespace Simple.ServiceBus.Common
 
         [OperationContract]
         void UnSubscribe(string requestKey);
+
+        [OperationContract]
+        string Ping();
     }
 }

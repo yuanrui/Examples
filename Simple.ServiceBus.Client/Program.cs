@@ -16,10 +16,39 @@ namespace Simple.ServiceBus.Client
         static void Main(string[] args)
         {
             Trace.Listeners.Add(new ConsoleTraceListener());
+            
+            DoTest(args);
+
+            Console.WriteLine("\nPress Any Key To Exit...");
+            Console.ReadLine();
+        }
+
+        static void DoTest(string[] args)
+        {
+            var input = args.Length > 0 ? args[0] ?? Console.ReadLine() : Console.ReadLine();
+
+            if (string.Equals(input, "s", StringComparison.OrdinalIgnoreCase))
+            {
+                SubTest();
+            }
+            else
+            {
+                PubTest();
+            }
+        }
+
+        static void SubTest()
+        {
+            SubscriptionClient client = new SubscriptionClient();
+            client.Subscribe("abc");
+        }
+
+        static void PubTest()
+        {
             var pub = client.CreateProxy();
             var input = string.Empty;
             var header = new Common.MessageHeader { RequestKey = "abc", MessageKey = Guid.NewGuid().ToString() };
-            
+
             do
             {
                 Console.WriteLine(DateTime.Now + ">>");
@@ -29,7 +58,7 @@ namespace Simple.ServiceBus.Client
                     {
                         header.MessageKey = i.ToString();
 
-                        if (i % 2 == 0)
+                        //if (i % 2 == 0)
                         {
                             Publish(new Message<Test1>(new Test1()) { Header = header });
                             //pub.Publish((new Message<Test1>(new Test1()) { Header = header }).ToMessage());
@@ -50,7 +79,7 @@ namespace Simple.ServiceBus.Client
                 }
                 catch (Exception ex)
                 {
-                    
+
                     Console.WriteLine(DateTime.Now + ">>" + ex.Message);
 
                     try
@@ -67,8 +96,6 @@ namespace Simple.ServiceBus.Client
                 input = Console.ReadLine();
 
             } while (input != "q");
-
-            Console.ReadLine();
         }
 
         static void Publish(Message msg)

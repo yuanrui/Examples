@@ -10,12 +10,20 @@ namespace Simple.ServiceBus.Common.Impl
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession, ConcurrencyMode = ConcurrencyMode.Multiple)]
     public class PublishingService : IPublishing
     {
+        protected OperationContext Context
+        {
+            get
+            {
+                return OperationContext.Current;
+            }
+        }
+
         public void Publish(Message message)
         {
             var subscribers = ServiceRouting.GlobalRouting.GetHandlers(message.Header.RequestKey);
             if (subscribers == null || subscribers.Count == 0)
             {
-                Trace.WriteLine("RequestKey:" + message.Header.RequestKey + " no Sub.");
+                Trace.WriteLine(Context.GetClientAddress() + " RequestKey:" + message.Header.RequestKey + " no Sub.");
                 return;
             }
             
@@ -25,12 +33,13 @@ namespace Simple.ServiceBus.Common.Impl
                 try
                 {
                     subscriber.Publish(message);
+                    Trace.WriteLine(Context.GetClientAddress() + " Published " + message.GetHashCode());
                 }
                 catch (CommunicationObjectAbortedException ex)
                 {
                     ServiceRouting.GlobalRouting.UnRegister(message.Header.RequestKey, subscriber);
 
-                    Trace.WriteLine("RequestKey:" + message.Header.RequestKey + " removed. Exception:" + ex.Message);
+                    Trace.WriteLine(Context.GetClientAddress() + " RequestKey:" + message.Header.RequestKey + " removed. Exception:" + ex.Message);
                 }
             }
         }

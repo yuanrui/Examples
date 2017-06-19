@@ -12,14 +12,17 @@ namespace Simple.ServiceBus.Host
         static void Main(string[] args)
         {
             Trace.Listeners.Add(new ConsoleTraceListener());
+
             ServerHost host = new ServerHost();
             host.Open();
+            var input = string.Empty;
             
-            SubscriptionClient client = new SubscriptionClient();
-            client.Subscribe("abc");
-            
+            Console.WriteLine("Press 'q' Key To Exit...");
 
-            Console.ReadLine();
+            do
+            {
+                input = Console.ReadLine();
+            } while (! string.Equals(input, "q", StringComparison.OrdinalIgnoreCase));            
         }
     }
 }

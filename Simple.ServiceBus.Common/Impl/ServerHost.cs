@@ -19,8 +19,10 @@ namespace Simple.ServiceBus.Common.Impl
             NetTcpBinding tcpBinding = new NetTcpBinding(SecurityMode.None);
             tcpBinding.MaxReceivedMessageSize = Int32.MaxValue;
             tcpBinding.MaxBufferSize = Int32.MaxValue;
-            tcpBinding.SendTimeout = TimeSpan.FromSeconds(10);
-            tcpBinding.ReceiveTimeout = TimeSpan.FromSeconds(10);
+            tcpBinding.MaxBufferPoolSize = 67108864;
+
+            tcpBinding.SendTimeout = TimeSpan.FromMinutes(1);
+            tcpBinding.ReceiveTimeout = TimeSpan.FromMinutes(1);
             
             _publishServiceHost.AddServiceEndpoint(typeof(IPublishing), tcpBinding,
                                 ServiceSetting.PubAddress);

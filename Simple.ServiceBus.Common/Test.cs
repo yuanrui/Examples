@@ -36,12 +36,16 @@ namespace Simple.ServiceBus.Common.Impl
             Id = Guid.NewGuid().ToString();
             Url = Guid.NewGuid().ToString();
             Img = Guid.NewGuid().ToString();
-            Code = DateTime.Now.ToShortTimeString();
+
+            for (int i = 0; i < 8000; i++)
+            {
+                Code = string.Concat(Code, "好");
+            }
         }
 
         public override string ToString()
         {
-            return Id + "@" + Url + "@" + Img + "@" + Code;
+            return Id + "@" + Url + "@" + Img + "@" + Code.Length;
         }
     }
 
