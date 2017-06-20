@@ -18,7 +18,7 @@ namespace Simple.ServiceBus.Client
             Trace.Listeners.Add(new ConsoleTraceListener());
             
             DoTest(args);
-
+            
             Console.WriteLine("\nPress Any Key To Exit...");
             Console.ReadLine();
         }
@@ -54,7 +54,7 @@ namespace Simple.ServiceBus.Client
                 Console.WriteLine(DateTime.Now + ">>");
                 try
                 {
-                    for (int i = 20; i < 100; i++)
+                    for (int i = 0; i < 100; i++)
                     {
                         header.MessageKey = i.ToString();
 

@@ -12,10 +12,11 @@ namespace Simple.ServiceBus.Common.Impl
     {
         ISubscription _proxy;
         Timer _timer;
-        string initTime;
+        Dictionary<string, DateTime> _keyMaps;
 
         public SubscriptionClient()
         {
+            _keyMaps = new Dictionary<string, DateTime>();
             MakeProxy(ServiceSetting.SubAddress, this);
             _timer = new Timer(DoPing, null, Timeout.Infinite, 5000);
         }
@@ -34,19 +35,29 @@ namespace Simple.ServiceBus.Common.Impl
             InstanceContext context = new InstanceContext(callbackinstance);
 
             DuplexChannelFactory<ISubscription> channelFactory = new DuplexChannelFactory<ISubscription>(new InstanceContext(this), tcpBinding, endpointAddress);
+            channelFactory.Open();
             _proxy = channelFactory.CreateChannel();
-            initTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
         }
         
         public void Subscribe(string requestKey)
         {
             _proxy.Subscribe(requestKey);
             _timer.Change(TimeSpan.Zero, TimeSpan.FromSeconds(30));
+
+            if (! _keyMaps.ContainsKey(requestKey))
+            {
+                _keyMaps.Add(requestKey, DateTime.Now);
+            }
         }
 
         public void UnSubscribe(string requestKey)
         {
             _proxy.UnSubscribe(requestKey);
+
+            if (_keyMaps.ContainsKey(requestKey))
+            {
+                _keyMaps.Remove(requestKey);
+            }
         }
 
         public virtual void Publish(Message message)
@@ -118,13 +129,40 @@ namespace Simple.ServiceBus.Common.Impl
             }
             catch (CommunicationObjectFaultedException ex)
             {
-                Trace.WriteLine("initTime:" + initTime + " exTime:" + now);
-                Trace.WriteLine(ex.Message);
+                Trace.WriteLine("Ping Exception:" + ex.Message);
+                
+                TryReconnect();
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine("Ping Exception:" + ex.Message);
 
-                //MakeProxy(ServiceSetting.SubAddress, this);
+                TryReconnect();
             }
 
             return string.Empty;
+        }
+
+        private void TryReconnect()
+        {
+            try
+            {
+                MakeProxy(ServiceSetting.SubAddress, this);
+
+                if (_keyMaps == null || _keyMaps.Count == 0)
+                {
+                    return;
+                }
+
+                //foreach (var item in _keyMaps)
+                //{
+                //    this.Subscribe(item.Key);
+                //}
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine("Reconnect Exception:" + ex.Message);
+            }
         }
     }
 }
