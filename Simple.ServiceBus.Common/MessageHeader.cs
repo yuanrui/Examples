@@ -15,6 +15,12 @@ namespace Simple.ServiceBus.Common
         [DataMember]
         public string RequestKey { get; set; }
 
+        [DataMember]
+        public string ResponseKey { get; set; }
+
+        [DataMember]
+        public int RunCount { get; set; }
+
         public MessageHeader()
         {
             MessageKey = Guid.NewGuid().ToString();

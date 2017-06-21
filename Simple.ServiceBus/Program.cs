@@ -22,7 +22,7 @@ namespace Simple.ServiceBus
 
                 Console.WriteLine(result);
             } while (input != "q");
-            
+
             Console.ReadLine();
         }
     }

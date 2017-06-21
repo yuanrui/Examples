@@ -14,21 +14,24 @@ namespace Simple.ServiceBus.Common
 
         [OperationContract(IsOneWay = true)]
         void Publish(Message message);
+
+        [OperationContract(IsOneWay = false)]
+        ResponseMessage PublishSync(RequestMessage message);
     }
     
     public static class IPublishingExtension
     {
-        public static void Publish2<T>(this IPublishing pub, Message<T> message) where T : IBusData
+        public static void Publish2<T>(this IPublishing pub, Message<T> message) where T : IBusEntity
         {
             pub.Publish(message.ToMessage());
         }
     }
 
     [ServiceContract]
-    public interface IPublishing<T> : IPublishing where T : IBusData
+    public interface IPublishing<T> : IPublishing where T : IBusEntity
     {
         [OperationContract(IsOneWay = true)]
-        void Publish(Message<T> message);
+        void Handle(Message<T> message);
     }
 
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.ServiceModel;
 using System.Text;
 
@@ -36,12 +37,11 @@ namespace Simple.ServiceBus.Common.Impl
             ServiceRegister.GlobalRegister.UnRegister(requestKey, subscriber);
         }
 
-
         public string Ping()
         {
-            var result = Context.GetClientAddress() + " ping current host at:" + DateTime.Now.ToString();
+            var result = Context.GetClientAddress() + " ping current host(" + Dns.GetHostName() + ") at:" + DateTime.Now.ToString();
             Trace.WriteLine(result);
-
+            
             return result;
         }
     }

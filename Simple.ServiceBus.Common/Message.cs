@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Simple.ServiceBus.Common
 {
-    public abstract class IBusData
+    public abstract class IBusEntity
     {
         
     }
@@ -22,17 +22,37 @@ namespace Simple.ServiceBus.Common
 
     [DataContract, Serializable]
     [KnownType("GetKnownTypes")]
-    public class Message //: IMessage
+    public class Message 
     {
-        [DataMember]
-        public MessageHeader Header { get; set; }
+        private Object _body;
 
         [DataMember]
-        public virtual Object Body { get; set; }
+        public virtual MessageHeader Header { get; set; }
 
-        private static Type[] GetKnownTypes()
+        [DataMember]
+        public virtual Object Body
         {
-            Type thisType = typeof(IBusData);
+            get { return _body; }
+            set
+            {
+                if (value != null)
+                {
+                    BodyType = value.GetType().FullName;
+                }
+
+                _body = value;
+            }
+        }
+
+        [DataMember]
+        public virtual string BodyType { get; set; }
+
+        [DataMember]
+        public virtual string TypeName { get; set; }
+
+        protected static Type[] GetKnownTypes()
+        {
+            Type thisType = typeof(IBusEntity);
             var result = thisType
                 .Assembly
                 .GetTypes()
@@ -44,16 +64,23 @@ namespace Simple.ServiceBus.Common
     }
 
     [KnownType("GetKnownTypes")]
-    public class Message<T> : Message where T : IBusData
+    public class Message<T> : Message where T : IBusEntity
     {
+        public Message()
+        {
+            TypeName = this.GetType().FullName;
+        }
+
         public Message(T data)
         {
             Body = data;
+
+            TypeName = this.GetType().FullName;
         }
 
         private static Type[] GetKnownTypes()
         {
-            Type thisType = typeof(IBusData);
+            Type thisType = typeof(IBusEntity);
             var result = thisType
                 .Assembly
                 .GetTypes()
@@ -68,6 +95,7 @@ namespace Simple.ServiceBus.Common
             var msg = new Message();
             msg.Header = this.Header;
             msg.Body = this.Body;
+            msg.TypeName = this.TypeName;
 
             return msg;
         }

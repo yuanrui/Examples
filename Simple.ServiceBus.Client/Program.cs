@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.ServiceModel;
 using System.Text;
+using System.Threading;
 using Simple.ServiceBus.Common;
 using Simple.ServiceBus.Common.Impl;
 
@@ -62,13 +63,13 @@ namespace Simple.ServiceBus.Client
                         {
                             Publish(new Message<Test1>(new Test1()) { Header = header });
                             //pub.Publish((new Message<Test1>(new Test1()) { Header = header }).ToMessage());
-                            continue;
+                            
                         }
 
                         if (i % 3 == 0)
                         {
                             //pub.Publish2((new Message<Test2>(new Test2()) { Header = header }));
-                            Publish((new Message<Test2>(new Test2()) { Header = header }));
+                            Handle((new Message<Test2>(new Test2()) { Header = header }));
                             continue;
                         }
 
@@ -98,12 +99,36 @@ namespace Simple.ServiceBus.Client
             } while (input != "q");
         }
 
+
+        static void Handle(Message msg)
+        {
+            RequestMessage dto = null;
+            
+            {
+                dto = new RequestMessage() { Header = msg.Header, Body = msg.Body, TypeName = msg.TypeName };
+            }
+            ResponseMessage result = null;
+            using (ChannelFactory<IPublishing> factory = client.CreateChannelFactory())
+            {
+                factory.Open();
+
+                result = factory.CreateChannel().PublishSync(dto);
+            }
+
+            if (result == null)
+            {
+                return;
+            }
+
+
+        }
+
         static void Publish(Message msg)
         {
             Message dto = null;
-            if (msg.Body is IBusData)
+            if (msg.Body is IBusEntity)
             {
-                dto = new Message() { Header = msg.Header, Body = msg.Body };
+                dto = new Message() { Header = msg.Header, Body = msg.Body, TypeName= msg.TypeName };
             }
             else
             {

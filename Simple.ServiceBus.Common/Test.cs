@@ -6,7 +6,7 @@ using System.Runtime.Serialization;
 
 namespace Simple.ServiceBus.Common.Impl
 {
-    public class Test : IBusData
+    public class Test : IBusEntity
     {
         public string Input { get; set; }
 
@@ -17,7 +17,7 @@ namespace Simple.ServiceBus.Common.Impl
     }
 
     //[DataContract, Serializable]
-    public class Test1 : IBusData
+    public class Test1 : IBusEntity
     {
         //[DataMember]
         public string Id { get; set; }
@@ -50,7 +50,7 @@ namespace Simple.ServiceBus.Common.Impl
     }
 
     //[DataContract, Serializable]
-    public class Test2 : IBusData
+    public class Test2 : IBusEntity
     {
         //[DataMember]
         public Int64 Id { get; set; }
