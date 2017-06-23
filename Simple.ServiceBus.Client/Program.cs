@@ -12,7 +12,7 @@ namespace Simple.ServiceBus.Client
 {
     class Program
     {
-        static PublishingClient client = new PublishingClient();
+        static PublishClient client = new PublishClient();
 
         static void Main(string[] args)
         {
@@ -40,7 +40,7 @@ namespace Simple.ServiceBus.Client
 
         static void SubTest()
         {
-            SubscriptionClient client = new SubscriptionClient();
+            SubscribeClient client = new SubscribeClient();
             client.Subscribe("abc");
         }
 
@@ -108,7 +108,7 @@ namespace Simple.ServiceBus.Client
                 dto = new RequestMessage() { Header = msg.Header, Body = msg.Body, TypeName = msg.TypeName };
             }
             ResponseMessage result = null;
-            using (ChannelFactory<IPublishing> factory = client.CreateChannelFactory())
+            using (ChannelFactory<IPublishService> factory = client.CreateChannelFactory())
             {
                 factory.Open();
 
@@ -126,7 +126,7 @@ namespace Simple.ServiceBus.Client
         static void Publish(Message msg)
         {
             Message dto = null;
-            if (msg.Body is IBusEntity)
+            if (msg.Body is ICommand)
             {
                 dto = new Message() { Header = msg.Header, Body = msg.Body, TypeName= msg.TypeName };
             }
@@ -135,7 +135,7 @@ namespace Simple.ServiceBus.Client
                 dto = msg;
             }
 
-            using (ChannelFactory<IPublishing> factory = client.CreateChannelFactory())
+            using (ChannelFactory<IPublishService> factory = client.CreateChannelFactory())
             {
                 factory.Open();
                 

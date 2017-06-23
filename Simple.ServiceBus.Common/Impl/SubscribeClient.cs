@@ -9,13 +9,13 @@ using System.ComponentModel;
 
 namespace Simple.ServiceBus.Common.Impl
 {
-    public class SubscriptionClient : ISubscription, IPublishing, IPublishing<Test1>//, IPublishing<Test2>
+    public class SubscribeClient : ISubscribeService, IPublishService, IBusCommond<Test1>, IBusCommond<Test2>
     {
-        ISubscription _proxy;
+        ISubscribeService _proxy;
         Timer _timer;
         Dictionary<string, DateTime> _keyMaps;
 
-        public SubscriptionClient()
+        public SubscribeClient()
         {
             _keyMaps = new Dictionary<string, DateTime>();
             MakeProxy(ServiceSetting.SubAddress, this);
@@ -35,7 +35,7 @@ namespace Simple.ServiceBus.Common.Impl
             EndpointAddress endpointAddress = new EndpointAddress(endpoindAddress);
             InstanceContext context = new InstanceContext(callbackinstance);
 
-            DuplexChannelFactory<ISubscription> channelFactory = new DuplexChannelFactory<ISubscription>(new InstanceContext(this), tcpBinding, endpointAddress);
+            DuplexChannelFactory<ISubscribeService> channelFactory = new DuplexChannelFactory<ISubscribeService>(new InstanceContext(this), tcpBinding, endpointAddress);
             channelFactory.Open();
             _proxy = channelFactory.CreateChannel();
         }
@@ -129,21 +129,16 @@ namespace Simple.ServiceBus.Common.Impl
             Trace.WriteLine("Message<Test1>:" + message.Body.ToString());
         }
 
-        public void Publish(Message<Test2> message)
+        public void Handle(Message<Test2> message)
         {
             Trace.WriteLine("Message<Test2>:" + message.Body.ToString());
         }
-
-        public void Publish<T>(Message<T> message) where T : IBusEntity
+        
+        public void Publish<T>(Message<T> message) where T : ICommand
         {
             throw new NotImplementedException();
         }
-
-        public void Publish(IMessage message)
-        {
-            throw new NotImplementedException();
-        }
-
+        
         public string GetAppId()
         {
             return "Sub_" + DateTime.Now;
@@ -223,5 +218,6 @@ namespace Simple.ServiceBus.Common.Impl
 
             return result;
         }
+
     }
 }

@@ -6,8 +6,8 @@ using System.Text;
 
 namespace Simple.ServiceBus.Common
 {
-    [ServiceContract(CallbackContract = typeof(IPublishing))]
-    public interface ISubscription
+    [ServiceContract(CallbackContract = typeof(IPublishService))]
+    public interface ISubscribeService
     {
         [OperationContract]
         void Subscribe(string requestKey);

@@ -6,14 +6,14 @@ using System.ServiceModel;
 
 namespace Simple.ServiceBus.Common.Impl
 {
-    public class PublishingClient
+    public class PublishClient
     {
-        public IPublishing CreateProxy()
+        public IPublishService CreateProxy()
         {
             return CreateChannelFactory().CreateChannel();
         }
 
-        public ChannelFactory<IPublishing> CreateChannelFactory()
+        public ChannelFactory<IPublishService> CreateChannelFactory()
         { 
             EndpointAddress endpointAddress = new EndpointAddress(ServiceSetting.PubAddress);
 
@@ -24,7 +24,7 @@ namespace Simple.ServiceBus.Common.Impl
             tcpBinding.SendTimeout = TimeSpan.FromMinutes(1);
             tcpBinding.ReceiveTimeout = TimeSpan.FromMinutes(1);
 
-            return new ChannelFactory<IPublishing>(tcpBinding, endpointAddress);
+            return new ChannelFactory<IPublishService>(tcpBinding, endpointAddress);
         }
     }
 }

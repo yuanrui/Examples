@@ -8,18 +8,6 @@ using System.Text;
 
 namespace Simple.ServiceBus.Common
 {
-    public abstract class IBusEntity
-    {
-        
-    }
-
-    public interface IMessage 
-    {
-        MessageHeader Header { get; set; }
-
-        Object Body { get; set; }
-    }
-
     [DataContract, Serializable]
     [KnownType("GetKnownTypes")]
     public class Message 
@@ -52,7 +40,7 @@ namespace Simple.ServiceBus.Common
 
         protected static Type[] GetKnownTypes()
         {
-            Type thisType = typeof(IBusEntity);
+            Type thisType = typeof(ICommand);
             var result = thisType
                 .Assembly
                 .GetTypes()
@@ -64,7 +52,7 @@ namespace Simple.ServiceBus.Common
     }
 
     [KnownType("GetKnownTypes")]
-    public class Message<T> : Message where T : IBusEntity
+    public class Message<T> : Message where T : ICommand
     {
         public Message()
         {
@@ -80,7 +68,7 @@ namespace Simple.ServiceBus.Common
 
         private static Type[] GetKnownTypes()
         {
-            Type thisType = typeof(IBusEntity);
+            Type thisType = typeof(ICommand);
             var result = thisType
                 .Assembly
                 .GetTypes()

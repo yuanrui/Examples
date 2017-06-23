@@ -22,7 +22,7 @@ namespace Simple.ServiceBus.Common
         }
     }
 
-    public class ResponseMessage<T> : ResponseMessage where T : IBusEntity
+    public class ResponseMessage<T> : ResponseMessage where T : ICommand
     {
         public ResponseMessage()
         {

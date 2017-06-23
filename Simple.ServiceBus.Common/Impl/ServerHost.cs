@@ -14,8 +14,8 @@ namespace Simple.ServiceBus.Common.Impl
 
         public ServerHost()
         {
-            _publishServiceHost = new ServiceHost(typeof(PublishingService));
-            _subscribeServiceHost = new ServiceHost(typeof(SubscriptionService));
+            _publishServiceHost = new ServiceHost(typeof(PublishService));
+            _subscribeServiceHost = new ServiceHost(typeof(SubscribeService));
             NetTcpBinding tcpBinding = new NetTcpBinding(SecurityMode.None);
             tcpBinding.MaxReceivedMessageSize = Int32.MaxValue;
             tcpBinding.MaxBufferSize = Int32.MaxValue;
@@ -24,10 +24,10 @@ namespace Simple.ServiceBus.Common.Impl
             tcpBinding.SendTimeout = TimeSpan.FromMinutes(1);
             tcpBinding.ReceiveTimeout = TimeSpan.FromMinutes(1);
             
-            _publishServiceHost.AddServiceEndpoint(typeof(IPublishing), tcpBinding,
+            _publishServiceHost.AddServiceEndpoint(typeof(IPublishService), tcpBinding,
                                 ServiceSetting.PubAddress);
             
-            _subscribeServiceHost.AddServiceEndpoint(typeof(ISubscription), tcpBinding,
+            _subscribeServiceHost.AddServiceEndpoint(typeof(ISubscribeService), tcpBinding,
                                 ServiceSetting.SubAddress);
         }
 

@@ -9,12 +9,12 @@ namespace Simple.ServiceBus.Common
     {
         public static ServiceRouting GlobalRouting = new ServiceRouting();
 
-        public List<IPublishing> GetHandlers(string requestKey)
+        public List<IPublishService> GetHandlers(string requestKey)
         {
             return ServiceRegister.GlobalRegister.GetHandler(requestKey);
         }
 
-        public void UnRegister(string requestKey, IPublishing subscriber)
+        public void UnRegister(string requestKey, IPublishService subscriber)
         {
             ServiceRegister.GlobalRegister.UnRegister(requestKey, subscriber);
         }

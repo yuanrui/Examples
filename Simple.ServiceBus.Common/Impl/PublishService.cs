@@ -8,7 +8,7 @@ using System.Diagnostics;
 namespace Simple.ServiceBus.Common.Impl
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession, ConcurrencyMode = ConcurrencyMode.Multiple)]
-    public class PublishingService : IPublishing
+    public class PublishService : IPublishService
     {
         protected OperationContext Context
         {
@@ -44,12 +44,7 @@ namespace Simple.ServiceBus.Common.Impl
             }
         }
 
-        public void Publish<T>(Message<T> message) where T : IBusEntity
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Publish(IMessage message)
+        public void Publish<T>(Message<T> message) where T : ICommand
         {
             throw new NotImplementedException();
         }

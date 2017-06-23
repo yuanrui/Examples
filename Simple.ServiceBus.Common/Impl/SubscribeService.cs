@@ -9,7 +9,7 @@ using System.Text;
 namespace Simple.ServiceBus.Common.Impl
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
-    public class SubscriptionService : ISubscription
+    public class SubscribeService : ISubscribeService
     {
         protected OperationContext Context
         {
@@ -21,7 +21,7 @@ namespace Simple.ServiceBus.Common.Impl
 
         public void Subscribe(string requestKey)
         {
-            IPublishing subscriber = Context.GetCallbackChannel<IPublishing>();
+            IPublishService subscriber = Context.GetCallbackChannel<IPublishService>();
             
             Trace.WriteLine(Context.GetClientAddress() +  " Subscribed");
             
@@ -30,7 +30,7 @@ namespace Simple.ServiceBus.Common.Impl
 
         public void UnSubscribe(string requestKey)
         {
-            IPublishing subscriber = Context.GetCallbackChannel<IPublishing>();
+            IPublishService subscriber = Context.GetCallbackChannel<IPublishService>();
             
             Trace.WriteLine(Context.GetClientAddress() + " UnSubscribed");
 

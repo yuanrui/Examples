@@ -10,7 +10,7 @@ namespace Simple.ServiceBus.Common
         
     }
 
-    public class RequestMessage<T> : RequestMessage where T : IBusEntity
+    public class RequestMessage<T> : RequestMessage where T : ICommand
     {
         public RequestMessage()
         {

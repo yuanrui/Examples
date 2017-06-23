@@ -6,11 +6,11 @@ using System.Collections.Concurrent;
 
 namespace Simple.ServiceBus.Common
 {
-    public class ServiceRegister : ConcurrentDictionary<string, List<IPublishing>>
+    public class ServiceRegister : ConcurrentDictionary<string, List<IPublishService>>
     {
         public static ServiceRegister GlobalRegister = new ServiceRegister();
         
-        public void Register(string requestKey, IPublishing subscriber)
+        public void Register(string requestKey, IPublishService subscriber)
         {
             if (this.ContainsKey(requestKey))
             {
@@ -21,13 +21,13 @@ namespace Simple.ServiceBus.Common
             }
             else
             {
-                var list = new List<IPublishing>();
+                var list = new List<IPublishService>();
                 list.Add(subscriber);
                 this[requestKey] = list;
             }
         }
 
-        public void UnRegister(string requestKey, IPublishing subscriber)
+        public void UnRegister(string requestKey, IPublishService subscriber)
         {
             if (! this.ContainsKey(requestKey))
             {
@@ -40,7 +40,7 @@ namespace Simple.ServiceBus.Common
             }
         }
 
-        public List<IPublishing> GetHandler(string requestKey)
+        public List<IPublishService> GetHandler(string requestKey)
         {
             if (this.ContainsKey(requestKey))
             {
