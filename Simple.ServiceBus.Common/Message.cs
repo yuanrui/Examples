@@ -38,6 +38,21 @@ namespace Simple.ServiceBus.Common
         [DataMember]
         public virtual string TypeName { get; set; }
 
+        [DataMember]
+        public Message Next { get; protected set; }
+
+        public void SetNext(Message next)
+        {
+            if (Next == null)
+            {
+                Next = next;
+
+                return;
+            }
+
+            Next.SetNext(next);
+        }
+
         protected static Type[] GetKnownTypes()
         {
             Type thisType = typeof(ICommand);
@@ -51,33 +66,35 @@ namespace Simple.ServiceBus.Common
         } 
     }
 
-    [KnownType("GetKnownTypes")]
-    public class Message<T> : Message where T : ICommand
+    public class Message<T> where T : class, ICommand
     {
-        public Message()
+        public virtual MessageHeader Header { get; set; }
+
+        public virtual T Body { get; set; }
+        
+        public virtual string BodyType { get; set; }
+
+        public virtual string TypeName { get; set; }
+
+        public Message() : this(null, null)
         {
-            TypeName = this.GetType().FullName;
+            
         }
 
-        public Message(T data)
+        public Message(T data) : this(data, null)
+        {
+
+        }
+
+        public Message(T data, MessageHeader header)
         {
             Body = data;
+            Header = header;
 
+            BodyType = typeof(T).FullName;
             TypeName = this.GetType().FullName;
         }
-
-        private static Type[] GetKnownTypes()
-        {
-            Type thisType = typeof(ICommand);
-            var result = thisType
-                .Assembly
-                .GetTypes()
-                .Where(t => t.IsSubclassOf(thisType) || t.GetInterface(thisType.Name) == thisType)
-                .ToArray();
-
-            return result;
-        } 
-
+        
         public Message ToMessage()
         {
             var msg = new Message();

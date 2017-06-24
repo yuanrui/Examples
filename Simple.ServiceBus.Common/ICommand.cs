@@ -8,4 +8,9 @@ namespace Simple.ServiceBus.Common
     public interface ICommand
     {
     }
+
+    public class EmptyCommand : ICommand 
+    {
+        
+    }
 }

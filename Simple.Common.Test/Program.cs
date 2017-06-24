@@ -9,7 +9,7 @@ namespace Simple.Common.Test
     {
         static void Main(string[] args)
         {
-
+            Simple.Common.Test._Tests.InstanceCreateTest.Run();
             Console.WriteLine("\nPress Any Key To Exit...");
             Console.ReadLine();
         }

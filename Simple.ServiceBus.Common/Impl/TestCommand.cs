@@ -6,7 +6,7 @@ using System.Runtime.Serialization;
 
 namespace Simple.ServiceBus.Common.Impl
 {
-    public class Test : ICommand
+    public class TestCommand : ICommand
     {
         public string Input { get; set; }
 
@@ -16,28 +16,25 @@ namespace Simple.ServiceBus.Common.Impl
         }
     }
 
-    //[DataContract, Serializable]
-    public class Test1 : ICommand
+    public class Test1Command : ICommand
     {
-        //[DataMember]
         public string Id { get; set; }
 
-        //[DataMember]
         public string Url { get; set; }
 
-        //[DataMember]
         public string Img { get; set; }
 
-        //[DataMember]
         public string Code { get; set; }
 
-        public Test1()
+        public Test1Command()
         {
             Id = Guid.NewGuid().ToString();
             Url = Guid.NewGuid().ToString();
             Img = Guid.NewGuid().ToString();
+            Code = string.Empty;
+            var length = (Math.Abs(Guid.NewGuid().GetHashCode()) % 4000) + 4000;
 
-            for (int i = 0; i < 8000; i++)
+            for (int i = 0; i < length; i++)
             {
                 Code = string.Concat(Code, "好");
             }
@@ -49,16 +46,13 @@ namespace Simple.ServiceBus.Common.Impl
         }
     }
 
-    //[DataContract, Serializable]
-    public class Test2 : ICommand
+    public class Test2Command : ICommand
     {
-        //[DataMember]
         public Int64 Id { get; set; }
 
-        //[DataMember]
         public DateTime Now { get; set; }
 
-        public Test2()
+        public Test2Command()
         {
             Now = DateTime.Now;
             Id = Now.Ticks;
@@ -67,6 +61,27 @@ namespace Simple.ServiceBus.Common.Impl
         public override string ToString()
         {
             return Id + "@" + Now;
+        }
+    }
+
+    public class Test2ResultCommand : ICommand
+    {
+        public string Key { get; set; }
+
+        public Int64 Id { get; set; }
+
+        public DateTime Now { get; set; }
+
+        public Test2ResultCommand()
+        {
+            Key = Guid.NewGuid().ToString();
+            Now = DateTime.Now;
+            Id = Now.Ticks;
+        }
+
+        public override string ToString()
+        {
+            return Id + "@" + Now + "_" + Key;
         }
     }
 }

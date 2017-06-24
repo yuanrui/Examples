@@ -6,15 +6,19 @@ using System.ServiceModel;
 using System.Text;
 using System.Threading;
 using System.ComponentModel;
+using System.Linq.Expressions;
+using System.Reflection;
 
 namespace Simple.ServiceBus.Common.Impl
 {
-    public class SubscribeClient : ISubscribeService, IPublishService, IBusCommond<Test1>, IBusCommond<Test2>
+    public class SubscribeClient : ISubscribeService, IPublishService
+        , ICommandHandler<EmptyCommand>, ICommandHandler<EmptyCommand, EmptyCommand>
+        , ICommandHandler<Test1Command>, ICommandHandler<Test2Command, Test2ResultCommand>
     {
         ISubscribeService _proxy;
         Timer _timer;
         Dictionary<string, DateTime> _keyMaps;
-
+        
         public SubscribeClient()
         {
             _keyMaps = new Dictionary<string, DateTime>();
@@ -73,19 +77,15 @@ namespace Simple.ServiceBus.Common.Impl
                 return;
             }
 
-            var type = Type.GetType(message.BodyType);
-
-
             try
             {
                 if (message.TypeName != null)
                 {
-                    var type2 = Type.GetType(message.TypeName);
-                    //var obj2 = ChangeType(message, type2);
-                    var obj3 = Activator.CreateInstance(type2, message.Body);
-                    Handle((dynamic)obj3);
-                }
+                    var type = Type.GetType(message.TypeName);
+                    var instance = Activator.CreateInstance(type, message.Body, message.Header);
 
+                    Handle((dynamic)instance);
+                }
             }
             catch (NotImplementedException notImplEx)
             { 
@@ -95,53 +95,40 @@ namespace Simple.ServiceBus.Common.Impl
             {
 
             }
-            
 
             Trace.WriteLine(string.Format("Key:{0} Id:{1} Msg:{2}", message.Header.MessageKey, message.Header.RequestKey, message.Body.ToString()));
         }
 
-        static public object ChangeType(object value, Type type)
+        public Message PublishSync(Message message)
         {
-            if (value == null && type.IsGenericType) return Activator.CreateInstance(type);
-            if (value == null) return null;
-            if (type == value.GetType()) return value;
-            if (type.IsEnum)
-            {
-                if (value is string)
-                    return Enum.Parse(type, value as string);
-                else
-                    return Enum.ToObject(type, value);
-            }
-            if (!type.IsInterface && type.IsGenericType)
-            {
-                Type innerType = type.GetGenericArguments()[0];
-                
-                return Activator.CreateInstance(type, new object[] { value });
-            }
-            if (value is string && type == typeof(Guid)) return new Guid(value as string);
-            if (value is string && type == typeof(Version)) return new Version(value as string);
-            if (!(value is IConvertible)) return value;
-            return Convert.ChangeType(value, type);
-        } 
+            var result = new Message();
 
-        public void Handle(Message<Test1> message)
-        {
-            Trace.WriteLine("Message<Test1>:" + message.Body.ToString());
-        }
+            try
+            {
+                if (message.TypeName != null)
+                {
+                    var type = Type.GetType(message.TypeName);
+                    var instance = Activator.CreateInstance(type, message.Body, message.Header);
 
-        public void Handle(Message<Test2> message)
-        {
-            Trace.WriteLine("Message<Test2>:" + message.Body.ToString());
-        }
-        
-        public void Publish<T>(Message<T> message) where T : ICommand
-        {
-            throw new NotImplementedException();
-        }
-        
-        public string GetAppId()
-        {
-            return "Sub_" + DateTime.Now;
+                    var handleResult = HandleSync((dynamic)instance);
+
+                    if (handleResult != null)
+                    {
+                        result.Header = handleResult.Header;
+                        result.Body = handleResult.Body;                        
+                    }
+                }
+            }
+            catch (NotImplementedException notImplEx)
+            {
+
+            }
+            catch (Exception ex)
+            {
+
+            }
+            
+            return result;
         }
 
         private void DoPing(object obj)
@@ -200,24 +187,32 @@ namespace Simple.ServiceBus.Common.Impl
             }
         }
 
-
-        public string PublishSync(Message message)
+        public void Handle(Message<EmptyCommand> message)
         {
-            var result = Guid.NewGuid().ToString("N") + "_" + DateTime.Now.ToString();
-            Trace.WriteLine(result);
-            Thread.Sleep(500);
-            return result;
+            
         }
 
-
-        public ResponseMessage PublishSync(RequestMessage message)
+        public Message<EmptyCommand> HandleSync(Message<EmptyCommand> message)
         {
-            var result = new ResponseMessage();
-
-            result.Body = DateTime.Now.ToString();
-
-            return result;
+            return null;
         }
 
+        public void Handle(Message<Test1Command> message)
+        {
+            Thread.Sleep(2000);
+            Trace.WriteLine("Message<Test1>:" + message.Body.ToString());
+        }
+
+        public void Handle(Message<Test2Command> message)
+        {
+            Trace.WriteLine("Message<Test2>:" + message.Body.ToString());
+        }
+
+        public Message<Test2ResultCommand> HandleSync(Message<Test2Command> message)
+        {
+            Thread.Sleep(2000);
+
+            return new Message<Test2ResultCommand>(new Test2ResultCommand(), message.Header);
+        }
     }
 }

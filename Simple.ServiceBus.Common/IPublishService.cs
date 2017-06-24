@@ -13,16 +13,6 @@ namespace Simple.ServiceBus.Common
         void Publish(Message message);
 
         [OperationContract(IsOneWay = false)]
-        ResponseMessage PublishSync(RequestMessage message);
-    }
-    
-    public interface IBusCommond<TIn> where TIn : ICommand
-    {
-        void Handle(Message<TIn> message);
-    }
-
-    public interface IBusCommond<TIn, TOut> : IBusCommond<TIn> where TIn : ICommand where TOut : ICommand
-    {
-        new Message<TOut> Handle(Message<TIn> message);
+        Message PublishSync(Message message);
     }
 }

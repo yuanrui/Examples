@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="Extensions\DateTimeExtension.cs" />
     <Compile Include="Extensions\StringExtension.cs" />
+    <Compile Include="Utility\ActivatorHelper.cs" />
     <Compile Include="Utility\CodeTimer.cs" />
     <Compile Include="Utility\DateTimeUtils.cs" />
     <Compile Include="Utility\ImageResizer.cs" />

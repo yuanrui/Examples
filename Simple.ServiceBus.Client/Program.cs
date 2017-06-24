@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.ServiceModel;
 using System.Text;
 using System.Threading;
@@ -58,23 +60,20 @@ namespace Simple.ServiceBus.Client
                     for (int i = 0; i < 100; i++)
                     {
                         header.MessageKey = i.ToString();
-
+                        
                         //if (i % 2 == 0)
                         {
-                            Publish(new Message<Test1>(new Test1()) { Header = header });
-                            //pub.Publish((new Message<Test1>(new Test1()) { Header = header }).ToMessage());
-                            
-                        }
-
-                        if (i % 3 == 0)
-                        {
-                            //pub.Publish2((new Message<Test2>(new Test2()) { Header = header }));
-                            Handle((new Message<Test2>(new Test2()) { Header = header }));
+                            Publish(new Message<Test1Command>(new Test1Command()) { Header = header });
                             continue;
                         }
 
-                        Publish(new Message() { Header = header, Body = i.ToString() + ">>" + Guid.NewGuid().ToString() });
-                        //pub.Publish(new Message() { Header = header, Body = i.ToString() + ">>" + Guid.NewGuid().ToString() });
+                        //if (i % 3 == 0)
+                        {
+                            Handle((new Message<Test2Command>(new Test2Command()) { Header = header }));
+                            //continue;
+                        }
+
+                        //Publish(new Message() { Header = header, Body = i.ToString() + ">>" + Guid.NewGuid().ToString() });
                     }
 
                 }
@@ -100,14 +99,14 @@ namespace Simple.ServiceBus.Client
         }
 
 
-        static void Handle(Message msg)
+        static void Handle<T>(Message<T> msg) where T : class, ICommand
         {
-            RequestMessage dto = null;
+            Message dto = null;
             
             {
-                dto = new RequestMessage() { Header = msg.Header, Body = msg.Body, TypeName = msg.TypeName };
+                dto = new Message() { Header = msg.Header, Body = msg.Body, TypeName = msg.TypeName };
             }
-            ResponseMessage result = null;
+            Message result = null;
             using (ChannelFactory<IPublishService> factory = client.CreateChannelFactory())
             {
                 factory.Open();
@@ -120,27 +119,32 @@ namespace Simple.ServiceBus.Client
                 return;
             }
 
-
+            Console.WriteLine(result.Body.ToString());
         }
 
         static void Publish(Message msg)
         {
-            Message dto = null;
-            if (msg.Body is ICommand)
-            {
-                dto = new Message() { Header = msg.Header, Body = msg.Body, TypeName= msg.TypeName };
-            }
-            else
-            {
-                dto = msg;
-            }
-
             using (ChannelFactory<IPublishService> factory = client.CreateChannelFactory())
             {
                 factory.Open();
-                
-                factory.CreateChannel().Publish(dto);
+
+                factory.CreateChannel().Publish(msg);
             }
+        }
+
+        static void Publish<T>(Message<T> msg) where T : class, ICommand
+        {
+            Message dto = new Message() { Header = msg.Header, Body = msg.Body, TypeName = msg.TypeName };
+            //if (msg.Body is ICommand)
+            //{
+            //    dto = new Message() { Header = msg.Header, Body = msg.Body, TypeName= msg.TypeName };
+            //}
+            //else
+            //{
+            //    dto = msg;
+            //}
+
+            Publish(dto);
         }
     }
 }
