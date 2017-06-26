@@ -9,10 +9,7 @@ namespace Simple.ServiceBus.Common
     [ServiceContract]
     public interface IPublishService
     {
-        [OperationContract(IsOneWay = true)]
-        void Publish(Message message);
-
         [OperationContract(IsOneWay = false)]
-        Message PublishSync(Message message);
+        Message Publish(Message message);
     }
 }

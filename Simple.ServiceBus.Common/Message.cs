@@ -38,6 +38,15 @@ namespace Simple.ServiceBus.Common
         [DataMember]
         public virtual string TypeName { get; set; }
 
+        [IgnoreDataMember]
+        public virtual bool IsSuccess
+        {
+            get
+            {
+                return !(Body is IFailCommand);
+            }
+        }
+
         [DataMember]
         public Message Next { get; protected set; }
 

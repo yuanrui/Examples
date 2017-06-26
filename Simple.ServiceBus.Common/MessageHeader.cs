@@ -19,7 +19,23 @@ namespace Simple.ServiceBus.Common
         public string ResponseKey { get; set; }
 
         [DataMember]
+        public int RouteTypeValue { get; set; }
+
+        [DataMember]
         public int RunCount { get; set; }
+        
+        [IgnoreDataMember]
+        public RouteType RouteType 
+        { 
+            get 
+            { 
+                return (RouteType)RouteTypeValue; 
+            }
+            set 
+            {
+                RouteTypeValue = (int)value;
+            }
+        }
 
         public MessageHeader()
         {

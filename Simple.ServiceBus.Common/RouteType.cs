@@ -5,12 +5,9 @@ using System.Text;
 
 namespace Simple.ServiceBus.Common
 {
-    public interface ICommand
+    public enum RouteType
     {
-    }
-
-    public interface IFailCommand : ICommand
-    {
-        string RequestKey { get; set; }
+        Single = 0,
+        All = 1
     }
 }

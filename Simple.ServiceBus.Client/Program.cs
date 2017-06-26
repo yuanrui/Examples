@@ -29,28 +29,40 @@ namespace Simple.ServiceBus.Client
         static void DoTest(string[] args)
         {
             var input = args.Length > 0 ? args[0] ?? Console.ReadLine() : Console.ReadLine();
-
-            if (string.Equals(input, "s", StringComparison.OrdinalIgnoreCase))
+            var key = "abc";
+            var subKey = "s";
+            if (input.Contains("="))
             {
-                SubTest();
+                var inputs = input.Split(new char[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
+
+                if (inputs.Length > 1)
+                {
+                    subKey = inputs[0];
+                    key = inputs[1];
+                }
+            }
+
+            if (string.Equals(subKey, "s", StringComparison.OrdinalIgnoreCase))
+            {
+                SubTest(key);
             }
             else
             {
-                PubTest();
+                PubTest(key);
             }
         }
 
-        static void SubTest()
+        static void SubTest(string key)
         {
             SubscribeClient client = new SubscribeClient();
-            client.Subscribe("abc");
+            client.Subscribe(key);
         }
 
-        static void PubTest()
+        static void PubTest(string key)
         {
             var pub = client.CreateProxy();
             var input = string.Empty;
-            var header = new Common.MessageHeader { RequestKey = "abc", MessageKey = Guid.NewGuid().ToString() };
+            var header = new Common.MessageHeader { RequestKey = key, MessageKey = Guid.NewGuid().ToString() };
 
             do
             {
@@ -61,10 +73,16 @@ namespace Simple.ServiceBus.Client
                     {
                         header.MessageKey = i.ToString();
                         
+                        header.RouteType = RouteType.Single;
+
+                        if (i % 2 == 0)
+                        {
+                            header.RouteType = RouteType.All;
+                        }
                         //if (i % 2 == 0)
                         {
-                            Publish(new Message<Test1Command>(new Test1Command()) { Header = header });
-                            continue;
+                            //Publish(new Message<Test1Command>(new Test1Command()) { Header = header });
+                            //continue;
                         }
 
                         //if (i % 3 == 0)
@@ -111,7 +129,7 @@ namespace Simple.ServiceBus.Client
             {
                 factory.Open();
 
-                result = factory.CreateChannel().PublishSync(dto);
+                result = factory.CreateChannel().Publish(dto);
             }
 
             if (result == null)
@@ -119,7 +137,7 @@ namespace Simple.ServiceBus.Client
                 return;
             }
 
-            Console.WriteLine(result.Body.ToString());
+            Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + ">> " + result.Body.ToString());
         }
 
         static void Publish(Message msg)

@@ -12,8 +12,8 @@ using System.Reflection;
 namespace Simple.ServiceBus.Common.Impl
 {
     public class SubscribeClient : ISubscribeService, IPublishService
-        , ICommandHandler<EmptyCommand>, ICommandHandler<EmptyCommand, EmptyCommand>
-        , ICommandHandler<Test1Command>, ICommandHandler<Test2Command, Test2ResultCommand>
+        , ICommandHandler<EmptyCommand, EmptyCommand>
+        , ICommandHandler<Test1Command, Test1Command>, ICommandHandler<Test2Command, Test2ResultCommand>
     {
         ISubscribeService _proxy;
         Timer _timer;
@@ -69,37 +69,7 @@ namespace Simple.ServiceBus.Common.Impl
             }
         }
 
-        public virtual void Publish(Message message)
-        {
-            if (message == null || message.Body == null)
-            {
-                Console.WriteLine("no message");
-                return;
-            }
-
-            try
-            {
-                if (message.TypeName != null)
-                {
-                    var type = Type.GetType(message.TypeName);
-                    var instance = Activator.CreateInstance(type, message.Body, message.Header);
-
-                    Handle((dynamic)instance);
-                }
-            }
-            catch (NotImplementedException notImplEx)
-            { 
-                
-            }
-            catch (Exception ex)
-            {
-
-            }
-
-            Trace.WriteLine(string.Format("Key:{0} Id:{1} Msg:{2}", message.Header.MessageKey, message.Header.RequestKey, message.Body.ToString()));
-        }
-
-        public Message PublishSync(Message message)
+        public Message Publish(Message message)
         {
             var result = new Message();
 
@@ -110,22 +80,29 @@ namespace Simple.ServiceBus.Common.Impl
                     var type = Type.GetType(message.TypeName);
                     var instance = Activator.CreateInstance(type, message.Body, message.Header);
 
-                    var handleResult = HandleSync((dynamic)instance);
+                    var handleResult = Handle((dynamic)instance);
 
                     if (handleResult != null)
                     {
                         result.Header = handleResult.Header;
-                        result.Body = handleResult.Body;                        
+                        result.Body = handleResult.Body;
                     }
                 }
             }
             catch (NotImplementedException notImplEx)
             {
-
+                var cmd = new Impl.NotImplExceptionCommand();
+                cmd.TypeName = message.TypeName;
+                cmd.OriginalObject = message.Body;
+                cmd.ExceptionMessage = notImplEx.Message;
+                result.Body = cmd;
             }
             catch (Exception ex)
             {
-
+                var cmd = new Impl.ExceptionCommand();
+                cmd.OriginalObject = message.Body;
+                cmd.ExceptionMessage = ex.Message;
+                result.Body = cmd;
             }
             
             return result;
@@ -187,31 +164,23 @@ namespace Simple.ServiceBus.Common.Impl
             }
         }
 
-        public void Handle(Message<EmptyCommand> message)
+        public Message<EmptyCommand> Handle(Message<EmptyCommand> message)
         {
-            
+            return message;
         }
 
-        public Message<EmptyCommand> HandleSync(Message<EmptyCommand> message)
-        {
-            return null;
-        }
-
-        public void Handle(Message<Test1Command> message)
+        public Message<Test1Command> Handle(Message<Test1Command> message)
         {
             Thread.Sleep(2000);
             Trace.WriteLine("Message<Test1>:" + message.Body.ToString());
+            message.Body.Id = DateTime.Now.ToString();
+            return message;
         }
 
-        public void Handle(Message<Test2Command> message)
-        {
-            Trace.WriteLine("Message<Test2>:" + message.Body.ToString());
-        }
-
-        public Message<Test2ResultCommand> HandleSync(Message<Test2Command> message)
+        public Message<Test2ResultCommand> Handle(Message<Test2Command> message)
         {
             Thread.Sleep(2000);
-
+            Trace.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + ">> Message<Test2Command>:" + message.Body.ToString());
             return new Message<Test2ResultCommand>(new Test2ResultCommand(), message.Header);
         }
     }

@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="ICommand.cs" />
     <Compile Include="ICommandHandler.cs" />
+    <Compile Include="Impl\DefaultCommand.cs" />
     <Compile Include="Impl\PublishClient.cs" />
     <Compile Include="Impl\ServerHost.cs" />
     <Compile Include="Impl\PublishService.cs" />
@@ -57,6 +58,7 @@
     <Compile Include="Message.cs" />
     <Compile Include="MessageHeader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RouteType.cs" />
     <Compile Include="ServiceRegister.cs" />
     <Compile Include="ServiceRouting.cs" />
     <Compile Include="ServiceSetting.cs" />

@@ -6,48 +6,67 @@ using System.Collections.Concurrent;
 
 namespace Simple.ServiceBus.Common
 {
-    public class ServiceRegister : ConcurrentDictionary<string, List<IPublishService>>
+    public class ServiceRegister
     {
+        private static ConcurrentDictionary<string, List<Pair<IPublishService, Int64>>> Cache = new ConcurrentDictionary<string, List<Pair<IPublishService, Int64>>>();
+
         public static ServiceRegister GlobalRegister = new ServiceRegister();
         
         public void Register(string requestKey, IPublishService subscriber)
         {
-            if (this.ContainsKey(requestKey))
+            if (Cache.ContainsKey(requestKey))
             {
-                if (! this[requestKey].Contains(subscriber))
+                if (Cache[requestKey].All(m => m.Key != subscriber))
                 {
-                    this[requestKey].Add(subscriber);
+                    Cache[requestKey].Add(new Pair<IPublishService, long>(subscriber, 0));
                 }
             }
             else
             {
-                var list = new List<IPublishService>();
-                list.Add(subscriber);
-                this[requestKey] = list;
+                var list = new List<Pair<IPublishService, long>>();
+                list.Add(new Pair<IPublishService, long>(subscriber, 0));
+                Cache.AddOrUpdate(requestKey, list, (k, l) => l);
             }
         }
 
         public void UnRegister(string requestKey, IPublishService subscriber)
         {
-            if (! this.ContainsKey(requestKey))
+            if (! Cache.ContainsKey(requestKey))
             {
                 return;
             }
 
-            if (this[requestKey].Contains(subscriber))
+            var item = Cache[requestKey].FirstOrDefault(m => m.Key == subscriber);
+
+            if (item.Key == null)
             {
-                this[requestKey].Remove(subscriber);
+                return;
             }
+
+            Cache[requestKey].Remove(item);
         }
 
-        public List<IPublishService> GetHandler(string requestKey)
+        public List<Pair<IPublishService, long>> GetHandler(string requestKey)
         {
-            if (this.ContainsKey(requestKey))
+            if (Cache.ContainsKey(requestKey))
             {
-                return this[requestKey];
+                return Cache[requestKey];
             }
 
-            return null;
+            return new List<Pair<IPublishService, long>>();
+        }
+
+        public class Pair<TKey, TValue>
+        {
+            public TKey Key { get; set; }
+
+            public TValue Value { get; set; }
+
+            public Pair(TKey key, TValue value)
+            {
+                Key = key;
+                Value = value;
+            }
         }
     }
 }

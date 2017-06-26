@@ -18,51 +18,33 @@ namespace Simple.ServiceBus.Common.Impl
                 return OperationContext.Current;
             }
         }
-
-        public void Publish(Message message)
+        
+        public Message Publish(Message message)
         {
-            var subscribers = ServiceRouting.GlobalRouting.GetHandlers(message.Header.RequestKey);
-            if (subscribers == null || subscribers.Count == 0)
-            {
-                Trace.WriteLine(Context.GetClientAddress() + " RequestKey:" + message.Header.RequestKey + " no Sub.");
-                return;
-            }
+            Message result = null;
 
-            for (int i = 0; i < subscribers.Count; i++)
-            {
-                var subscriber = subscribers[i];
-                try
-                {
-                    subscriber.Publish(message);
-                    Trace.WriteLine(Context.GetClientAddress() + " Published " + message.GetHashCode());
-                }
-                catch (Exception ex)
-                {
-                    ServiceRouting.GlobalRouting.UnRegister(message.Header.RequestKey, subscriber);
-
-                    Trace.WriteLine(Context.GetClientAddress() + " RequestKey:" + message.Header.RequestKey + " removed. Exception:" + ex.Message);
-                }
-            }
-        }
-
-        public Message PublishSync(Message message)
-        {
-            var subscribers = ServiceRouting.GlobalRouting.GetHandlers(message.Header.RequestKey);
+            var subscribers = ServiceRouting.GlobalRouting.GetHandlers(message.Header.RequestKey, message.Header.RouteType);
             if (subscribers == null || subscribers.Count == 0)
             {
                 var msg = Context.GetClientAddress() + " RequestKey:" + message.Header.RequestKey + " no Sub.";
                 Trace.WriteLine(msg);
-                return null;
-            }
+                
+                result = new Message();
+                result.Header = message.Header;
+                var cmd = new NotSubscriberCommand();
+                cmd.RequestKey = message.Header.RequestKey;
+                result.Body = cmd;
 
-            Message result = null;
+                return result;
+            }
 
             for (int i = 0; i < subscribers.Count; i++)
             {
                 var subscriber = subscribers[i];
+                
                 try
                 {
-                    var tmpResult = subscriber.PublishSync(message);
+                    var tmpResult = subscriber.Publish(message);
                     if (result == null)
 	                {
                         result = tmpResult;
@@ -74,9 +56,22 @@ namespace Simple.ServiceBus.Common.Impl
                     
                     Trace.WriteLine(Context.GetClientAddress() + " Published " + message.GetHashCode());
                 }
-                catch (CommunicationObjectAbortedException ex)
+                catch (CommunicationException ex)
                 {
                     ServiceRouting.GlobalRouting.UnRegister(message.Header.RequestKey, subscriber);
+                    
+                    if (result == null)
+                    {
+                        result = new Message();
+                        result.Header = message.Header;
+                    }
+
+                    var cmd = new CommExceptionCommand();
+                    cmd.OriginalObject = message.Body;
+                    cmd.RequestKey = message.Header.RequestKey;
+                    cmd.ExceptionMessage = ex.Message;
+                    
+                    result.Body = cmd;
 
                     Trace.WriteLine(Context.GetClientAddress() + " RequestKey:" + message.Header.RequestKey + " removed. Exception:" + ex.Message);
                 }
