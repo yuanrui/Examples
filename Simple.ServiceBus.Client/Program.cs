@@ -60,7 +60,6 @@ namespace Simple.ServiceBus.Client
 
         static void PubTest(string key)
         {
-            var pub = client.CreateProxy();
             var input = string.Empty;
             var header = new Common.MessageHeader { RequestKey = key, MessageKey = Guid.NewGuid().ToString() };
 
@@ -119,18 +118,21 @@ namespace Simple.ServiceBus.Client
 
         static void Handle<T>(Message<T> msg) where T : class, ICommand
         {
-            Message dto = null;
+            //Message dto = null;
             
-            {
-                dto = new Message() { Header = msg.Header, Body = msg.Body, TypeName = msg.TypeName };
-            }
-            Message result = null;
-            using (ChannelFactory<IPublishService> factory = client.CreateChannelFactory())
-            {
-                factory.Open();
+            //{
+            //    dto = new Message() { Header = msg.Header, Body = msg.Body, TypeName = msg.TypeName };
+            //}
+            //Message result = null;
+            //using (ChannelFactory<IPublishService> factory = client.CreateChannelFactory())
+            //{
+            //    factory.Open();
+            //    var channel = factory.CreateChannel();
 
-                result = factory.CreateChannel().Publish(dto);
-            }
+            //    result = factory.CreateChannel().Publish(dto);
+            //}
+
+            var result = client.Send(msg);
 
             if (result == null)
             {
@@ -142,12 +144,14 @@ namespace Simple.ServiceBus.Client
 
         static void Publish(Message msg)
         {
-            using (ChannelFactory<IPublishService> factory = client.CreateChannelFactory())
-            {
-                factory.Open();
+            //using (ChannelFactory<IPublishService> factory = client.CreateChannelFactory())
+            //{
+            //    factory.Open();
 
-                factory.CreateChannel().Publish(msg);
-            }
+            //    factory.CreateChannel().Publish(msg);
+            //}
+
+            client.Send(msg);
         }
 
         static void Publish<T>(Message<T> msg) where T : class, ICommand

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.ServiceModel;
 using System.Diagnostics;
+using System.Linq;
+using System.ServiceModel;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Simple.ServiceBus.Common.Impl
@@ -23,7 +23,7 @@ namespace Simple.ServiceBus.Common.Impl
         {
             Message result = null;
 
-            var subscribers = ServiceRouting.GlobalRouting.GetHandlers(message.Header.RequestKey, message.Header.RouteType);
+            var subscribers = ServiceRouting.GlobalRouting.GetHandlers(message.Header.RequestKey, message.Header.RouteType).ToList();
             if (subscribers == null || subscribers.Count == 0)
             {
                 var msg = Context.GetClientAddress() + " RequestKey:" + message.Header.RequestKey + " no Sub.";

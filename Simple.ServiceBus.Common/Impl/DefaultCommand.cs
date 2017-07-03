@@ -9,8 +9,6 @@ namespace Simple.ServiceBus.Common.Impl
     {
     }
 
-    
-
     public class EmptyCommand : ICommand
     {
 
@@ -32,6 +30,7 @@ namespace Simple.ServiceBus.Common.Impl
 
     public class CommExceptionCommand : ExceptionCommand, IFailCommand, ICommand
     {
+
     }
 
     public class NotSubscriberCommand : IFailCommand, ICommand
