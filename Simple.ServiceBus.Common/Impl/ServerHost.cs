@@ -16,19 +16,11 @@ namespace Simple.ServiceBus.Common.Impl
         {
             _publishServiceHost = new ServiceHost(typeof(PublishService));
             _subscribeServiceHost = new ServiceHost(typeof(SubscribeService));
-            NetTcpBinding tcpBinding = new NetTcpBinding(SecurityMode.None);
-            tcpBinding.MaxReceivedMessageSize = Int32.MaxValue;
-            tcpBinding.MaxBufferSize = Int32.MaxValue;
-            tcpBinding.MaxBufferPoolSize = 67108864;
+            var binding = NetSetting.GetBinding();
 
-            tcpBinding.SendTimeout = TimeSpan.FromMinutes(1);
-            tcpBinding.ReceiveTimeout = TimeSpan.FromMinutes(1);
+            _publishServiceHost.AddServiceEndpoint(typeof(IPublishService), binding, NetSetting.PubAddress);
             
-            _publishServiceHost.AddServiceEndpoint(typeof(IPublishService), tcpBinding,
-                                ServiceSetting.PubAddress);
-            
-            _subscribeServiceHost.AddServiceEndpoint(typeof(ISubscribeService), tcpBinding,
-                                ServiceSetting.SubAddress);
+            _subscribeServiceHost.AddServiceEndpoint(typeof(ISubscribeService), binding, NetSetting.SubAddress);
         }
 
         public void Open()

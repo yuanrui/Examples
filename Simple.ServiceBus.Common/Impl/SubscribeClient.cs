@@ -22,24 +22,18 @@ namespace Simple.ServiceBus.Common.Impl
         public SubscribeClient()
         {
             _keyMaps = new Dictionary<string, DateTime>();
-            MakeProxy(ServiceSetting.SubAddress, this);
+            MakeProxy(NetSetting.SubAddress, this);
             _timer = new Timer(DoPing, null, Timeout.Infinite, 5000);
         }
 
         public void MakeProxy(string endpoindAddress, object callbackinstance)
         {
-            NetTcpBinding tcpBinding = new NetTcpBinding(SecurityMode.None);
-            tcpBinding.MaxReceivedMessageSize = Int32.MaxValue;
-            tcpBinding.MaxBufferSize = Int32.MaxValue;
-            tcpBinding.MaxBufferPoolSize = 67108864;
-
-            tcpBinding.SendTimeout = TimeSpan.FromMinutes(1);
-            tcpBinding.ReceiveTimeout = TimeSpan.FromMinutes(1);
+            var binding = NetSetting.GetBinding();
             
             EndpointAddress endpointAddress = new EndpointAddress(endpoindAddress);
             InstanceContext context = new InstanceContext(callbackinstance);
 
-            DuplexChannelFactory<ISubscribeService> channelFactory = new DuplexChannelFactory<ISubscribeService>(new InstanceContext(this), tcpBinding, endpointAddress);
+            DuplexChannelFactory<ISubscribeService> channelFactory = new DuplexChannelFactory<ISubscribeService>(new InstanceContext(this), binding, endpointAddress);
             channelFactory.Open();
             _proxy = channelFactory.CreateChannel();
         }
@@ -146,7 +140,7 @@ namespace Simple.ServiceBus.Common.Impl
         {
             try
             {
-                MakeProxy(ServiceSetting.SubAddress, this);
+                MakeProxy(NetSetting.SubAddress, this);
 
                 if (_keyMaps == null || _keyMaps.Count == 0)
                 {

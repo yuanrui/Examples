@@ -86,7 +86,7 @@ namespace Simple.ServiceBus.Client
 
                         //if (i % 3 == 0)
                         {
-                            Handle((new Message<Test2Command>(new Test2Command()) { Header = header }));
+                            Handle((new Message<Test1Command>(new Test1Command()) { Header = header }));
                             //continue;
                         }
 

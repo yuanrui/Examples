@@ -17,17 +17,12 @@ namespace Simple.ServiceBus.Common.Impl
         }
 
         protected ChannelFactory<IPublishService> CreateChannelFactory()
-        { 
-            EndpointAddress endpointAddress = new EndpointAddress(ServiceSetting.PubAddress);
+        {
+            EndpointAddress endpointAddress = new EndpointAddress(NetSetting.PubAddress);
 
-            NetTcpBinding tcpBinding = new NetTcpBinding(SecurityMode.None);
-            tcpBinding.MaxReceivedMessageSize = Int32.MaxValue;
-            tcpBinding.MaxBufferSize = Int32.MaxValue;
-            tcpBinding.MaxBufferPoolSize = 67108864;
-            tcpBinding.SendTimeout = TimeSpan.FromMinutes(1);
-            tcpBinding.ReceiveTimeout = TimeSpan.FromMinutes(1);
+            var binding = NetSetting.GetBinding();
 
-            return new ChannelFactory<IPublishService>(tcpBinding, endpointAddress);
+            return new ChannelFactory<IPublishService>(binding, endpointAddress);
         }
 
         public Message Send(Message message)
@@ -74,18 +69,18 @@ namespace Simple.ServiceBus.Common.Impl
 
         public static class Service<T>
         {
-            static EndpointAddress endpointAddress = new EndpointAddress(ServiceSetting.PubAddress);
+            static EndpointAddress endpointAddress = new EndpointAddress(NetSetting.PubAddress);
 
-            static NetTcpBinding tcpBinding = new NetTcpBinding(SecurityMode.None)
-            {
-                MaxReceivedMessageSize = Int32.MaxValue,
-                MaxBufferSize = Int32.MaxValue,
-                MaxBufferPoolSize = 67108864,
-                SendTimeout = TimeSpan.FromMinutes(1),
-                ReceiveTimeout = TimeSpan.FromMinutes(1)
-            };
+            //static NetTcpBinding tcpBinding = new NetTcpBinding(SecurityMode.None)
+            //{
+            //    MaxReceivedMessageSize = Int32.MaxValue,
+            //    MaxBufferSize = Int32.MaxValue,
+            //    MaxBufferPoolSize = 67108864,
+            //    SendTimeout = TimeSpan.FromMinutes(1),
+            //    ReceiveTimeout = TimeSpan.FromMinutes(1)
+            //};
 
-            public static ChannelFactory<T> _channelFactory = new ChannelFactory<T>(tcpBinding, endpointAddress);
+            public static ChannelFactory<T> _channelFactory = new ChannelFactory<T>(NetSetting.GetBinding(), endpointAddress);
 
             public static void Use(UseServiceDelegate<T> codeBlock)
             {

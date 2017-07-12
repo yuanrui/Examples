@@ -61,7 +61,7 @@
     <Compile Include="RouteType.cs" />
     <Compile Include="ServiceRegister.cs" />
     <Compile Include="ServiceRouting.cs" />
-    <Compile Include="ServiceSetting.cs" />
+    <Compile Include="NetSetting.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

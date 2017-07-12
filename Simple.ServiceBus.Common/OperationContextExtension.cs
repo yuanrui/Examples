@@ -13,6 +13,11 @@ namespace Simple.ServiceBus.Common
         {
             MessageProperties properties = context.IncomingMessageProperties;
 
+            if (! properties.ContainsKey(RemoteEndpointMessageProperty.Name))
+            {
+                return null;
+            }
+
             RemoteEndpointMessageProperty endpoint = properties[RemoteEndpointMessageProperty.Name] as RemoteEndpointMessageProperty;
 
             return endpoint;
@@ -27,8 +32,19 @@ namespace Simple.ServiceBus.Common
                 return UNKNOWN;
             }
 
-            RemoteEndpointMessageProperty endpoint = GetRemoteEndpointMessageProperty(context);
+            if (string.Equals(context.Channel.LocalAddress.Uri.Scheme, "net.pipe", StringComparison.OrdinalIgnoreCase))
+            {
+                var seesionId = context.SessionId;
+                if (seesionId != null && seesionId.Contains(";"))
+                {
+                    return "ClientId:" + seesionId.Split(';')[1].Replace("id=", string.Empty);
+                }
 
+                return seesionId;
+            }
+
+            RemoteEndpointMessageProperty endpoint = GetRemoteEndpointMessageProperty(context);
+            
             return endpoint == null ? UNKNOWN : endpoint.Address + ":" + endpoint.Port.ToString();
         }
 
