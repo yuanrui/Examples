@@ -12,7 +12,7 @@ namespace Simple.ServiceBus.Host
         static void Main(string[] args)
         {
             Trace.Listeners.Add(new ConsoleTraceListener());
-
+            Console.Title = "Host Start:" + DateTime.Now.ToString("yyyyMMddHHmmss");
             ServerHost host = new ServerHost();
             host.Open();
             var input = string.Empty;

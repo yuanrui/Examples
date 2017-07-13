@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Simple.ServiceBus.Common
 {
-    [ServiceContract(CallbackContract = typeof(IPublishService))]
+    [ServiceContract(SessionMode = SessionMode.Required, CallbackContract = typeof(IPublishService))]
     public interface ISubscribeService
     {
         [OperationContract]

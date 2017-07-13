@@ -8,6 +8,7 @@ using System.Reflection;
 using System.ServiceModel;
 using System.Text;
 using System.Threading;
+using System.Collections.Concurrent;
 
 namespace Simple.ServiceBus.Common.Impl
 {
@@ -17,11 +18,11 @@ namespace Simple.ServiceBus.Common.Impl
     {
         ISubscribeService _proxy;
         Timer _timer;
-        Dictionary<string, DateTime> _keyMaps;
+        ConcurrentDictionary<string, DateTime> _keyMaps;
         
         public SubscribeClient()
         {
-            _keyMaps = new Dictionary<string, DateTime>();
+            _keyMaps = new ConcurrentDictionary<string, DateTime>();
             MakeProxy(NetSetting.SubAddress, this);
             _timer = new Timer(DoPing, null, Timeout.Infinite, 5000);
         }
@@ -40,27 +41,29 @@ namespace Simple.ServiceBus.Common.Impl
         
         public void Subscribe(string requestKey)
         {
-            _proxy.Subscribe(requestKey);
-            _timer.Change(TimeSpan.Zero, TimeSpan.FromSeconds(30));
+            var waitTime = TimeSpan.FromSeconds(30);
+            try
+            {
+                _proxy.Subscribe(requestKey);
+            }
+            catch (EndpointNotFoundException enfEx)
+            {
+                Trace.WriteLine(enfEx.Message);
+                Trace.Write("wait:" + waitTime.TotalSeconds + "s" + Environment.NewLine);
+                Thread.Sleep(waitTime);
+            }
 
-            if (! _keyMaps.ContainsKey(requestKey))
-            {
-                _keyMaps.Add(requestKey, DateTime.Now);
-            }
-            else
-            {
-                _keyMaps[requestKey] = DateTime.Now;
-            }
+            _timer.Change(TimeSpan.Zero, waitTime);
+
+            _keyMaps.AddOrUpdate(requestKey, DateTime.Now, (m, n) => DateTime.Now);
         }
 
         public void UnSubscribe(string requestKey)
         {
             _proxy.UnSubscribe(requestKey);
 
-            if (_keyMaps.ContainsKey(requestKey))
-            {
-                _keyMaps.Remove(requestKey);
-            }
+            DateTime time = DateTime.MinValue;
+            _keyMaps.TryRemove(requestKey, out time);
         }
 
         public Message Publish(Message message)
@@ -167,7 +170,8 @@ namespace Simple.ServiceBus.Common.Impl
         {
             Thread.Sleep(2000);
             Trace.WriteLine("Message<Test1>:" + message.Body.ToString());
-            message.Body.Id = DateTime.Now.ToString();
+            message.Body.Id = message.Body.Time.ToString("HH:mm:ss");
+            message.Body.Time = DateTime.Now;            
             return message;
         }
 

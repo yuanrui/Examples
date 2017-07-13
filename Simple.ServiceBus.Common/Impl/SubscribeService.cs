@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Simple.ServiceBus.Common.Impl
 {
-    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
+    [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession, ConcurrencyMode = ConcurrencyMode.Reentrant)]
     public class SubscribeService : ISubscribeService
     {
         protected OperationContext Context

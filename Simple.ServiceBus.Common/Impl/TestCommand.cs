@@ -26,6 +26,10 @@ namespace Simple.ServiceBus.Common.Impl
 
         public string Code { get; set; }
 
+        public Int64 Index { get; set; }
+
+        public DateTime Time { get; set; }
+
         public Test1Command()
         {
             Id = Guid.NewGuid().ToString();
@@ -38,11 +42,13 @@ namespace Simple.ServiceBus.Common.Impl
             {
                 Code = string.Concat(Code, "好");
             }
+
+            Time = DateTime.Now;
         }
 
         public override string ToString()
         {
-            return Id + "@" + Url + "@" + Img + "@" + Code.Length;
+            return Time.ToString("HH:mm:ss") + "=" + Id + " #" + Index + "@" + Code.Length;
         }
     }
 

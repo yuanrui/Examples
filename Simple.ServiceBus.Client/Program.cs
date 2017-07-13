@@ -44,10 +44,12 @@ namespace Simple.ServiceBus.Client
 
             if (string.Equals(subKey, "s", StringComparison.OrdinalIgnoreCase))
             {
+                Console.Title = "SubKey=" + key + " Start:" + DateTime.Now.ToString("yyyyMMddHHmmss");
                 SubTest(key);
             }
             else
             {
+                Console.Title = "PubKey=" + key + " Start:" + DateTime.Now.ToString("yyyyMMddHHmmss");
                 PubTest(key);
             }
         }
@@ -86,7 +88,7 @@ namespace Simple.ServiceBus.Client
 
                         //if (i % 3 == 0)
                         {
-                            Handle((new Message<Test1Command>(new Test1Command()) { Header = header }));
+                            Handle((new Message<Test1Command>(new Test1Command() { Index = i }) { Header = header }), i);
                             //continue;
                         }
 
@@ -116,7 +118,7 @@ namespace Simple.ServiceBus.Client
         }
 
 
-        static void Handle<T>(Message<T> msg) where T : class, ICommand
+        static void Handle<T>(Message<T> msg, Int64 index) where T : class, ICommand
         {
             //Message dto = null;
             
@@ -139,7 +141,7 @@ namespace Simple.ServiceBus.Client
                 return;
             }
 
-            Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + ">> " + result.Body.ToString());
+            Console.WriteLine(index.ToString().PadLeft(3, '0') + "_" + DateTime.Now.ToString("HH:mm:ss") + ">> " + result.Body.ToString());
         }
 
         static void Publish(Message msg)
