@@ -23,6 +23,11 @@ namespace Simple.ServiceBus.Common
             return endpoint;
         }
 
+        private static bool IsNamedPipe(OperationContext context)
+        {
+            return string.Equals(context.Channel.LocalAddress.Uri.Scheme, "net.pipe", StringComparison.OrdinalIgnoreCase);
+        }
+
         public static string GetClientAddress(this OperationContext context)
         {
             const string UNKNOWN = "unknown";
@@ -32,20 +37,9 @@ namespace Simple.ServiceBus.Common
                 return UNKNOWN;
             }
 
-            if (string.Equals(context.Channel.LocalAddress.Uri.Scheme, "net.pipe", StringComparison.OrdinalIgnoreCase))
-            {
-                var seesionId = context.SessionId;
-                if (seesionId != null && seesionId.Contains(";"))
-                {
-                    return "ClientId:" + seesionId.Split(';')[1].Replace("id=", string.Empty);
-                }
-
-                return seesionId;
-            }
-
-            RemoteEndpointMessageProperty endpoint = GetRemoteEndpointMessageProperty(context);
+            var clientInfo = GetClientInfo(context);
             
-            return endpoint == null ? UNKNOWN : endpoint.Address + ":" + endpoint.Port.ToString();
+            return clientInfo != null ? clientInfo.ToString() : UNKNOWN;
         }
 
         public static string GetClientIP(this OperationContext context)
@@ -56,10 +50,24 @@ namespace Simple.ServiceBus.Common
             {
                 return UNKNOWN;
             }
-
+            
             RemoteEndpointMessageProperty endpoint = GetRemoteEndpointMessageProperty(context);
 
             return endpoint == null ? UNKNOWN : endpoint.Address;
+        }
+
+        internal static ClientInfo GetClientInfo(this OperationContext context)
+        {
+            var clientInfo = context.IncomingMessageHeaders.GetHeader<ClientInfo>(ClientInfo.KEY, ClientInfo.HEADER_NAMESPACE);
+
+            if (clientInfo != null && ! IsNamedPipe(context))
+            {
+                var endpoint = GetRemoteEndpointMessageProperty(context);
+                clientInfo.IP = endpoint.Address;
+                clientInfo.Port = endpoint.Port;
+            }
+
+            return clientInfo;
         }
     }
 }

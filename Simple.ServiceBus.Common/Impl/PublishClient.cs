@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.ServiceModel;
 using System.Text;
+using Simple.ServiceBus.Common.Inspect;
 
 namespace Simple.ServiceBus.Common.Impl
 {
@@ -19,10 +20,14 @@ namespace Simple.ServiceBus.Common.Impl
         protected ChannelFactory<IPublishService> CreateChannelFactory()
         {
             EndpointAddress endpointAddress = new EndpointAddress(NetSetting.PubAddress);
-
+            
             var binding = NetSetting.GetBinding();
+            
+            var result = new ChannelFactory<IPublishService>(binding, endpointAddress);
 
-            return new ChannelFactory<IPublishService>(binding, endpointAddress);
+            result.Endpoint.Behaviors.Add(new BusClientBehavior());
+
+            return result;
         }
 
         public Message Send(Message message)

@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClientInfo.cs" />
     <Compile Include="ICommand.cs" />
     <Compile Include="ICommandHandler.cs" />
     <Compile Include="Impl\DefaultCommand.cs" />
@@ -51,6 +52,7 @@
     <Compile Include="Impl\PublishService.cs" />
     <Compile Include="Impl\SubscribeClient.cs" />
     <Compile Include="Impl\SubscribeService.cs" />
+    <Compile Include="Inspect\BusClientBehavior.cs" />
     <Compile Include="OperationContextExtension.cs" />
     <Compile Include="Impl\TestCommand.cs" />
     <Compile Include="IPublishService.cs" />

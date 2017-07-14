@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -8,7 +9,7 @@ using System.Reflection;
 using System.ServiceModel;
 using System.Text;
 using System.Threading;
-using System.Collections.Concurrent;
+using Simple.ServiceBus.Common.Inspect;
 
 namespace Simple.ServiceBus.Common.Impl
 {
@@ -35,6 +36,7 @@ namespace Simple.ServiceBus.Common.Impl
             InstanceContext context = new InstanceContext(callbackinstance);
 
             DuplexChannelFactory<ISubscribeService> channelFactory = new DuplexChannelFactory<ISubscribeService>(new InstanceContext(this), binding, endpointAddress);
+            channelFactory.Endpoint.Behaviors.Add(new BusClientBehavior()); 
             channelFactory.Open();
             _proxy = channelFactory.CreateChannel();
         }
