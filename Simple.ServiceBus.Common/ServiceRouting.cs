@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -20,7 +21,7 @@ namespace Simple.ServiceBus.Common
             {
                 foreach (var sub in handlers)
                 {
-                    sub.Value ++;
+                    sub.Value.Up();
                     result.Add(sub.Key);
                 }
 
@@ -28,12 +29,18 @@ namespace Simple.ServiceBus.Common
             }
             else
             {
-                var sub = handlers.FirstOrDefault(m => m.Value == handlers.Min(t => t.Value));
+                var sub = handlers.Count > 1 ? 
+                    handlers.OrderBy(m => m.Value.Count).ThenBy(m => m.Value.Time).FirstOrDefault() 
+                    : handlers.FirstOrDefault();
 
                 if (sub != null)
                 {
-                    sub.Value ++;
+                    //Trace.Indent();
+                    //Trace.Write("SubscriberId:" + sub.Value.Id + Environment.NewLine);
+                    //Trace.Unindent();
 
+                    sub.Value.Up();
+                    
                     result.Add(sub.Key);
                 }
 

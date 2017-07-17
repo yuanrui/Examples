@@ -3,28 +3,29 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace Simple.ServiceBus.Common
 {
     public class ServiceRegister
     {
-        private static ConcurrentDictionary<string, List<Pair<IPublishService, Int64>>> Cache = new ConcurrentDictionary<string, List<Pair<IPublishService, Int64>>>();
+        private static ConcurrentDictionary<string, List<Pair<IPublishService, RunInfo>>> Cache = new ConcurrentDictionary<string, List<Pair<IPublishService, RunInfo>>>();
 
         public static ServiceRegister GlobalRegister = new ServiceRegister();
-        
-        public void Register(string requestKey, IPublishService subscriber)
+
+        public void Register(string requestKey, IPublishService subscriber, string subscriberId)
         {
             if (Cache.ContainsKey(requestKey))
             {
                 if (Cache[requestKey].All(m => m.Key != subscriber))
                 {
-                    Cache[requestKey].Add(new Pair<IPublishService, long>(subscriber, 0));
+                    Cache[requestKey].Add(new Pair<IPublishService, RunInfo>(subscriber, new RunInfo(subscriberId)));
                 }
             }
             else
             {
-                var list = new List<Pair<IPublishService, long>>();
-                list.Add(new Pair<IPublishService, long>(subscriber, 0));
+                var list = new List<Pair<IPublishService, RunInfo>>();
+                list.Add(new Pair<IPublishService, RunInfo>(subscriber, new RunInfo(subscriberId)));
                 Cache.AddOrUpdate(requestKey, list, (k, l) => l);
             }
         }
@@ -46,14 +47,45 @@ namespace Simple.ServiceBus.Common
             Cache[requestKey].Remove(item);
         }
 
-        public List<Pair<IPublishService, long>> GetHandler(string requestKey)
+        public List<Pair<IPublishService, RunInfo>> GetHandler(string requestKey)
         {
             if (Cache.ContainsKey(requestKey))
             {
                 return Cache[requestKey];
             }
 
-            return new List<Pair<IPublishService, long>>();
+            return new List<Pair<IPublishService, RunInfo>>();
+        }
+
+        public class RunInfo
+        {
+            public string Id { get; private set; }
+
+            public long Count { get; set; }
+
+            public DateTime Time { get; set; }
+
+            public RunInfo() : this("unknown")
+            {
+                
+            }
+
+            public RunInfo(string id)
+            {
+                Id = id;
+                Time = DateTime.Now;
+            }
+
+            public void Up()
+            {
+                Thread.MemoryBarrier();
+                this.Count++;
+                Thread.MemoryBarrier();
+
+                Thread.MemoryBarrier();
+                this.Time = DateTime.Now;
+                Thread.MemoryBarrier();
+            }
         }
 
         public class Pair<TKey, TValue>

@@ -17,11 +17,11 @@ namespace Simple.ServiceBus.Host
             host.Open();
             var input = string.Empty;
             
-            Console.WriteLine("Press 'q' Key To Exit...");
-
             do
             {
+                Console.WriteLine("Press 'q' Key To Exit...");
                 input = Console.ReadLine();
+                
             } while (! string.Equals(input, "q", StringComparison.OrdinalIgnoreCase));            
         }
     }

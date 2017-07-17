@@ -24,8 +24,8 @@ namespace Simple.ServiceBus.Common.Impl
             IPublishService subscriber = Context.GetCallbackChannel<IPublishService>();
             
             Trace.WriteLine(Context.GetClientAddress() +  " Subscribed");
-            
-            ServiceRegister.GlobalRegister.Register(requestKey, subscriber);
+
+            ServiceRegister.GlobalRegister.Register(requestKey, subscriber, Context.GetClientAddress());
         }
 
         public void UnSubscribe(string requestKey)

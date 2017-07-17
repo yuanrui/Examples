@@ -85,6 +85,7 @@ namespace Simple.ServiceBus.Common.Impl
                     {
                         result.Header = handleResult.Header;
                         result.Body = handleResult.Body;
+                        result.TypeName = handleResult.GetType().FullName;
                     }
                 }
             }
