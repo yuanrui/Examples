@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Simple.ServiceBus.Messages;
 
-namespace Simple.ServiceBus.Common
+namespace Simple.ServiceBus.Messages
 {
-    public interface ICommandHandler<TIn, TOut>
+    public interface ICommandHandler { }
+
+    public interface ICommandHandler<TIn, TOut> : ICommandHandler
         where TIn : class, ICommand
         where TOut : class, ICommand
     {

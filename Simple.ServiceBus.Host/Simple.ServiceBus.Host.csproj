@@ -85,6 +85,10 @@
       <Project>{D0FAE35D-8803-412D-8A00-2CCA4C94BF71}</Project>
       <Name>Simple.ServiceBus.Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Simple.ServiceBus.Messages\Simple.ServiceBus.Messages.csproj">
+      <Project>{CF978C60-D452-4D4C-AEC7-B3302AD10D2E}</Project>
+      <Name>Simple.ServiceBus.Messages</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using Simple.ServiceBus.Common.Impl;
 
 namespace Simple.ServiceBus.Host
 {

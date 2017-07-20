@@ -4,8 +4,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.ServiceModel;
 using System.Text;
+using Simple.ServiceBus.Configuration;
 
-namespace Simple.ServiceBus.Common.Impl
+namespace Simple.ServiceBus.Host
 {
     public class ServerHost
     {

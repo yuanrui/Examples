@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.Text;
 
-namespace Simple.ServiceBus.Common
+namespace Simple.ServiceBus.Messages
 {
     [DataContract, Serializable]
     [KnownType("GetKnownTypes")]
@@ -64,14 +66,7 @@ namespace Simple.ServiceBus.Common
 
         protected static Type[] GetKnownTypes()
         {
-            Type thisType = typeof(ICommand);
-            var result = thisType
-                .Assembly
-                .GetTypes()
-                .Where(t => t.IsSubclassOf(thisType) || t.GetInterface(thisType.Name) == thisType)
-                .ToArray();
-
-            return result;
+            return MessageTypeHelper.GetCommandTypes();
         } 
     }
 
@@ -112,6 +107,36 @@ namespace Simple.ServiceBus.Common
             msg.TypeName = this.TypeName;
 
             return msg;
+        }
+    }
+
+    internal class MessageTypeHelper
+    {
+        static Type[] _types;
+        
+        public static Type[] GetCommandTypes()
+        {
+            if (_types == null)
+            {
+                List<Assembly> allAssemblies = new List<Assembly>();
+                string path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+                foreach (string dll in Directory.GetFiles(path, "*.dll"))
+                    allAssemblies.Add(Assembly.LoadFile(dll));
+
+                var result = new List<Type>();
+
+                Type thisType = typeof(ICommand);
+
+                allAssemblies.ForEach(m =>
+                {
+                    result.AddRange(m.GetTypes().Where(t => t.IsSubclassOf(thisType) || t.GetInterface(thisType.Name) == thisType));
+                });
+
+                _types = result.ToArray();
+            }
+
+            return _types;
         }
     }
 }

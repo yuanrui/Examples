@@ -6,7 +6,7 @@ using System.Net;
 using System.ServiceModel;
 using System.Text;
 
-namespace Simple.ServiceBus.Common.Impl
+namespace Simple.ServiceBus.Host
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession, ConcurrencyMode = ConcurrencyMode.Reentrant)]
     public class SubscribeService : ISubscribeService

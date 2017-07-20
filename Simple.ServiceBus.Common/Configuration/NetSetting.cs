@@ -6,7 +6,7 @@ using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.Text;
 
-namespace Simple.ServiceBus.Common
+namespace Simple.ServiceBus.Configuration
 {
     public class NetSetting
     {

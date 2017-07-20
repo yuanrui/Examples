@@ -5,8 +5,9 @@ using System.Linq;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
+using Simple.ServiceBus.Messages;
 
-namespace Simple.ServiceBus.Common.Impl
+namespace Simple.ServiceBus.Host
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession, ConcurrencyMode = ConcurrencyMode.Multiple)]
     public class PublishService : IPublishService

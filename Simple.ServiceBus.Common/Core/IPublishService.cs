@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
 using System.Text;
+using Simple.ServiceBus.Messages;
 
-namespace Simple.ServiceBus.Common
+namespace Simple.ServiceBus
 {
     [ServiceContract]
     public interface IPublishService

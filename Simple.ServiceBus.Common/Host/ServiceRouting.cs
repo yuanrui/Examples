@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using Simple.ServiceBus.Messages;
 
-namespace Simple.ServiceBus.Common
+namespace Simple.ServiceBus.Host
 {
     public class ServiceRouting
     {
@@ -29,8 +30,8 @@ namespace Simple.ServiceBus.Common
             }
             else
             {
-                var sub = handlers.Count > 1 ? 
-                    handlers.OrderBy(m => m.Value.Count).ThenBy(m => m.Value.Time).FirstOrDefault() 
+                var sub = handlers.Count > 1 ?
+                    handlers.OrderBy(m => m.Value.Time).ThenBy(m => m.Value.Count).FirstOrDefault() 
                     : handlers.FirstOrDefault();
 
                 if (sub != null)

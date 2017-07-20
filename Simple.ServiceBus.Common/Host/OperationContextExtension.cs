@@ -4,8 +4,9 @@ using System.Linq;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.Text;
+using Simple.ServiceBus.Messages;
 
-namespace Simple.ServiceBus.Common
+namespace Simple.ServiceBus.Host
 {
     public static class OperationContextExtension
     {

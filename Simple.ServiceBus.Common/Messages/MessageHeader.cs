@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 
-namespace Simple.ServiceBus.Common
+namespace Simple.ServiceBus.Messages
 {
     [DataContract]
     public class MessageHeader

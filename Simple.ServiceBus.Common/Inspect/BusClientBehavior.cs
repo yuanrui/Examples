@@ -8,8 +8,9 @@ using System.ServiceModel.Dispatcher;
 using System.Text;
 using ChannelMessage = System.ServiceModel.Channels.Message;
 using ChannelMessageHeader = System.ServiceModel.Channels.MessageHeader;
+using Simple.ServiceBus.Messages;
 
-namespace Simple.ServiceBus.Common.Inspect
+namespace Simple.ServiceBus.Inspect
 {
     public class BusClientBehavior : IClientMessageInspector, IDispatchMessageInspector, IEndpointBehavior
     {

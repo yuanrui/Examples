@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 
-namespace Simple.ServiceBus.Common.Impl
+namespace Simple.ServiceBus.Messages
 {
     public class TestCommand : ICommand
     {

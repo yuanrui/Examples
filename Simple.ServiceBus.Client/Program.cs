@@ -7,8 +7,8 @@ using System.Reflection;
 using System.ServiceModel;
 using System.Text;
 using System.Threading;
-using Simple.ServiceBus.Common;
-using Simple.ServiceBus.Common.Impl;
+using System.Threading.Tasks;
+using Simple.ServiceBus.Messages;
 
 namespace Simple.ServiceBus.Client
 {
@@ -56,14 +56,22 @@ namespace Simple.ServiceBus.Client
 
         static void SubTest(string key)
         {
-            SubscribeClient client = new SubscribeClient();
-            client.Subscribe(key);
+            for (int i = 0; i < 5; i++)
+            {
+                SubscribeClient client = new SubscribeClient();
+                client.Register(new Test1Handler());
+                client.Register(new Test3Handler());
+
+                client.Subscribe(key);
+
+                Thread.Sleep(1000);
+            }
         }
 
         static void PubTest(string key)
         {
             var input = string.Empty;
-            var header = new Common.MessageHeader { RequestKey = key, MessageKey = Guid.NewGuid().ToString() };
+            var header = new MessageHeader { RequestKey = key, MessageKey = Guid.NewGuid().ToString() };
 
             do
             {
@@ -78,17 +86,17 @@ namespace Simple.ServiceBus.Client
 
                         if (i % 2 == 0)
                         {
-                            header.RouteType = RouteType.All;
+                            //header.RouteType = RouteType.All;
                         }
                         //if (i % 2 == 0)
                         {
                             //Publish(new Message<Test1Command>(new Test1Command()) { Header = header });
                             //continue;
                         }
-
+                        SendTest3(new Test3InCommand() { Index = i }, header, i);
                         //if (i % 3 == 0)
                         {
-                            Handle((new Message<Test1Command>(new Test1Command() { Index = i }) { Header = header }), i);
+                            //Handle<Test1Command, Test1Command>((new Message<Test1Command>(new Test1Command() { Index = i }) { Header = header }), i);
                             //continue;
                         }
 
@@ -117,8 +125,16 @@ namespace Simple.ServiceBus.Client
             } while (input != "q");
         }
 
+        static void SendTest3(Test3InCommand cmd, MessageHeader header, Int64 index)
+        { 
+            var msg = new Message<Test3InCommand>(cmd, header);
+            var result = client.Send<Test3InCommand, Test3OutCommand>(msg);
+            Console.WriteLine(index.ToString().PadLeft(3, '0') + "_" + DateTime.Now.ToString("HH:mm:ss") + ">> " + result.Body.ToString());
+        }
 
-        static void Handle<T>(Message<T> msg, Int64 index) where T : class, ICommand
+        static void Handle<TIn, TOut>(Message<TIn> msg, Int64 index) 
+            where TIn : class, ICommand
+            where TOut : class, ICommand
         {
             //Message dto = null;
             
@@ -134,8 +150,8 @@ namespace Simple.ServiceBus.Client
             //    result = factory.CreateChannel().Publish(dto);
             //}
 
-            var result = client.Send(msg);
-
+            var result = client.Send<TIn, TOut>(msg);
+            
             if (result == null)
             {
                 return;

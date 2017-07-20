@@ -5,29 +5,34 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
-namespace Simple.ServiceBus.Common
+namespace Simple.ServiceBus.Host
 {
     public class ServiceRegister
     {
         private static ConcurrentDictionary<string, List<Pair<IPublishService, RunInfo>>> Cache = new ConcurrentDictionary<string, List<Pair<IPublishService, RunInfo>>>();
 
         public static ServiceRegister GlobalRegister = new ServiceRegister();
+        private static object _syncObj = new object();
 
         public void Register(string requestKey, IPublishService subscriber, string subscriberId)
         {
-            if (Cache.ContainsKey(requestKey))
+            lock (_syncObj)
             {
-                if (Cache[requestKey].All(m => m.Key != subscriber))
+                if (Cache.ContainsKey(requestKey))
                 {
-                    Cache[requestKey].Add(new Pair<IPublishService, RunInfo>(subscriber, new RunInfo(subscriberId)));
+                    if (Cache[requestKey].All(m => m.Key != subscriber))
+                    {
+                        Cache[requestKey].Add(new Pair<IPublishService, RunInfo>(subscriber, new RunInfo(subscriberId)));
+                    }
+                }
+                else
+                {
+                    var list = new List<Pair<IPublishService, RunInfo>>();
+                    list.Add(new Pair<IPublishService, RunInfo>(subscriber, new RunInfo(subscriberId)));
+                    Cache.AddOrUpdate(requestKey, list, (k, l) => l);
                 }
             }
-            else
-            {
-                var list = new List<Pair<IPublishService, RunInfo>>();
-                list.Add(new Pair<IPublishService, RunInfo>(subscriber, new RunInfo(subscriberId)));
-                Cache.AddOrUpdate(requestKey, list, (k, l) => l);
-            }
+            
         }
 
         public void UnRegister(string requestKey, IPublishService subscriber)
@@ -37,14 +42,17 @@ namespace Simple.ServiceBus.Common
                 return;
             }
 
-            var item = Cache[requestKey].FirstOrDefault(m => m.Key == subscriber);
-
-            if (item.Key == null)
+            lock (_syncObj)
             {
-                return;
-            }
+                var item = Cache[requestKey].FirstOrDefault(m => m.Key == subscriber);
 
-            Cache[requestKey].Remove(item);
+                if (item.Key == null)
+                {
+                    return;
+                }
+
+                Cache[requestKey].Remove(item);
+            }
         }
 
         public List<Pair<IPublishService, RunInfo>> GetHandler(string requestKey)

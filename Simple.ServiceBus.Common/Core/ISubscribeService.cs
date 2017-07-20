@@ -4,7 +4,7 @@ using System.Linq;
 using System.ServiceModel;
 using System.Text;
 
-namespace Simple.ServiceBus.Common
+namespace Simple.ServiceBus
 {
     [ServiceContract(SessionMode = SessionMode.Required, CallbackContract = typeof(IPublishService))]
     public interface ISubscribeService

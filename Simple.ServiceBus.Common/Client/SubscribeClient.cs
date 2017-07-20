@@ -9,22 +9,26 @@ using System.Reflection;
 using System.ServiceModel;
 using System.Text;
 using System.Threading;
-using Simple.ServiceBus.Common.Inspect;
+using Simple.ServiceBus.Configuration;
+using Simple.ServiceBus.Inspect;
+using Simple.ServiceBus.Messages;
 
-namespace Simple.ServiceBus.Common.Impl
+namespace Simple.ServiceBus.Client
 {
     public class SubscribeClient : ISubscribeService, IPublishService
-        , ICommandHandler<EmptyCommand, EmptyCommand>
-        , ICommandHandler<Test1Command, Test1Command>, ICommandHandler<Test2Command, Test2ResultCommand>
     {
+        Dictionary<Type, ICommandHandler> _handlers;
         ISubscribeService _proxy;
         Timer _timer;
+        TimeSpan _defaultWaitTime;
         ConcurrentDictionary<string, DateTime> _keyMaps;
         
         public SubscribeClient()
         {
+            _handlers = new Dictionary<Type, ICommandHandler>();
             _keyMaps = new ConcurrentDictionary<string, DateTime>();
             MakeProxy(NetSetting.SubAddress, this);
+            _defaultWaitTime = TimeSpan.FromSeconds(15);
             _timer = new Timer(DoPing, null, Timeout.Infinite, 5000);
         }
 
@@ -43,19 +47,17 @@ namespace Simple.ServiceBus.Common.Impl
         
         public void Subscribe(string requestKey)
         {
-            var waitTime = TimeSpan.FromSeconds(30);
             try
             {
                 _proxy.Subscribe(requestKey);
+                _timer.Change(TimeSpan.Zero, _defaultWaitTime);
             }
             catch (EndpointNotFoundException enfEx)
             {
                 Trace.WriteLine(enfEx.Message);
-                Trace.Write("wait:" + waitTime.TotalSeconds + "s" + Environment.NewLine);
-                Thread.Sleep(waitTime);
-            }
-
-            _timer.Change(TimeSpan.Zero, waitTime);
+                Trace.Write("wait:" + _defaultWaitTime.TotalSeconds + "s" + Environment.NewLine);
+                _timer.Change(_defaultWaitTime, _defaultWaitTime);
+            }            
 
             _keyMaps.AddOrUpdate(requestKey, DateTime.Now, (m, n) => DateTime.Now);
         }
@@ -70,6 +72,8 @@ namespace Simple.ServiceBus.Common.Impl
 
         public Message Publish(Message message)
         {
+            _timer.Change(_defaultWaitTime, _defaultWaitTime);
+            ICommandHandler handler = null;
             var result = new Message();
 
             try
@@ -79,19 +83,36 @@ namespace Simple.ServiceBus.Common.Impl
                     var type = Type.GetType(message.TypeName);
                     var instance = Activator.CreateInstance(type, message.Body, message.Header);
 
-                    var handleResult = Handle((dynamic)instance);
-
-                    if (handleResult != null)
+                    if (this._handlers.TryGetValue(message.Body.GetType(), out handler))
                     {
-                        result.Header = handleResult.Header;
-                        result.Body = handleResult.Body;
-                        result.TypeName = handleResult.GetType().FullName;
+                        var handleResult = ((dynamic)handler).Handle((dynamic)instance);
+
+                        if (handleResult != null)
+                        {
+                            result.Header = handleResult.Header;
+                            result.Body = handleResult.Body;
+                            result.TypeName = handleResult.GetType().FullName;
+                        }
                     }
+
+                    if (handler == null)
+                    {
+                        throw new NotImplementedException("no provider");
+                    }
+                    
+                    //var handleResult = Handle((dynamic)instance);
+
+                    //if (handleResult != null)
+                    //{
+                    //    result.Header = handleResult.Header;
+                    //    result.Body = handleResult.Body;
+                    //    result.TypeName = handleResult.GetType().FullName;
+                    //}
                 }
             }
             catch (NotImplementedException notImplEx)
             {
-                var cmd = new Impl.NotImplExceptionCommand();
+                var cmd = new NotImplExceptionCommand();
                 cmd.TypeName = message.TypeName;
                 cmd.OriginalObject = message.Body;
                 cmd.ExceptionMessage = notImplEx.Message;
@@ -99,7 +120,7 @@ namespace Simple.ServiceBus.Common.Impl
             }
             catch (Exception ex)
             {
-                var cmd = new Impl.ExceptionCommand();
+                var cmd = new ExceptionCommand();
                 cmd.OriginalObject = message.Body;
                 cmd.ExceptionMessage = ex.Message;
                 result.Body = cmd;
@@ -116,7 +137,7 @@ namespace Simple.ServiceBus.Common.Impl
         public string Ping()
         {
             var now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-
+            
             try
             {
                 var result = _proxy.Ping();
@@ -164,25 +185,22 @@ namespace Simple.ServiceBus.Common.Impl
             }
         }
 
-        public Message<EmptyCommand> Handle(Message<EmptyCommand> message)
+        public void Register(ICommandHandler commandHandler)
         {
-            return message;
-        }
+            var genericHandler = typeof(ICommandHandler<,>);
+            var supportedCommandTypes = commandHandler.GetType()
+                .GetInterfaces()
+                .Where(iface => iface.IsGenericType && iface.GetGenericTypeDefinition() == genericHandler)
+                .Select(iface => iface.GetGenericArguments()[0])
+                .ToList();
 
-        public Message<Test1Command> Handle(Message<Test1Command> message)
-        {
-            Thread.Sleep(2000);
-            Trace.WriteLine("Message<Test1>:" + message.Body.ToString());
-            message.Body.Id = message.Body.Time.ToString("HH:mm:ss");
-            message.Body.Time = DateTime.Now;            
-            return message;
-        }
+            if (_handlers.Keys.Any(registeredType => supportedCommandTypes.Contains(registeredType)))
+                throw new ArgumentException("The command handled by the received handler already has a registered handler.");
 
-        public Message<Test2ResultCommand> Handle(Message<Test2Command> message)
-        {
-            Thread.Sleep(2000);
-            Trace.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + ">> Message<Test2Command>:" + message.Body.ToString());
-            return new Message<Test2ResultCommand>(new Test2ResultCommand(), message.Header);
+            foreach (var commandType in supportedCommandTypes)
+            {
+                this._handlers.Add(commandType, commandHandler);
+            }
         }
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Simple.ServiceBus.Common.Impl
+namespace Simple.ServiceBus.Messages
 {
     class DefaultCommand
     {
