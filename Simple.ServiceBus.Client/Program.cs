@@ -8,6 +8,7 @@ using System.ServiceModel;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Simple.ServiceBus.Logging;
 using Simple.ServiceBus.Messages;
 
 namespace Simple.ServiceBus.Client
@@ -18,7 +19,7 @@ namespace Simple.ServiceBus.Client
 
         static void Main(string[] args)
         {
-            Trace.Listeners.Add(new ConsoleTraceListener());
+            Trace.Listeners.Add(new BusDefaultTraceListener());
             
             DoTest(args);
             
@@ -71,8 +72,7 @@ namespace Simple.ServiceBus.Client
         static void PubTest(string key)
         {
             var input = string.Empty;
-            var header = new MessageHeader { RequestKey = key, MessageKey = Guid.NewGuid().ToString() };
-
+            
             do
             {
                 Console.WriteLine(DateTime.Now + ">>");
@@ -80,27 +80,25 @@ namespace Simple.ServiceBus.Client
                 {
                     for (int i = 0; i < 100; i++)
                     {
+                        var header = new MessageHeader { RequestKey = key, MessageKey = i.ToString() };
+
                         header.MessageKey = i.ToString();
                         
                         header.RouteType = RouteType.Single;
 
                         if (i % 2 == 0)
                         {
-                            //header.RouteType = RouteType.All;
+                            header.RouteType = RouteType.All;
+                            SendAsyncTest3(new Test3InCommand() { Index = i }, header, i);
+                            continue;
                         }
                         //if (i % 2 == 0)
                         {
                             //Publish(new Message<Test1Command>(new Test1Command()) { Header = header });
                             //continue;
                         }
-                        SendTest3(new Test3InCommand() { Index = i }, header, i);
-                        //if (i % 3 == 0)
-                        {
-                            //Handle<Test1Command, Test1Command>((new Message<Test1Command>(new Test1Command() { Index = i }) { Header = header }), i);
-                            //continue;
-                        }
 
-                        //Publish(new Message() { Header = header, Body = i.ToString() + ">>" + Guid.NewGuid().ToString() });
+                        SendTest3(new Test3InCommand() { Index = i }, header, i);                        
                     }
 
                 }
@@ -108,15 +106,6 @@ namespace Simple.ServiceBus.Client
                 {
 
                     Console.WriteLine(DateTime.Now + ">>" + ex.Message);
-
-                    try
-                    {
-                        Publish(new Message() { Header = header, Body = DateTime.Now.ToShortTimeString() + " >> " + Guid.NewGuid().ToString() });
-                    }
-                    catch (Exception ex2)
-                    {
-                        Console.WriteLine("Pub_Ex:" + ex2.Message);
-                    }
                 }
 
                 Console.WriteLine(DateTime.Now + ">> send finish");
@@ -129,62 +118,14 @@ namespace Simple.ServiceBus.Client
         { 
             var msg = new Message<Test3InCommand>(cmd, header);
             var result = client.Send<Test3InCommand, Test3OutCommand>(msg);
-            Console.WriteLine(index.ToString().PadLeft(3, '0') + "_" + DateTime.Now.ToString("HH:mm:ss") + ">> " + result.Body.ToString());
+            Trace.WriteLine(index.ToString().PadLeft(3, '0') + "_" + DateTime.Now.ToString("HH:mm:ss") + ">> " + result.Body.ToString());
         }
 
-        static void Handle<TIn, TOut>(Message<TIn> msg, Int64 index) 
-            where TIn : class, ICommand
-            where TOut : class, ICommand
+        static void SendAsyncTest3(Test3InCommand cmd, MessageHeader header, Int64 index)
         {
-            //Message dto = null;
-            
-            //{
-            //    dto = new Message() { Header = msg.Header, Body = msg.Body, TypeName = msg.TypeName };
-            //}
-            //Message result = null;
-            //using (ChannelFactory<IPublishService> factory = client.CreateChannelFactory())
-            //{
-            //    factory.Open();
-            //    var channel = factory.CreateChannel();
-
-            //    result = factory.CreateChannel().Publish(dto);
-            //}
-
-            var result = client.Send<TIn, TOut>(msg);
-            
-            if (result == null)
-            {
-                return;
-            }
-
-            Console.WriteLine(index.ToString().PadLeft(3, '0') + "_" + DateTime.Now.ToString("HH:mm:ss") + ">> " + result.Body.ToString());
+            var msg = new Message<Test3InCommand>(cmd, header);
+            client.SendAsync(msg);            
         }
 
-        static void Publish(Message msg)
-        {
-            //using (ChannelFactory<IPublishService> factory = client.CreateChannelFactory())
-            //{
-            //    factory.Open();
-
-            //    factory.CreateChannel().Publish(msg);
-            //}
-
-            client.Send(msg);
-        }
-
-        static void Publish<T>(Message<T> msg) where T : class, ICommand
-        {
-            Message dto = new Message() { Header = msg.Header, Body = msg.Body, TypeName = msg.TypeName };
-            //if (msg.Body is ICommand)
-            //{
-            //    dto = new Message() { Header = msg.Header, Body = msg.Body, TypeName= msg.TypeName };
-            //}
-            //else
-            //{
-            //    dto = msg;
-            //}
-
-            Publish(dto);
-        }
     }
 }

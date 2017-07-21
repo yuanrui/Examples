@@ -43,6 +43,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Logging\BusDefaultTraceListener.cs" />
+    <Compile Include="Logging\FileLogTraceListener.cs" />
+    <Compile Include="Logging\SimpleLogger.cs" />
     <Compile Include="Messages\ClientInfo.cs" />
     <Compile Include="Messages\ICommand.cs" />
     <Compile Include="Messages\ICommandHandler.cs" />

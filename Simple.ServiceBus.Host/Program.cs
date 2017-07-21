@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using Simple.ServiceBus.Logging;
 
 namespace Simple.ServiceBus.Host
 {
@@ -10,7 +11,7 @@ namespace Simple.ServiceBus.Host
     {
         static void Main(string[] args)
         {
-            Trace.Listeners.Add(new ConsoleTraceListener());
+            Trace.Listeners.Add(new BusDefaultTraceListener());
             Console.Title = "Host Start:" + DateTime.Now.ToString("yyyyMMddHHmmss");
             ServerHost host = new ServerHost();
             host.Open();

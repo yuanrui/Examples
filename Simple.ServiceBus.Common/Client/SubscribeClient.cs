@@ -94,20 +94,11 @@ namespace Simple.ServiceBus.Client
                             result.TypeName = handleResult.GetType().FullName;
                         }
                     }
-
+                    //TODO refactor hander
                     if (handler == null)
                     {
                         throw new NotImplementedException("no provider");
                     }
-                    
-                    //var handleResult = Handle((dynamic)instance);
-
-                    //if (handleResult != null)
-                    //{
-                    //    result.Header = handleResult.Header;
-                    //    result.Body = handleResult.Body;
-                    //    result.TypeName = handleResult.GetType().FullName;
-                    //}
                 }
             }
             catch (NotImplementedException notImplEx)
@@ -142,7 +133,7 @@ namespace Simple.ServiceBus.Client
             {
                 var result = _proxy.Ping();
                 Console.ForegroundColor = ConsoleColor.DarkGray;
-                Console.WriteLine(result);
+                Trace.Write(result);
                 Console.ForegroundColor = ConsoleColor.Gray;
 
                 return result;
