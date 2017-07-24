@@ -46,7 +46,7 @@ namespace Simple.ServiceBus.Host
             {
                 var item = Cache[requestKey].FirstOrDefault(m => m.Key == subscriber);
 
-                if (item.Key == null)
+                if (item == null || item.Key == null)
                 {
                     return;
                 }

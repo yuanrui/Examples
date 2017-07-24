@@ -40,15 +40,6 @@ namespace Simple.ServiceBus.Messages
         [DataMember]
         public virtual string TypeName { get; set; }
 
-        [IgnoreDataMember]
-        public virtual bool IsSuccess
-        {
-            get
-            {
-                return !(Body is IFailCommand);
-            }
-        }
-
         [DataMember]
         public Message Next { get; protected set; }
 
@@ -80,6 +71,16 @@ namespace Simple.ServiceBus.Messages
 
         public virtual string TypeName { get; set; }
 
+        public virtual FailCommand Fail { get; set; }
+
+        public virtual bool IsSuccess
+        {
+            get
+            {
+                return Fail == null;
+            }
+        }
+        
         public Message() : this(null, null)
         {
             

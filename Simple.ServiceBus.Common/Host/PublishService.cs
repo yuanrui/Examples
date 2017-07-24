@@ -34,6 +34,7 @@ namespace Simple.ServiceBus.Host
                 result.Header = message.Header;
                 var cmd = new NotSubscriberCommand();
                 cmd.RequestKey = message.Header.RequestKey;
+                
                 result.Body = cmd;
 
                 return result;

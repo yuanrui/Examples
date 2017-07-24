@@ -12,25 +12,25 @@ namespace Simple.ServiceBus.Client
         , ICommandHandler<Test1Command, Test1Command>, ICommandHandler<Test2Command, Test2ResultCommand>
     {
 
-        public Message<EmptyCommand> Handle(Message<EmptyCommand> message)
+        public EmptyCommand Handle(EmptyCommand message)
         {
             return message;
         }
 
-        public Message<Test1Command> Handle(Message<Test1Command> message)
+        public Test1Command Handle(Test1Command message)
         {
             Thread.Sleep(2000);
-            Trace.WriteLine("Message<Test1>:" + message.Body.ToString());
-            message.Body.Id = message.Body.Time.ToString("HH:mm:ss");
-            message.Body.Time = DateTime.Now;
+            Trace.WriteLine("Message<Test1>:" + message.ToString());
+            message.Id = message.Time.ToString("HH:mm:ss");
+            message.Time = DateTime.Now;
             return message;
         }
 
-        public Message<Test2ResultCommand> Handle(Message<Test2Command> message)
+        public Test2ResultCommand Handle(Test2Command message)
         {
             Thread.Sleep(2000);
-            Trace.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + ">> Message<Test2Command>:" + message.Body.ToString());
-            return new Message<Test2ResultCommand>(new Test2ResultCommand(), message.Header);
+            Trace.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + ">> Message<Test2Command>:" + message.ToString());
+            return new Test2ResultCommand();
         }
 
     }

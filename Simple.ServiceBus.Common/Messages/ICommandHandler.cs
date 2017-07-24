@@ -12,6 +12,6 @@ namespace Simple.ServiceBus.Messages
         where TIn : class, ICommand
         where TOut : class, ICommand
     {
-        Message<TOut> Handle(Message<TIn> message);
+        TOut Handle(TIn message);
     }
 }

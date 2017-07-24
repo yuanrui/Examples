@@ -55,7 +55,7 @@ namespace Simple.ServiceBus.Client
             catch (EndpointNotFoundException enfEx)
             {
                 Trace.WriteLine(enfEx.Message);
-                Trace.Write("wait:" + _defaultWaitTime.TotalSeconds + "s" + Environment.NewLine);
+                Trace.Write("wait:" + _defaultWaitTime.TotalSeconds + "s");
                 _timer.Change(_defaultWaitTime, _defaultWaitTime);
             }            
 
@@ -75,43 +75,45 @@ namespace Simple.ServiceBus.Client
             _timer.Change(_defaultWaitTime, _defaultWaitTime);
             ICommandHandler handler = null;
             var result = new Message();
+            var header = new MessageHeader();
+            header.RequestKey = message.Header.ResponseKey;
+            header.ResponseKey = message.Header.ResponseKey;
+            header.RouteType = message.Header.RouteType;
+            header.RunCount = message.Header.RunCount;
+            result.Header = header;
 
             try
             {
                 if (message.TypeName != null)
                 {
-                    var type = Type.GetType(message.TypeName);
-                    var instance = Activator.CreateInstance(type, message.Body, message.Header);
-
                     if (this._handlers.TryGetValue(message.Body.GetType(), out handler))
                     {
-                        var handleResult = ((dynamic)handler).Handle((dynamic)instance);
-
-                        if (handleResult != null)
-                        {
-                            result.Header = handleResult.Header;
-                            result.Body = handleResult.Body;
-                            result.TypeName = handleResult.GetType().FullName;
-                        }
+                        var handleResult = ((dynamic)handler).Handle((dynamic)message.Body);
+                        
+                        result.Body = handleResult;
                     }
-                    //TODO refactor hander
+                                        
                     if (handler == null)
                     {
-                        throw new NotImplementedException("no provider");
+                        var cmd = new NotImplExceptionCommand();
+                        cmd.TypeName = message.BodyType;
+                        cmd.OriginalObject = message.Body;
+                        cmd.ExceptionMessage = "no provider";
+                        result.Body = cmd;
                     }
                 }
             }
             catch (NotImplementedException notImplEx)
             {
                 var cmd = new NotImplExceptionCommand();
-                cmd.TypeName = message.TypeName;
+                cmd.TypeName = message.BodyType;
                 cmd.OriginalObject = message.Body;
                 cmd.ExceptionMessage = notImplEx.Message;
                 result.Body = cmd;
             }
             catch (Exception ex)
             {
-                var cmd = new ExceptionCommand();
+                var cmd = new FailCommand();
                 cmd.OriginalObject = message.Body;
                 cmd.ExceptionMessage = ex.Message;
                 result.Body = cmd;

@@ -10,18 +10,18 @@ namespace Simple.ServiceBus.Client
 {
     public class Test3Handler : ICommandHandler<Test3InCommand, Test3OutCommand>
     {
-        public Message<Test3OutCommand> Handle(Message<Test3InCommand> message)
+        public Test3OutCommand Handle(Test3InCommand message)
         {
             Thread.Sleep(2000);
-            Trace.WriteLine(message.Body.Index.ToString().PadLeft(3, '0') + ":" + message.Body.ToString());
+            Trace.WriteLine(message.Index.ToString().PadLeft(3, '0') + ":" + message.ToString());
 
             var result = new Test3OutCommand();
             for (int i = 0; i < 10; i++)
             {
-                result.List.Add(new Test3OutCommand.Test3OutWapper() { Id = message.Body.Id, Message = message.Body.Remark, Success = true });
+                result.List.Add(new Test3OutCommand.Test3OutWapper() { Id = message.Id, Message = message.Remark, Success = true });
             }
 
-            return new Message<Test3OutCommand>(result, message.Header);
+            return result;
         }
     }
 }

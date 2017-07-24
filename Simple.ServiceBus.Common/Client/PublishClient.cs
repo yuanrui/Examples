@@ -75,15 +75,12 @@ namespace Simple.ServiceBus.Client
 
             var result = Send(dto);
 
-            if (result.TypeName == null)
+            if (result.Body is FailCommand)
             {
-                return new Message<TOut>();
+                return new Message<TOut>() { Fail = (dynamic)result.Body };
             }
 
-            var type = Type.GetType(result.TypeName);
-            var instance = Activator.CreateInstance(type, result.Body, result.Header);
-
-            return instance as Message<TOut>;
+            return new Message<TOut>((dynamic)result.Body, result.Header);
         }
 
         public virtual void SendAsync<TIn>(Message<TIn> message) 
