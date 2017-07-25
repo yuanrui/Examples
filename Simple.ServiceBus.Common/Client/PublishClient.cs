@@ -118,7 +118,7 @@ namespace Simple.ServiceBus.Client
             const int DEFAULT_WAIT = 200;
             
             var factory = CreateChannelFactory();
-
+            Stopwatch watch = new Stopwatch();
             while (true)
             {
                 try
@@ -137,8 +137,10 @@ namespace Simple.ServiceBus.Client
                     }
 
                     Trace.Write(GetWorkerName() + " begin send: " + msg.Header.MessageKey);
+                    watch.Restart();
                     DoSend(factory, msg);
-                    Trace.Write(GetWorkerName() + " send: " + msg.Header.MessageKey + " complete");
+                    watch.Stop();
+                    Trace.Write(GetWorkerName() + " send: " + msg.Header.MessageKey + " complete, total time:" + Math.Round(watch.Elapsed.TotalSeconds, 1) + "s");
 
                     Thread.Sleep(DEFAULT_WAIT);
                 }

@@ -39,7 +39,7 @@ namespace Simple.ServiceBus.Host
 
                 return result;
             }
-
+            var watch = Stopwatch.StartNew();
             for (int i = 0; i < subscribers.Count; i++)
             {
                 var subscriber = subscribers[i];
@@ -56,7 +56,7 @@ namespace Simple.ServiceBus.Host
                         result.SetNext(tmpResult);
                     }
                     
-                    Trace.WriteLine(Context.GetClientAddress() + " Published " + message.GetHashCode());
+                    
                 }
                 catch (CommunicationException ex)
                 {
@@ -79,6 +79,10 @@ namespace Simple.ServiceBus.Host
                 }
             }
 
+            watch.Stop();
+            
+            Trace.WriteLine(Context.GetClientAddress() + " Published " + message.Header.MessageKey + " total time:" + Math.Round(watch.Elapsed.TotalSeconds, 2) + "s");
+            
             return result;
         }
     }

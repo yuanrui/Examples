@@ -57,7 +57,7 @@ namespace Simple.ServiceBus.Client
                 Trace.WriteLine(enfEx.Message);
                 Trace.Write("wait:" + _defaultWaitTime.TotalSeconds + "s");
                 _timer.Change(_defaultWaitTime, _defaultWaitTime);
-            }            
+            }
 
             _keyMaps.AddOrUpdate(requestKey, DateTime.Now, (m, n) => DateTime.Now);
         }

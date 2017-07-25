@@ -16,7 +16,7 @@ namespace Simple.ServiceBus.Client
             Trace.WriteLine(message.Index.ToString().PadLeft(3, '0') + ":" + message.ToString());
 
             var result = new Test3OutCommand();
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < message.Index % 10; i++)
             {
                 result.List.Add(new Test3OutCommand.Test3OutWapper() { Id = message.Id, Message = message.Remark, Success = true });
             }

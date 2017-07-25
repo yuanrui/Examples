@@ -11,7 +11,11 @@ namespace Simple.ServiceBus.Host
     {
         static void Main(string[] args)
         {
+#if DEBUG
             Trace.Listeners.Add(new BusDefaultTraceListener());
+#else
+            Trace.Listeners.Add(new FileLogTraceListener());
+#endif
             Console.Title = "Host Start:" + DateTime.Now.ToString("yyyyMMddHHmmss");
             ServerHost host = new ServerHost();
             host.Open();

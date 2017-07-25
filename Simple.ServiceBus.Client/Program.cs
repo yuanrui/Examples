@@ -19,8 +19,11 @@ namespace Simple.ServiceBus.Client
 
         static void Main(string[] args)
         {
+#if DEBUG
             Trace.Listeners.Add(new BusDefaultTraceListener());
-            
+#else
+            Trace.Listeners.Add(new FileLogTraceListener());
+#endif
             DoTest(args);
             
             Console.WriteLine("\nPress Any Key To Exit...");
@@ -72,30 +75,38 @@ namespace Simple.ServiceBus.Client
         static void PubTest(string key)
         {
             var input = string.Empty;
-            
+            var process = Process.GetCurrentProcess();
+            Trace.WriteLine("current process id:" + process.Id);
+
             do
             {
                 Console.WriteLine(DateTime.Now + ">>");
                 try
                 {
-                    for (int i = 0; i < 100; i++)
+                    for (int i = 0; i < 100000000; i++)
                     {
-                        var header = new MessageHeader { RequestKey = key, MessageKey = i.ToString() };
+                        Thread.Sleep(100);
+                        var header = new MessageHeader { RequestKey = key, MessageKey = process.Id.ToString() + "_" + i.ToString() };
 
-                        header.MessageKey = i.ToString();
-                        
                         header.RouteType = RouteType.Single;
 
-                        if (i % 2 == 0)
+                        if (i % 3 == 0)
+                        {
+                            SendTest1(header, i);
+                            continue;
+                        }
+
+                        if (i % 4 == 0)
+                        {
+                            SendTest2(header, i);
+                            continue;
+                        }
+
+                        if (i % 5 == 0)
                         {
                             header.RouteType = RouteType.All;
                             SendAsyncTest3(new Test3InCommand() { Index = i }, header, i);
                             continue;
-                        }
-                        //if (i % 2 == 0)
-                        {
-                            //Publish(new Message<Test1Command>(new Test1Command()) { Header = header });
-                            //continue;
                         }
 
                         SendTest3(new Test3InCommand() { Index = i }, header, i);                        
@@ -104,14 +115,29 @@ namespace Simple.ServiceBus.Client
                 }
                 catch (Exception ex)
                 {
-
-                    Console.WriteLine(DateTime.Now + ">>" + ex.Message);
+                    Trace.WriteLine("Exception:" + ex.Message);
                 }
 
-                Console.WriteLine(DateTime.Now + ">> send finish");
+                Trace.WriteLine("send finish");
                 input = Console.ReadLine();
 
             } while (input != "q");
+        }
+
+        static void SendTest1(MessageHeader header, Int64 index)
+        {
+            var msg = new Message<Test1Command>(new Test1Command(), header);
+            var result = client.Send<Test1Command, Test1Command>(msg);
+
+            Trace.WriteLine(index.ToString().PadLeft(3, '0') + "_" + result.Body.ToString());
+        }
+
+        static void SendTest2(MessageHeader header, Int64 index)
+        {
+            var msg = new Message<Test2Command>(new Test2Command(), header);
+            var result = client.Send<Test2Command, Test2ResultCommand>(msg);
+
+            Trace.WriteLine(index.ToString().PadLeft(3, '0') + "_" + result.Body.ToString());
         }
 
         static void SendTest3(Test3InCommand cmd, MessageHeader header, Int64 index)

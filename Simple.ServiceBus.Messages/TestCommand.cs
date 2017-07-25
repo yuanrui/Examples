@@ -30,6 +30,8 @@ namespace Simple.ServiceBus.Messages
 
         public DateTime Time { get; set; }
 
+        public Int32 Wait { get; set; }
+
         public Test1Command()
         {
             Id = Guid.NewGuid().ToString();
@@ -37,18 +39,14 @@ namespace Simple.ServiceBus.Messages
             Img = Guid.NewGuid().ToString();
             Code = string.Empty;
             var length = (Math.Abs(Guid.NewGuid().GetHashCode()) % 4000) + 4000;
-
-            for (int i = 0; i < length; i++)
-            {
-                Code = string.Concat(Code, "好");
-            }
+            Code = new string('好', length);
 
             Time = DateTime.Now;
         }
 
         public override string ToString()
         {
-            return Time.ToString("HH:mm:ss") + "=" + Id + " #" + Index + "@" + Code.Length;
+            return Time.ToString("HH:mm:ss") + "=" + Id + " #" + Index + "@" + Code.Length + "&" + Wait;
         }
     }
 
@@ -58,6 +56,8 @@ namespace Simple.ServiceBus.Messages
 
         public DateTime Now { get; set; }
 
+        public Int32 Wait { get; set; }
+
         public Test2Command()
         {
             Now = DateTime.Now;
@@ -66,7 +66,7 @@ namespace Simple.ServiceBus.Messages
 
         public override string ToString()
         {
-            return Id + "@" + Now;
+            return Id + "@" + Now + "&" + Wait;
         }
     }
 
@@ -78,6 +78,8 @@ namespace Simple.ServiceBus.Messages
 
         public DateTime Now { get; set; }
 
+        public Int32 Wait { get; set; }
+
         public Test2ResultCommand()
         {
             Key = Guid.NewGuid().ToString();
@@ -87,7 +89,7 @@ namespace Simple.ServiceBus.Messages
 
         public override string ToString()
         {
-            return Id + "@" + Now + "_" + Key;
+            return Id + "@" + Now + "_" + Key + "&" + Wait;
         }
     }
 }
