@@ -56,6 +56,8 @@ namespace Simple.ServiceBus.Client
                 Console.Title = "PubKey=" + key + " Start:" + DateTime.Now.ToString("yyyyMMddHHmmss");
                 PubTest(key);
             }
+
+            Console.Title = Console.Title + " " + Process.GetCurrentProcess().Id;
         }
 
         static void SubTest(string key)
@@ -128,6 +130,11 @@ namespace Simple.ServiceBus.Client
         {
             var msg = new Message<Test1Command>(new Test1Command(), header);
             var result = client.Send<Test1Command, Test1Command>(msg);
+            if (!result.IsSuccess)
+            {
+                Trace.WriteLine(result.Fail.ExceptionMessage);
+                return;
+            }
 
             Trace.WriteLine(index.ToString().PadLeft(3, '0') + "_" + result.Body.ToString());
         }
@@ -136,6 +143,11 @@ namespace Simple.ServiceBus.Client
         {
             var msg = new Message<Test2Command>(new Test2Command(), header);
             var result = client.Send<Test2Command, Test2ResultCommand>(msg);
+            if (!result.IsSuccess)
+            {
+                Trace.WriteLine(result.Fail.ExceptionMessage);
+                return;
+            }
 
             Trace.WriteLine(index.ToString().PadLeft(3, '0') + "_" + result.Body.ToString());
         }
@@ -144,6 +156,13 @@ namespace Simple.ServiceBus.Client
         { 
             var msg = new Message<Test3InCommand>(cmd, header);
             var result = client.Send<Test3InCommand, Test3OutCommand>(msg);
+
+            if (! result.IsSuccess)
+            {
+                Trace.WriteLine(result.Fail.ExceptionMessage);
+                return;
+            }
+
             Trace.WriteLine(index.ToString().PadLeft(3, '0') + "_" + DateTime.Now.ToString("HH:mm:ss") + ">> " + result.Body.ToString());
         }
 
