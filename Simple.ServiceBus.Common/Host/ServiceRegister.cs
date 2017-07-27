@@ -65,6 +65,11 @@ namespace Simple.ServiceBus.Host
             return new List<Pair<IPublishService, RunInfo>>();
         }
 
+        public Dictionary<string, IEnumerable<RunInfo>> GetStats()
+        {
+            return Cache.ToDictionary(m => m.Key, m => m.Value.Select(t => t.Value));
+        }
+
         public class RunInfo
         {
             public string Id { get; private set; }
@@ -93,6 +98,11 @@ namespace Simple.ServiceBus.Host
                 Thread.MemoryBarrier();
                 this.Time = DateTime.Now;
                 Thread.MemoryBarrier();
+            }
+
+            public override string ToString()
+            {
+                return Id + "=" + Count + "(" + Time.ToString("yyyyMMddHHmmss") + ")";
             }
         }
 
