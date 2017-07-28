@@ -33,7 +33,7 @@ namespace Simple.ServiceBus.Host
             _publishServiceHost.Open();
             _subscribeServiceHost.Open();
 
-            _timer.Change(TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(30));
+            _timer.Change(TimeSpan.FromSeconds(0), TimeSpan.FromMinutes(1));
         }
 
         public void Close()
@@ -45,10 +45,28 @@ namespace Simple.ServiceBus.Host
         protected void ShowStats(object obj)
         {
             var list = ServiceRegister.GlobalRegister.GetStats();
+            var compareTime = DateTime.Now.AddMinutes(-1);
+            var disconnectedList = list.Where(m => m.Value.Any(t => t.Time < compareTime));
+            foreach (var disConn in disconnectedList)
+            {
+                var disConnHandlers = ServiceRegister.GlobalRegister.GetHandler(disConn.Key).ToList();
+                var tmpPair = list.FirstOrDefault(m => m.Key == disConn.Key);
+                
+                foreach (var item in disConnHandlers)
+                {
+                    if (disConn.Value.Any(m => m.Id == item.Value.Id && m.Time == item.Value.Time && m.Time < compareTime))
+                    {
+                        tmpPair.Value.RemoveAll(m => m.Id == item.Value.Id && m.Time == item.Value.Time);                        
+                        
+                        ServiceRegister.GlobalRegister.UnRegister(disConn.Key, item.Key);
+                        Trace.WriteLine(item.Key + ":[" + item.Value.Id + " time out removed, last access time:" + item.Value.Time.ToString("yyyyMMddHHmmss") + "]");
+                    }
+                }
+            }
 
             foreach (var item in list)
             {
-                Trace.Write(item.Key + ":[" + string.Join(",", item.Value.Select(m => m.ToString())) + "]");
+                Trace.WriteLine(item.Key + ":[" + string.Join(",", item.Value.Select(m => m.ToString())) + "]");
             }
         }
     }

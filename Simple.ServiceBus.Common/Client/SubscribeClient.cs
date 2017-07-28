@@ -124,16 +124,16 @@ namespace Simple.ServiceBus.Client
 
         private void DoPing(object obj)
         {
-            Ping();
+            Ping(_keyMaps.Select(m => m.Key).ToArray());
         }
 
-        public string Ping()
+        public string Ping(string[] keys)
         {
             var now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             
             try
             {
-                var result = _proxy.Ping();
+                var result = _proxy.Ping(keys);
                 Console.ForegroundColor = ConsoleColor.DarkGray;
                 Trace.Write(result);
                 Console.ForegroundColor = ConsoleColor.Gray;

@@ -17,6 +17,7 @@ namespace Simple.ServiceBus.Host
             Trace.Listeners.Add(new FileLogTraceListener());
 #endif
             Console.Title = "Host Start:" + DateTime.Now.ToString("yyyyMMddHHmmss");
+            Trace.WriteLine(Console.Title);
             ServerHost host = new ServerHost();
             host.Open();
             var input = string.Empty;
