@@ -19,11 +19,11 @@ namespace Simple.ServiceBus.Client
 
         static void Main(string[] args)
         {
-#if DEBUG
-            Trace.Listeners.Add(new BusDefaultTraceListener());
-#else
+//#if DEBUG
+//            Trace.Listeners.Add(new BusDefaultTraceListener());
+//#else
             Trace.Listeners.Add(new FileLogTraceListener());
-#endif
+//#endif
             DoTest(args);
             
             Console.WriteLine("\nPress Any Key To Exit...");
@@ -46,18 +46,19 @@ namespace Simple.ServiceBus.Client
                 }
             }
 
+            Console.Title = "SubKey=" + key + " Start:" + DateTime.Now.ToString("yyyyMMddHHmmss");
+            Console.Title = Console.Title + " " + Process.GetCurrentProcess().Id;
+
             if (string.Equals(subKey, "s", StringComparison.OrdinalIgnoreCase))
             {
-                Console.Title = "SubKey=" + key + " Start:" + DateTime.Now.ToString("yyyyMMddHHmmss");
                 SubTest(key);
             }
             else
             {
-                Console.Title = "PubKey=" + key + " Start:" + DateTime.Now.ToString("yyyyMMddHHmmss");
                 PubTest(key);
             }
 
-            Console.Title = Console.Title + " " + Process.GetCurrentProcess().Id;
+            
         }
 
         static void SubTest(string key)
@@ -79,15 +80,23 @@ namespace Simple.ServiceBus.Client
             var input = string.Empty;
             var process = Process.GetCurrentProcess();
             Trace.WriteLine("current process id:" + process.Id);
-
+            var randomMaker = new Random(Guid.NewGuid().GetHashCode());
             do
             {
                 Console.WriteLine(DateTime.Now + ">>");
                 try
                 {
-                    for (int i = 0; i < 100000000; i++)
+                    for (int i = 1; i <= 100000000; i++)
                     {
                         Thread.Sleep(100);
+
+                        if (i % 7 == 0 || i % 11 == 0 || i % 17 == 0)
+                        {
+                            var wait = TimeSpan.FromSeconds(randomMaker.Next(1, 90));
+                            Trace.Write("wait " + wait.TotalSeconds + "s");
+                            Thread.Sleep(wait);
+                        }
+
                         var header = new MessageHeader { RequestKey = key, MessageKey = process.Id.ToString() + "_" + i.ToString() };
 
                         header.RouteType = RouteType.Single;
