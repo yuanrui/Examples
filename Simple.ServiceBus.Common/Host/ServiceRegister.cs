@@ -9,7 +9,7 @@ namespace Simple.ServiceBus.Host
 {
     public class ServiceRegister
     {
-        private static ConcurrentDictionary<string, List<Pair<IPublishService, RunInfo>>> Cache = new ConcurrentDictionary<string, List<Pair<IPublishService, RunInfo>>>();
+        private static ConcurrentDictionary<string, List<CustomPair<IPublishService, RunInfo>>> Cache = new ConcurrentDictionary<string, List<CustomPair<IPublishService, RunInfo>>>();
 
         public static ServiceRegister GlobalRegister = new ServiceRegister();
         private static object _syncObj = new object();
@@ -22,13 +22,13 @@ namespace Simple.ServiceBus.Host
                 {
                     if (Cache[requestKey].All(m => m.Key != subscriber))
                     {
-                        Cache[requestKey].Add(new Pair<IPublishService, RunInfo>(subscriber, new RunInfo(subscriberId)));
+                        Cache[requestKey].Add(new CustomPair<IPublishService, RunInfo>(subscriber, new RunInfo(subscriberId)));
                     }
                 }
                 else
                 {
-                    var list = new List<Pair<IPublishService, RunInfo>>();
-                    list.Add(new Pair<IPublishService, RunInfo>(subscriber, new RunInfo(subscriberId)));
+                    var list = new List<CustomPair<IPublishService, RunInfo>>();
+                    list.Add(new CustomPair<IPublishService, RunInfo>(subscriber, new RunInfo(subscriberId)));
                     Cache.AddOrUpdate(requestKey, list, (k, l) => l);
                 }
             }
@@ -55,14 +55,14 @@ namespace Simple.ServiceBus.Host
             }
         }
 
-        public List<Pair<IPublishService, RunInfo>> GetHandler(string requestKey)
+        public List<CustomPair<IPublishService, RunInfo>> GetHandler(string requestKey)
         {
             if (Cache.ContainsKey(requestKey))
             {
                 return Cache[requestKey];
             }
 
-            return new List<Pair<IPublishService, RunInfo>>();
+            return new List<CustomPair<IPublishService, RunInfo>>();
         }
 
         public Dictionary<string, List<RunInfo>> GetStats()
@@ -113,13 +113,13 @@ namespace Simple.ServiceBus.Host
             }
         }
 
-        public class Pair<TKey, TValue>
+        public class CustomPair<TKey, TValue>
         {
             public TKey Key { get; set; }
 
             public TValue Value { get; set; }
 
-            public Pair(TKey key, TValue value)
+            public CustomPair(TKey key, TValue value)
             {
                 Key = key;
                 Value = value;

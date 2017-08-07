@@ -19,11 +19,9 @@ namespace Simple.ServiceBus.Client
 
         static void Main(string[] args)
         {
-//#if DEBUG
-//            Trace.Listeners.Add(new BusDefaultTraceListener());
-//#else
+            //Trace.Listeners.Add(new BusDefaultTraceListener());
             Trace.Listeners.Add(new FileLogTraceListener());
-//#endif
+
             DoTest(args);
             
             Console.WriteLine("\nPress Any Key To Exit...");
