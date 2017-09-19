@@ -107,6 +107,13 @@ namespace Simple.ServiceBus.Host
                 Thread.MemoryBarrier();
             }
 
+            public void ResetCount()
+            {
+                Thread.MemoryBarrier();
+                this.Count = 0;
+                Thread.MemoryBarrier();
+            }
+
             public override string ToString()
             {
                 return Id + "=" + Count + "(" + Time.ToString("yyyyMMddHHmmss") + ")";

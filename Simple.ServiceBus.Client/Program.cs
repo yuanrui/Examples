@@ -33,6 +33,7 @@ namespace Simple.ServiceBus.Client
             var input = args.Length > 0 ? args[0] ?? Console.ReadLine() : Console.ReadLine();
             var key = "abc";
             var subKey = "s";
+            var isSub = true;
             if (input.Contains("="))
             {
                 var inputs = input.Split(new char[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
@@ -44,19 +45,18 @@ namespace Simple.ServiceBus.Client
                 }
             }
 
-            Console.Title = "SubKey=" + key + " Start:" + DateTime.Now.ToString("yyyyMMddHHmmss");
+            isSub = string.Equals(subKey, "s", StringComparison.OrdinalIgnoreCase);
+            Console.Title = (isSub ? "SubKey" : "PubKey") + "=" + key + " Start:" + DateTime.Now.ToString("yyyyMMddHHmmss");
             Console.Title = Console.Title + " " + Process.GetCurrentProcess().Id;
 
-            if (string.Equals(subKey, "s", StringComparison.OrdinalIgnoreCase))
+            if (isSub)
             {
                 SubTest(key);
             }
             else
             {
                 PubTest(key);
-            }
-
-            
+            }            
         }
 
         static void SubTest(string key)

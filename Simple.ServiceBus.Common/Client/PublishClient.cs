@@ -17,15 +17,18 @@ namespace Simple.ServiceBus.Client
         protected ChannelFactory<IPublishService> Factory { get; private set; }
         protected ConcurrentQueue<Message> Queue { get; private set; }
 
-        public PublishClient()
+        public PublishClient() : this(CreateChannelFactory(), new ConcurrentQueue<Message>(), 5)
         {
-            Queue = new ConcurrentQueue<Message>();
-            Factory = CreateChannelFactory();
-
-            InitWorker(Queue, 5);
         }
 
-        protected ChannelFactory<IPublishService> CreateChannelFactory()
+        public PublishClient(ChannelFactory<IPublishService> factory, ConcurrentQueue<Message> queue, int workerCount)
+        {
+            Factory = factory;
+            Queue = queue;
+            InitWorker(Queue, workerCount);
+        }
+
+        protected static ChannelFactory<IPublishService> CreateChannelFactory()
         {
             EndpointAddress endpointAddress = new EndpointAddress(NetSetting.PubAddress);
             
