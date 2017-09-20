@@ -21,7 +21,22 @@ namespace Simple.Common.Extensions
 
             return input.Replace("\u3000", string.Empty).Replace("\u0020", string.Empty).Replace("\t", string.Empty).Replace("\n", string.Empty).Replace("\r", string.Empty);
         }
+        
+        /// <summary>
+        /// trim input string blank space \t \n \r
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static string TrimAll(this string input)
+        {
+            if (input == null)
+            {
+                return string.Empty;
+            }
 
+            return input.Trim('\u0020', '\u3000', '\t', '\n', '\r');
+        }
+        
         public static string ToHex(this string input)
         {
             return ToHex(input, null, Encoding.UTF8);
