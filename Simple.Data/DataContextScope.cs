@@ -8,7 +8,7 @@ using System.Web;
 
 namespace Simple.Data
 {
-    public class DataContextScope : IReleasable, IDisposable
+    public class DataContextScope : IAutoCloseable, IDisposable
     {
         private const string KeyPrefix = "Simple.DataContextScope.";
         private const string DefaultConnectionName = "DefaultConnectionString";
@@ -121,7 +121,7 @@ namespace Simple.Data
             DataContext.Dispose();
         }
 
-        void IReleasable.Dispose()
+        void IAutoCloseable.Dispose()
         {
             DataContext.DoDispose(true);
         }

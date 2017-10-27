@@ -27,7 +27,7 @@ namespace Simple.Common.Threading
         {
             get
             {
-                return true;
+                return false;
             }
         }
 

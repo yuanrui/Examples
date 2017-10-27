@@ -10,7 +10,7 @@ namespace Simple.Data
 {
     /// <summary>
     /// Copy From EnterpriseLibrary.Data.Database
-    /// The Database class can replace DatabaseWrapper
+    /// The Database class can replaced by DatabaseWrapper
     /// </summary>
     public class DatabaseWrapper
     {

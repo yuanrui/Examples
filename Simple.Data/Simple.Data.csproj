@@ -52,7 +52,7 @@
     <Compile Include="DataContext.cs" />
     <Compile Include="DataContextScope.cs" />
     <Compile Include="DbUtils.cs" />
-    <Compile Include="IReleasable.cs" />
+    <Compile Include="IAutoCloseable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Simple.Data
 {
-    public interface IReleasable : IDisposable
+    public interface IAutoCloseable : IDisposable
     {
         new void Dispose();
     }
