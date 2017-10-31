@@ -74,6 +74,17 @@ namespace Simple.Data
             }
         }
 
+        public Object ExecuteScalar(string sql)
+        {
+            using (var ctx = DataContextScope.GetCurrent(ConnectionName).Begin())
+            {
+                var cmd = ctx.DataContext.DatabaseObject.GetSqlStringCommand(sql);
+                var result = DataContextScope.GetCurrent(ConnectionName).DataContext.ExecuteScalar(cmd);
+
+                return result;
+            }
+        }
+
         public DataTable QueryDataTable(string sql)
         {
             using (DataContextScope.GetCurrent(ConnectionName).Begin())
