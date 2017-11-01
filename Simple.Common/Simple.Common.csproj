@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="Extensions\DateTimeExtension.cs" />
     <Compile Include="Extensions\StringExtension.cs" />
+    <Compile Include="IO\DirectoryMonitor.cs" />
     <Compile Include="Logging\TraceHelper.cs" />
     <Compile Include="Threading\ThreadWorker.cs" />
     <Compile Include="Utility\ActivatorHelper.cs" />
