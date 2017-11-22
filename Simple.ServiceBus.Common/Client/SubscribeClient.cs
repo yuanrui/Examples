@@ -86,9 +86,10 @@ namespace Simple.ServiceBus.Client
             {
                 if (message.TypeName != null)
                 {
-                    if (this._handlers.TryGetValue(message.Body.GetType(), out handler))
+                    if (GetHandler(message.BodyType, out handler))
                     {
-                        var handleResult = ((dynamic)handler).Handle((dynamic)message.Body);
+                        var cmd = message.Body;
+                        var handleResult = ((dynamic)handler).Handle((dynamic)cmd);
                         
                         result.Body = handleResult;
                     }
@@ -194,6 +195,13 @@ namespace Simple.ServiceBus.Client
             {
                 this._handlers.Add(commandType, commandHandler);
             }
+        }
+
+        protected bool GetHandler(string typeName, out ICommandHandler handler)
+        {
+            var handlerType = this._handlers.FirstOrDefault(m => m.Key.FullName == typeName).Key;
+
+            return this._handlers.TryGetValue(handlerType, out handler);
         }
     }
 }

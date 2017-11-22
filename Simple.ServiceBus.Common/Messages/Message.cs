@@ -7,22 +7,36 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.Text;
+using Simple.ServiceBus.Utility;
 
 namespace Simple.ServiceBus.Messages
 {
     [DataContract, Serializable]
-    [KnownType("GetKnownTypes")]
+    //[KnownType("GetKnownTypes")]
     public class Message 
     {
         private Object _body;
 
         [DataMember]
-        public virtual MessageHeader Header { get; set; }
+        protected string BodyWrapper { get; set; }
 
         [DataMember]
+        public virtual MessageHeader Header { get; set; }
+
         public virtual Object Body
         {
-            get { return _body; }
+            get 
+            {
+                if (_body != null)
+                {
+                    return _body;
+                }
+
+                var type = GetType(BodyType);
+                _body = JsonUtils.Deserialize(BodyWrapper, type);
+
+                return _body; 
+            }
             set
             {
                 if (value != null)
@@ -31,6 +45,8 @@ namespace Simple.ServiceBus.Messages
                 }
 
                 _body = value;
+
+                BodyWrapper = JsonUtils.Serialize(value);
             }
         }
 
@@ -58,7 +74,21 @@ namespace Simple.ServiceBus.Messages
         protected static Type[] GetKnownTypes()
         {
             return MessageTypeHelper.GetCommandTypes();
-        } 
+        }
+
+        protected static Type GetType(string typeName)
+        {
+            var type = Type.GetType(typeName);
+            if (type != null) return type;
+            foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                type = a.GetType(typeName);
+                if (type != null)
+                    return type;
+            }
+            return null;
+        }
+
     }
 
     public class Message<T> where T : class, ICommand
