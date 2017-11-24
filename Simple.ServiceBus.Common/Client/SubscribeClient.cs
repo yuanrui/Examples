@@ -32,7 +32,7 @@ namespace Simple.ServiceBus.Client
             _timer = new Timer(DoPing, null, Timeout.Infinite, 5000);
         }
 
-        public void MakeProxy(string endpoindAddress, object callbackinstance)
+        protected void MakeProxy(string endpoindAddress, object callbackinstance)
         {
             var binding = NetSetting.GetBinding();
             
@@ -123,7 +123,7 @@ namespace Simple.ServiceBus.Client
             return result;
         }
 
-        private void DoPing(object obj)
+        protected void DoPing(object obj)
         {
             Ping(_keyMaps.Select(m => m.Key).ToArray());
         }
@@ -157,7 +157,7 @@ namespace Simple.ServiceBus.Client
             return string.Empty;
         }
 
-        private void TryReconnect()
+        protected void TryReconnect()
         {
             try
             {
