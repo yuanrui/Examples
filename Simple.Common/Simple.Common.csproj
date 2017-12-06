@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions\DateTimeExtension.cs" />
+    <Compile Include="Extensions\HttpContextBaseExtension.cs" />
     <Compile Include="Extensions\StringExtension.cs" />
     <Compile Include="IO\DirectoryMonitor.cs" />
     <Compile Include="Logging\TraceHelper.cs" />
