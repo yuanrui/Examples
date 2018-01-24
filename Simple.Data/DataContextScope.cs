@@ -65,25 +65,18 @@ namespace Simple.Data
 
         private DataContextScope(string connectionName)
         {
-            DataContext = new DataContext(connectionName);
-            
-            //if (HttpContext.Current != null && HttpContext.Current.ApplicationInstance != null)
-            //{
-            //    //未起作用
-            //    HttpContext.Current.ApplicationInstance.EndRequest += (sender, e) => DataContext.DoDispose(true);
-            //}
+            DataContext = new DataContext(connectionName);            
         }
 
         public DataContextScope Begin()
         {
-            DataContext.OpenConnection();
-
-            return this;
+            return Begin(false);
         }
 
         public DataContextScope Begin(bool useTran)
         {
             DataContext.OpenConnection();
+
             if (useTran)
             {
                 DataContext.BeginTransaction();
