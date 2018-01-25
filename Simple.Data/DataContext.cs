@@ -11,7 +11,7 @@ namespace Simple.Data
 {
     public class DataContext : IDisposable
     {
-        protected const string ConnectionName = "DefaultConnectionString";
+        protected const String ConnectionName = "DefaultConnectionString";
         private DbConnection _dbConnection;
 
         private DbTransaction _dbTransaction;
@@ -52,7 +52,7 @@ namespace Simple.Data
             //_dbConnection = _database.CreateConnection();
         }
 
-        public DataContext(string connectionName)
+        public DataContext(String connectionName)
         {
             var connSetting = ConfigurationManager.ConnectionStrings[connectionName];
             _dbProviderFactory = DbProviderFactories.GetFactory(connSetting.ProviderName);
@@ -168,7 +168,7 @@ namespace Simple.Data
         /// <param name="param"></param>
         /// <param name="cmdType"></param>
         /// <returns></returns>
-        public List<TEntity> Query<TEntity>(string sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
+        public List<TEntity> Query<TEntity>(String sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
         {
             return _dbConnection.Query<TEntity>(sql, (object)param, transaction: _dbTransaction, commandType: cmdType).ToList();
         }
@@ -184,7 +184,7 @@ namespace Simple.Data
         /// <param name="param"></param>
         /// <param name="cmdType"></param>
         /// <returns></returns>
-        public List<TFirst> Query<TFirst, TSecond>(string sql, Func<TFirst, TSecond, TFirst> map, string splitOn, dynamic param = null, CommandType? cmdType = CommandType.Text)
+        public List<TFirst> Query<TFirst, TSecond>(String sql, Func<TFirst, TSecond, TFirst> map, String splitOn, dynamic param = null, CommandType? cmdType = CommandType.Text)
         {
             return _dbConnection.Query<TFirst, TSecond, TFirst>(sql, map, (object)param, transaction: _dbTransaction, splitOn: splitOn, commandType: cmdType).ToList();
         }
@@ -202,7 +202,7 @@ namespace Simple.Data
         /// <param name="param"></param>
         /// <param name="cmdType"></param>
         /// <returns></returns>
-        public List<TParent> Query<TParent, TChild, TParentKey>(string sql, Func<TParent, TParentKey> parentKeySelector, Func<TParent, ICollection<TChild>> childSelector, string splitOn = "ID", dynamic param = null, CommandType? cmdType = CommandType.Text)
+        public List<TParent> Query<TParent, TChild, TParentKey>(String sql, Func<TParent, TParentKey> parentKeySelector, Func<TParent, ICollection<TChild>> childSelector, String splitOn = "ID", dynamic param = null, CommandType? cmdType = CommandType.Text)
         {
             var cache = new Dictionary<TParentKey, TParent>();
 
@@ -222,7 +222,7 @@ namespace Simple.Data
             return cache.Values.ToList();
         }
 
-        public Tuple<IEnumerable<TFirst>, IEnumerable<TSecond>> QueryMultiple<TFirst, TSecond>(string sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
+        public Tuple<IEnumerable<TFirst>, IEnumerable<TSecond>> QueryMultiple<TFirst, TSecond>(String sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
         {
             SqlMapper.GridReader gridReader = _dbConnection.QueryMultiple(sql, (object)param, transaction: _dbTransaction, commandType: cmdType);
 
@@ -232,17 +232,17 @@ namespace Simple.Data
             }
         }
 
-        public List<dynamic> QueryDynamic(string sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
+        public List<dynamic> QueryDynamic(String sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
         {
             return _dbConnection.Query(sql, (object)param, transaction: _dbTransaction, commandType: cmdType).ToList();
         }
 
-        public DataTable QueryDataTable(string sql)
+        public DataTable QueryDataTable(String sql)
         {
-            return QueryDataTable(sql, string.Empty);
+            return QueryDataTable(sql, String.Empty);
         }
 
-        public DataTable QueryDataTable(string sql, string tableName, CommandType cmdType = CommandType.Text)
+        public DataTable QueryDataTable(String sql, String tableName, CommandType cmdType = CommandType.Text)
         {
             using (var cmd = _dbConnection.CreateCommand())
             {
@@ -251,19 +251,29 @@ namespace Simple.Data
                 
                 using (var adapter = _dbProviderFactory.CreateDataAdapter())
                 {
-                    var table = string.IsNullOrEmpty(tableName) ? new DataTable() : new DataTable(tableName);
+                    var table = String.IsNullOrEmpty(tableName) ? new DataTable() : new DataTable(tableName);
 
                     adapter.SelectCommand = cmd;
                     adapter.Fill(table);
-
+                    
                     return table;
                 }
             }
         }
 
-        public int Execute(string sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
+        public Int32 Execute(String sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
         {
             return _dbConnection.Execute(sql, (object)param, transaction: _dbTransaction, commandType: cmdType);
+        }
+
+        public Object ExecuteScalar(String sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
+        {
+            return _dbConnection.ExecuteScalar(sql, (object)param, transaction: _dbTransaction, commandType: cmdType);
+        }
+
+        public TEntity ExecuteScalar<TEntity>(String sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
+        {
+            return _dbConnection.ExecuteScalar<TEntity>(sql, (object)param, transaction: _dbTransaction, commandType: cmdType);
         }
 
         public void Dispose()

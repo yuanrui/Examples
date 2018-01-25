@@ -20,11 +20,6 @@ namespace Simple.Data
             return new DbUtils<IEntityWrapper>(ConnectionName).QueryDynamic(sql, param, cmdType);
         }
 
-        public static int Execute(string sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
-        {
-            return new DbUtils<IEntityWrapper>(ConnectionName).Execute(sql, param, cmdType);
-        }
-
         public static DataTable QueryDataTable(string sql)
         {
             return new DbUtils<IEntityWrapper>(ConnectionName).QueryDataTable(sql);
@@ -33,6 +28,21 @@ namespace Simple.Data
         public static DataTable QueryDataTable(string sql, string tableName, CommandType cmdType = CommandType.Text)
         {
             return new DbUtils<IEntityWrapper>(ConnectionName).QueryDataTable(sql, tableName, cmdType);
+        }
+
+        public static int Execute(string sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
+        {
+            return new DbUtils<IEntityWrapper>(ConnectionName).Execute(sql, param, cmdType);
+        }
+
+        public static Object ExecuteScalar(string sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
+        {
+            return new DbUtils<IEntityWrapper>(ConnectionName).ExecuteScalar(sql, param, cmdType);
+        }
+
+        public static TEntity ExecuteScalar<TEntity>(string sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
+        {
+            return new DbUtils<TEntity>(ConnectionName).ExecuteScalar<TEntity>(sql, param, cmdType);
         }
 
         private interface IEntityWrapper { }
@@ -49,37 +59,48 @@ namespace Simple.Data
 
         public List<TEntity> Query(string sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
         {
-            using (DataContextScope.GetCurrent(ConnectionName).Begin())
+            using (var scope = DataContextScope.GetCurrent(ConnectionName).Begin())
             {
-                return DataContextScope.GetCurrent(ConnectionName).DataContext.Query<TEntity>(sql, param, cmdType);
+                return scope.DataContext.Query<TEntity>(sql, param, cmdType);
             }
         }
 
         public List<dynamic> QueryDynamic(string sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
         {
-            using (DataContextScope.GetCurrent(ConnectionName).Begin())
+            using (var scope = DataContextScope.GetCurrent(ConnectionName).Begin())
             {
-                return DataContextScope.GetCurrent(ConnectionName).DataContext.QueryDynamic(sql, param, cmdType);
+                return scope.DataContext.QueryDynamic(sql, param, cmdType);
             }
         }
 
-        public int Execute(string sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
+        public int Execute(string sql, dynamic param = null, CommandType? cmdType = CommandType.Text, bool useTran = true)
         {
-            using (var ctx = DataContextScope.GetCurrent(ConnectionName).Begin(true))
+            using (var scope = DataContextScope.GetCurrent(ConnectionName).Begin(useTran))
             {
-                var result = DataContextScope.GetCurrent(ConnectionName).DataContext.Execute(sql, param, cmdType);
-                ctx.Commit();
+                var result = scope.DataContext.Execute(sql, param, cmdType);
+                scope.Commit();
 
                 return result;
             }
         }
 
-        public Object ExecuteScalar(string sql)
+        public Object ExecuteScalar(string sql, dynamic param = null, CommandType? cmdType = CommandType.Text, bool useTran = false)
         {
-            using (var ctx = DataContextScope.GetCurrent(ConnectionName).Begin())
+            using (var scope = DataContextScope.GetCurrent(ConnectionName).Begin(useTran))
             {
-                var cmd = ctx.DataContext.DatabaseObject.GetSqlStringCommand(sql);
-                var result = DataContextScope.GetCurrent(ConnectionName).DataContext.ExecuteScalar(cmd);
+                var result = scope.DataContext.ExecuteScalar(sql, param, cmdType);
+                scope.Commit();
+
+                return result;
+            }
+        }
+
+        public TObject ExecuteScalar<TObject>(string sql, dynamic param = null, CommandType? cmdType = CommandType.Text, bool useTran = false) where TObject : TEntity
+        {
+            using (var scope = DataContextScope.GetCurrent(ConnectionName).Begin(useTran))
+            {
+                var result = scope.DataContext.ExecuteScalar<TObject>(sql, param, cmdType);
+                scope.Commit();
 
                 return result;
             }
@@ -87,17 +108,17 @@ namespace Simple.Data
 
         public DataTable QueryDataTable(string sql)
         {
-            using (DataContextScope.GetCurrent(ConnectionName).Begin())
+            using (var scope = DataContextScope.GetCurrent(ConnectionName).Begin())
             {
-                return DataContextScope.GetCurrent(ConnectionName).DataContext.QueryDataTable(sql);
+                return scope.DataContext.QueryDataTable(sql);
             }
         }
 
         public DataTable QueryDataTable(string sql, string tableName, CommandType cmdType = CommandType.Text)
         {
-            using (DataContextScope.GetCurrent(ConnectionName).Begin())
+            using (var scope = DataContextScope.GetCurrent(ConnectionName).Begin())
             {
-                return DataContextScope.GetCurrent(ConnectionName).DataContext.QueryDataTable(sql, tableName, cmdType);
+                return scope.DataContext.QueryDataTable(sql, tableName, cmdType);
             }
         }
     }
