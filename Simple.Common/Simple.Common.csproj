@@ -53,6 +53,7 @@
     <Compile Include="Extensions\StringExtension.cs" />
     <Compile Include="Extensions\XmlExtension.cs" />
     <Compile Include="IO\DirectoryMonitor.cs" />
+    <Compile Include="Logging\SimpleLogger.cs" />
     <Compile Include="Logging\TraceHelper.cs" />
     <Compile Include="Threading\ThreadWorker.cs" />
     <Compile Include="Utility\ActivatorHelper.cs" />
