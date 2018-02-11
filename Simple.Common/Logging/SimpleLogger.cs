@@ -8,26 +8,20 @@ namespace Simple.Common.Logging
 {
     public class SimpleLogger
     {
-        protected static object _thatObj = new object();
-        protected static readonly string _baseDirectory;
-
-        protected static SimpleLogControl LogControl = new SimpleLogControl();
+        protected static Object _thatObj = new Object();
+        protected static SimpleLogControl LogControl;
 
         static SimpleLogger()
         {
-            _baseDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Logs");
-
-            if (!Directory.Exists(_baseDirectory))
-            {
-                Directory.CreateDirectory(_baseDirectory);
-            }
+            LogControl = new SimpleLogControl();
+            LogControl.Init();
         }
 
-        internal static void Write(string text, string fileName)
+        internal static void Write(String text, String fileName)
         {
             lock (_thatObj)
             {
-                string nowPrefix = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + ">>";
+                String nowPrefix = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + ">>";
                 try
                 {
                     FileInfo fileInfo = new FileInfo(fileName);
@@ -39,62 +33,113 @@ namespace Simple.Common.Logging
                         writer.Close();
                     }
 
-                    LogControl.CheckFile(fileInfo.Length);
+                    LogControl.TryResetFileName(fileInfo.Length);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("{0}file:{1}, content:{2}, write log exception:{3}", nowPrefix, fileName, text, ex);
+                    Console.WriteLine("{0}文件:{1},内容:{2},记录日志出现异常:{3}", nowPrefix, fileName, text, ex);
                 }
             }
         }
 
-        public static void Info(string text)
+        public static void Info(String text)
         {
-            string logFileName = Path.Combine(_baseDirectory, LogControl.FileName);
+            LogControl.TryResetFileName();
 
-            Write(text, logFileName);
+            Write(text, LogControl.GetFileFullName());
         }
 
         protected class SimpleLogControl
         {
-            public DateTime Now { get; protected set; }
+            public String BaseDirectory { get; protected set; }
 
-            public bool IsCreateNewFile { get; protected set; }
+            public DateTime Now { get; protected set; }
 
             public Int64 LogSize { get; set; }
 
-            public string FileName { get; protected set; }
+            public String FileName { get; protected set; }
 
             public SimpleLogControl()
             {
-                Now = DateTime.Now;
-
-                LogSize = 20971520;//20MB
-
-                FileName = GetFileName("yyyyMMdd");
+                this.BaseDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Logs");
+                this.LogSize = 20971520;//20MB
+                this.Now = DateTime.Now;
+                this.FileName = GetFileName("yyyyMMdd");
             }
 
-            private string GetFileName(string timeFormat)
+            public void Init()
             {
-                return DateTime.Now.ToString(timeFormat) + ".log";
-            }
+                DirectoryInfo dirInfo = new DirectoryInfo(this.BaseDirectory);
 
-            public void CheckFile(Int64 fileLength)
-            {
-                if (Now.Date != DateTime.Now.Date)
+                if (!dirInfo.Exists)
                 {
-                    Now = DateTime.Now;
-                    FileName = GetFileName("yyyyMMdd");
+                    dirInfo.Create();
 
                     return;
                 }
 
-                IsCreateNewFile = fileLength >= LogSize;
+                TryResetFileName(dirInfo);
+            }
 
-                if (IsCreateNewFile)
+            private String GetFileName(String timeFormat)
+            {
+                return DateTime.Now.ToString(timeFormat) + ".log";
+            }
+
+            public String GetFileFullName()
+            {
+                return Path.Combine(this.BaseDirectory, this.FileName);
+            }
+
+            public Boolean TryResetFileName()
+            {
+                if (Now.Date == DateTime.Now.Date)
                 {
-                    FileName = GetFileName("yyyyMMdd_HHmmss");
+                    return false;
                 }
+
+                this.Now = DateTime.Now;
+                this.FileName = GetFileName("yyyyMMdd");
+
+                return true;
+            }
+
+            public Boolean TryResetFileName(Int64 fileLength)
+            {
+                var isCreateNewFile = TryResetFileName();
+                if (isCreateNewFile)
+                {
+                    return true;
+                }
+
+                isCreateNewFile = fileLength >= LogSize;
+
+                if (isCreateNewFile)
+                {
+                    this.FileName = GetFileName("yyyyMMdd_HHmmss");
+                }
+
+                return isCreateNewFile;
+            }
+
+            protected Boolean TryResetFileName(DirectoryInfo dirInfo)
+            {
+                if (dirInfo == null || !dirInfo.Exists)
+                {
+                    return false;
+                }
+
+                String searchPattern = DateTime.Now.ToString("yyyyMMdd") + "*.log";
+                FileInfo[] logFiles = dirInfo.GetFiles(searchPattern, SearchOption.TopDirectoryOnly);
+
+                if (logFiles != null && logFiles.Length > 1)
+                {
+                    this.FileName = logFiles[logFiles.Length - 1].Name;
+
+                    return true;
+                }
+
+                return false;
             }
         }
     }
