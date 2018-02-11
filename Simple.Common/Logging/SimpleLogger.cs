@@ -37,7 +37,7 @@ namespace Simple.Common.Logging
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("{0}文件:{1},内容:{2},记录日志出现异常:{3}", nowPrefix, fileName, text, ex);
+                    Console.WriteLine("{0} file:{1}, content:{2}, write log exception:{3}", nowPrefix, fileName, text, ex);
                 }
             }
         }
