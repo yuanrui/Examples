@@ -4,35 +4,28 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Simple.Common.Threading
 {
-    public class ThreadWorker : IWorker
+    public class TaskWorker : IWorker
     {
         private readonly Action _methodToRunInLoop;
-        private Thread _thread;
+        private Task _task;
         private bool _stopRequested;
         private object _syncObject = new object();
         protected string _workerName;
 
         public string Name
         {
-            get { return this.ThreadName; }
+            get { return this.TaskName; }
         }
 
-        protected virtual string ThreadName
+        protected virtual string TaskName
         {
             get
             {
-                return _workerName + "." + GetThreadId().ToString();
-            }
-        }
-
-        protected virtual bool IsBackground
-        {
-            get
-            {
-                return false;
+                return _workerName + "." + GetTaskId().ToString();
             }
         }
 
@@ -48,40 +41,34 @@ namespace Simple.Common.Threading
             }
         }
 
-        public ThreadWorker()
+        public TaskWorker()
             : this(null)
         {
             _workerName = this.GetType().Name;
             _methodToRunInLoop = DoWork;
         }
 
-        public ThreadWorker(Action methodToRunInLoop)
+        public TaskWorker(Action methodToRunInLoop)
         {
             _workerName = this.GetType().Name;
             _methodToRunInLoop = methodToRunInLoop;
-            this._thread = new Thread(new ThreadStart(this.Loop));
-            this._thread.Name = this.ThreadName;
-            this._thread.IsBackground = this.IsBackground;
+            _task = new Task(this.Loop, TaskCreationOptions.LongRunning);
         }
 
         public void Start()
         {
-            if (!this._thread.IsAlive)
+            if (!(_task.Status == TaskStatus.Running))
             {
-                this._thread.Start();
+                _task.Start(TaskScheduler.Current);
             }
-
-            Trace.WriteLine(this.ThreadName + " started.");
         }
 
         public void Stop()
         {
             lock (_syncObject)
             {
-                _stopRequested = true;
+                _stopRequested = true;                
             }
-
-            Trace.WriteLine(this.ThreadName + " stopped.");
         }
 
         protected void Loop()
@@ -94,7 +81,7 @@ namespace Simple.Common.Threading
                 }
                 catch (Exception ex)
                 {
-                    Trace.WriteLine(this.ThreadName + " run exception:" + ex.Message);
+                    Trace.WriteLine(this.TaskName + " run exception:" + ex.Message);
                 }
             }
         }
@@ -104,9 +91,9 @@ namespace Simple.Common.Threading
             Trace.Write("//TODO Override");
         }
 
-        protected Int32 GetThreadId()
+        protected Int32 GetTaskId()
         {
-            return _thread.ManagedThreadId;
+            return _task.Id;
         }
     }
 }

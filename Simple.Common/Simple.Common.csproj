@@ -55,6 +55,8 @@
     <Compile Include="IO\DirectoryMonitor.cs" />
     <Compile Include="Logging\SimpleLogger.cs" />
     <Compile Include="Logging\TraceHelper.cs" />
+    <Compile Include="Threading\IWorker.cs" />
+    <Compile Include="Threading\TaskWorker.cs" />
     <Compile Include="Threading\ThreadWorker.cs" />
     <Compile Include="Utility\ActivatorHelper.cs" />
     <Compile Include="Utility\CodeTimer.cs" />
