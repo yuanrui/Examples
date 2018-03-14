@@ -59,6 +59,7 @@
     <Compile Include="Threading\TaskWorker.cs" />
     <Compile Include="Threading\ThreadWorker.cs" />
     <Compile Include="Utility\ActivatorHelper.cs" />
+    <Compile Include="Utility\AutoStartupUtils.cs" />
     <Compile Include="Utility\CodeTimer.cs" />
     <Compile Include="Utility\DateTimeUtils.cs" />
     <Compile Include="Utility\EnumUtils.cs" />
