@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="Extensions\DateTimeExtension.cs" />
     <Compile Include="Extensions\HttpContextBaseExtension.cs" />
+    <Compile Include="Extensions\NameValueCollectionExtension.cs" />
     <Compile Include="Extensions\StringExtension.cs" />
     <Compile Include="Extensions\XmlExtension.cs" />
     <Compile Include="IO\DirectoryMonitor.cs" />
