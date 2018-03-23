@@ -29,5 +29,22 @@ namespace Simple.Common.Extensions
 
             return result;
         }
+
+        public static KeyValuePair<String, String>[] ToKeyValues(this NameValueCollection collection)
+        {
+            if (collection == null || collection.Count == 0)
+            {
+                return new KeyValuePair<String, String>[0];
+            }
+
+            var result = new KeyValuePair<String, String>[collection.Count];
+
+            for (int i = 0; i < collection.Count; i++)
+            {
+                result[i] = new KeyValuePair<String, String>(collection.Keys[i], collection[i]);
+            }
+
+            return result;
+        }
     }
 }
