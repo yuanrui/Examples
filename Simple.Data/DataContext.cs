@@ -20,23 +20,10 @@ namespace Simple.Data
 
         private DatabaseWrapper _database;
 
-        public DatabaseWrapper DatabaseObject
+        public virtual DatabaseWrapper DatabaseObject
         {
             get { return _database; }
         }
-
-        //public DbConnection ConnectionObject
-        //{
-        //    get
-        //    {
-        //        return _dbConnection;
-        //    }
-        //}
-
-        //public DbTransaction TransactionObject
-        //{
-        //    get { return _dbTransaction; }
-        //}
         
         internal DbProviderFactory DbProviderFactory
         {
@@ -61,7 +48,7 @@ namespace Simple.Data
             _dbConnection.ConnectionString = connSetting.ConnectionString;
         }
 
-        public void OpenConnection()
+        public virtual void OpenConnection()
         {
             if (_dbConnection.State == ConnectionState.Open)
             {
@@ -78,19 +65,19 @@ namespace Simple.Data
             IsDisposed = false;
         }
 
-        public void BeginTransaction()
+        public virtual void BeginTransaction()
         {
             _dbTransaction = _dbConnection.BeginTransaction();
             IsTransactionOpened = true;
         }
 
-        public void BeginTransaction(IsolationLevel isolationLevel)
+        public virtual void BeginTransaction(IsolationLevel isolationLevel)
         {
             _dbTransaction = _dbConnection.BeginTransaction(isolationLevel);
             IsTransactionOpened = true;
         }
 
-        public void CommitTransaction()
+        public virtual void CommitTransaction()
         {
             if (!IsTransactionOpened)
             {
@@ -110,7 +97,7 @@ namespace Simple.Data
             }
         }
 
-        public void RollbackTransaction()
+        public virtual void RollbackTransaction()
         {
             if (!IsTransactionOpened)
             {
@@ -130,29 +117,23 @@ namespace Simple.Data
             }
         }
 
-        public IDataReader ExecuteReader(DbCommand dbCommand)
+        public virtual IDataReader ExecuteReader(DbCommand dbCommand)
         {
             dbCommand.Connection = _dbConnection;
             dbCommand.Transaction = _dbTransaction;
-            if (dbCommand.Connection.State == ConnectionState.Closed)
-            {
-                dbCommand.Connection.Open();
-            }
+            
             return dbCommand.ExecuteReader();
         }
 
-        public Object ExecuteScalar(DbCommand dbCommand)
+        public virtual Object ExecuteScalar(DbCommand dbCommand)
         {
             dbCommand.Connection = _dbConnection;
             dbCommand.Transaction = _dbTransaction;
-            if (dbCommand.Connection.State == ConnectionState.Closed)
-            {
-                dbCommand.Connection.Open();
-            }
+            
             return dbCommand.ExecuteScalar();
         }
 
-        public Int32 ExecuteNonQuery(DbCommand dbCommand)
+        public virtual Int32 ExecuteNonQuery(DbCommand dbCommand)
         {
             dbCommand.Connection = _dbConnection;
             dbCommand.Transaction = _dbTransaction;
@@ -168,7 +149,7 @@ namespace Simple.Data
         /// <param name="param"></param>
         /// <param name="cmdType"></param>
         /// <returns></returns>
-        public List<TEntity> Query<TEntity>(String sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
+        public virtual List<TEntity> Query<TEntity>(String sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
         {
             return _dbConnection.Query<TEntity>(sql, (object)param, transaction: _dbTransaction, commandType: cmdType).ToList();
         }
@@ -184,7 +165,7 @@ namespace Simple.Data
         /// <param name="param"></param>
         /// <param name="cmdType"></param>
         /// <returns></returns>
-        public List<TFirst> Query<TFirst, TSecond>(String sql, Func<TFirst, TSecond, TFirst> map, String splitOn, dynamic param = null, CommandType? cmdType = CommandType.Text)
+        public virtual List<TFirst> Query<TFirst, TSecond>(String sql, Func<TFirst, TSecond, TFirst> map, String splitOn, dynamic param = null, CommandType? cmdType = CommandType.Text)
         {
             return _dbConnection.Query<TFirst, TSecond, TFirst>(sql, map, (object)param, transaction: _dbTransaction, splitOn: splitOn, commandType: cmdType).ToList();
         }
@@ -202,7 +183,7 @@ namespace Simple.Data
         /// <param name="param"></param>
         /// <param name="cmdType"></param>
         /// <returns></returns>
-        public List<TParent> Query<TParent, TChild, TParentKey>(String sql, Func<TParent, TParentKey> parentKeySelector, Func<TParent, ICollection<TChild>> childSelector, String splitOn = "ID", dynamic param = null, CommandType? cmdType = CommandType.Text)
+        public virtual List<TParent> Query<TParent, TChild, TParentKey>(String sql, Func<TParent, TParentKey> parentKeySelector, Func<TParent, ICollection<TChild>> childSelector, String splitOn = "ID", dynamic param = null, CommandType? cmdType = CommandType.Text)
         {
             var cache = new Dictionary<TParentKey, TParent>();
 
@@ -222,7 +203,7 @@ namespace Simple.Data
             return cache.Values.ToList();
         }
 
-        public Tuple<IEnumerable<TFirst>, IEnumerable<TSecond>> QueryMultiple<TFirst, TSecond>(String sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
+        public virtual Tuple<IEnumerable<TFirst>, IEnumerable<TSecond>> QueryMultiple<TFirst, TSecond>(String sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
         {
             SqlMapper.GridReader gridReader = _dbConnection.QueryMultiple(sql, (object)param, transaction: _dbTransaction, commandType: cmdType);
 
@@ -232,17 +213,17 @@ namespace Simple.Data
             }
         }
 
-        public List<dynamic> QueryDynamic(String sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
+        public virtual List<dynamic> QueryDynamic(String sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
         {
             return _dbConnection.Query(sql, (object)param, transaction: _dbTransaction, commandType: cmdType).ToList();
         }
 
-        public DataTable QueryDataTable(String sql)
+        public virtual DataTable QueryDataTable(String sql)
         {
             return QueryDataTable(sql, String.Empty);
         }
 
-        public DataTable QueryDataTable(String sql, String tableName, CommandType cmdType = CommandType.Text)
+        public virtual DataTable QueryDataTable(String sql, String tableName, CommandType cmdType = CommandType.Text)
         {
             using (var cmd = _dbConnection.CreateCommand())
             {
@@ -261,17 +242,17 @@ namespace Simple.Data
             }
         }
 
-        public Int32 Execute(String sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
+        public virtual Int32 Execute(String sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
         {
             return _dbConnection.Execute(sql, (object)param, transaction: _dbTransaction, commandType: cmdType);
         }
 
-        public Object ExecuteScalar(String sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
+        public virtual Object ExecuteScalar(String sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
         {
             return _dbConnection.ExecuteScalar(sql, (object)param, transaction: _dbTransaction, commandType: cmdType);
         }
 
-        public TEntity ExecuteScalar<TEntity>(String sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
+        public virtual TEntity ExecuteScalar<TEntity>(String sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
         {
             return _dbConnection.ExecuteScalar<TEntity>(sql, (object)param, transaction: _dbTransaction, commandType: cmdType);
         }
