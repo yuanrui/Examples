@@ -1,18 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 
 namespace Simple.Common.Logging
 {
     public class SimpleLogger
     {
-        protected static Object _thatObj = new Object();
+        private const string TEXT_PREFIX_FORMAT = "yyyy-MM-dd HH:mm:ss>>";
+        protected static Object _thatObj;
         protected static SimpleLogControl LogControl;
 
         static SimpleLogger()
         {
+            _thatObj = new Object();
             LogControl = new SimpleLogControl();
             LogControl.Init();
         }
@@ -21,15 +21,13 @@ namespace Simple.Common.Logging
         {
             lock (_thatObj)
             {
-                String nowPrefix = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + ">>";
                 try
                 {
                     FileInfo fileInfo = new FileInfo(fileName);
 
                     using (StreamWriter writer = fileInfo.AppendText())
                     {
-                        writer.Write(nowPrefix);
-                        writer.Write(text + System.Environment.NewLine);
+                        writer.WriteLine(text);
                         writer.Close();
                     }
 
@@ -37,7 +35,8 @@ namespace Simple.Common.Logging
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("{0} file:{1}, content:{2}, write log exception:{3}", nowPrefix, fileName, text, ex);
+                    Console.WriteLine("{0}file:{1}, content:{2}, write log exception:{3}",
+                        DateTime.Now.ToString(TEXT_PREFIX_FORMAT), fileName, text, ex);
                 }
             }
         }
@@ -46,6 +45,8 @@ namespace Simple.Common.Logging
         {
             LogControl.TryResetFileName();
 
+            String nowPrefix = DateTime.Now.ToString(TEXT_PREFIX_FORMAT);
+            text = nowPrefix + text;
             Write(text, LogControl.GetFileFullName());
         }
 
@@ -106,7 +107,7 @@ namespace Simple.Common.Logging
 
             public Boolean TryResetFileName(Int64 fileLength)
             {
-                var isCreateNewFile = TryResetFileName();
+                Boolean isCreateNewFile = TryResetFileName();
                 if (isCreateNewFile)
                 {
                     return true;
