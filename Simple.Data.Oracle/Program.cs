@@ -16,14 +16,49 @@ namespace Simple.Data.Oracle
     {
         static void Main(string[] args)
         {
+            TestBindByName();
+            Console.WriteLine("\nPress Any Key To Exit...");
+            Console.ReadLine();
+        }
+
+        private static void TestBindByName()
+        {
+            const string cmdText = @"
+insert into emp (EMPNO, ENAME, JOB, MGR, HIREDATE, SAL, COMM, DEPTNO) 
+values (:EMPNO, :ENAME, :JOB, :MGR, :HIREDATE, :SAL, :COMM, :DEPTNO)";
+
+            var connStr = "Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.1.170)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=ebos)));User ID=scott;Password=tiger;";
+            using (var conn = new OracleConnection(connStr))
+            {
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = cmdText;
+                    //cmd.BindByName = false;
+                    cmd.Parameters.Add("EMPNO", OracleDbType.Int16, 4, ParameterDirection.Input);
+                    cmd.Parameters.Add("ENAME", OracleDbType.Varchar2, "ENAME".ToArray(), ParameterDirection.Input);
+                    cmd.Parameters.Add("JOB", OracleDbType.Varchar2, "JOB", ParameterDirection.Input);
+                    cmd.Parameters.Add("MGR", OracleDbType.Int32, 1, ParameterDirection.Input);
+                    cmd.Parameters.Add("HIREDATE", OracleDbType.Date, DateTime.Now, ParameterDirection.Input);
+                    cmd.Parameters.Add("DEPTNO", OracleDbType.Int32, 30, ParameterDirection.Input);
+                    cmd.Parameters.Add("COMM", OracleDbType.Decimal, 20, ParameterDirection.Input);
+                    cmd.Parameters.Add("SAL", OracleDbType.Decimal, 10, ParameterDirection.Input);
+
+                    conn.Open();
+                    var result = cmd.ExecuteNonQuery() > 0;
+                }
+            }
+        }
+
+        private static void TestInsert()
+        {
             const int totalCount = 5000;
             SaveConfig();
             DropTable();
             CreateTable();
-            
+
             var list = new List<Employee>();
             var sqlList = new List<string>();
-            
+
             for (int i = 0; i < totalCount; i++)
             {
                 var ent = new Employee();
@@ -33,7 +68,7 @@ namespace Simple.Data.Oracle
                 ent.Hiredate = DateTime.Now.AddDays((0 - i) * 1.5);
                 ent.Sal = ent.EName.GetHashCode() / 100000;
                 ent.Comm = ent.EName.GetHashCode() / 100000;
-                
+
                 sqlList.Add(string.Format("insert into emp (EMPNO, ENAME, JOB, MGR, HIREDATE, SAL, COMM, DEPTNO) values ('{0}', '{1}', '{2}', {3}, to_date('{4}', 'yyyy-mm-dd'), {5}, {6}, {7})", Guid.NewGuid().ToString(), "A-" + ent.EName, ent.Job, ent.Mgr, ent.Hiredate.ToString("yyyy-MM-dd"), ent.Sal, ent.Comm, ent.DeptNo));
                 sqlList.Add(string.Format("insert into emp (EMPNO, ENAME, JOB, MGR, HIREDATE, SAL, COMM, DEPTNO) values ('{0}', '{1}', '{2}', {3}, to_date('{4}', 'yyyy-mm-dd'), {5}, {6}, {7})", Guid.NewGuid().ToString(), "A-" + ent.EName, ent.Job, ent.Mgr, ent.Hiredate.ToString("yyyy-MM-dd"), ent.Sal, ent.Comm, ent.DeptNo));
                 list.Add(ent);
@@ -59,9 +94,6 @@ namespace Simple.Data.Oracle
 
             var empCount = DbUtils.Query<Int32>("SELECT COUNT(*) FROM EMP").FirstOrDefault();
             Console.WriteLine("EMP table count:{0}", empCount);
-
-            Console.WriteLine("\nPress Any Key To Exit...");
-            Console.ReadLine();
         }
 
         static void SaveConfig()
@@ -81,10 +113,10 @@ namespace Simple.Data.Oracle
             var builder = new OracleConnectionStringBuilder();
             builder.UserID = "scott";
             builder.Password = "tiger";
-            builder.DataSource = "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.1.170)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=orcl.Router)))";
+            builder.DataSource = "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.1.170)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=ebos)))";
             builder.Pooling = true;
             builder.ConnectionTimeout = 5;
-
+            
             //Console.WriteLine(builder.ToString());
             return builder;
         }
