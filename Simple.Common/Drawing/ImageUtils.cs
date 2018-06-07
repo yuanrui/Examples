@@ -9,7 +9,7 @@ using System.Text;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace Simple.Common
+namespace Simple.Common.Drawing
 {
     public class ImageUtils
     {
