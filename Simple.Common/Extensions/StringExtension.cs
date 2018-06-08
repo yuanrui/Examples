@@ -12,14 +12,18 @@ namespace Simple.Common.Extensions
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        public static string Clean(this string input)
+        public static String Clean(this String input)
         {
             if (input == null)
             {
-                return string.Empty;
+                return String.Empty;
             }
 
-            return input.Replace("\u3000", string.Empty).Replace("\u0020", string.Empty).Replace("\t", string.Empty).Replace("\n", string.Empty).Replace("\r", string.Empty);
+            return input.Replace("\u0020", String.Empty)
+                .Replace("\t", String.Empty)
+                .Replace("\n", String.Empty)
+                .Replace("\r", String.Empty)
+                .Replace("\u3000", String.Empty);
         }
         
         /// <summary>
@@ -27,22 +31,22 @@ namespace Simple.Common.Extensions
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        public static string TrimAll(this string input)
+        public static String TrimAll(this String input)
         {
             if (input == null)
             {
-                return string.Empty;
+                return String.Empty;
             }
 
             return input.Trim('\u0020', '\u3000', '\t', '\n', '\r');
         }
         
-        public static string ToHex(this string input)
+        public static String ToHex(this String input)
         {
             return ToHex(input, null, Encoding.UTF8);
         }
 
-        public static string ToHex(this string input, string separator, Encoding encoding)
+        public static String ToHex(this String input, String separator, Encoding encoding)
         {
             if (input == null)
             {
@@ -60,7 +64,7 @@ namespace Simple.Common.Extensions
             for (int i = 0; i < bytes.Length; i++)
             {
                 builder.AppendFormat("{0:X}", bytes[i]);
-                if (! string.IsNullOrEmpty(separator) && (i != bytes.Length - 1))
+                if (! String.IsNullOrEmpty(separator) && (i != bytes.Length - 1))
                 {
                     builder.Append(",");
                 }
@@ -69,33 +73,33 @@ namespace Simple.Common.Extensions
             return builder.ToString();
         }
 
-        public static string UnHex(this string hex)
+        public static String UnHex(this String hex)
         {
             return UnHex(hex, Encoding.UTF8);
         }
 
-        public static string UnHex(this string hex, Encoding encoding)
+        public static String UnHex(this String hex, Encoding encoding)
         {
             if (hex == null)
             {
                 throw new ArgumentNullException("hex");
             }
             hex = Clean(hex);
-            hex = hex.Replace(",", string.Empty);
+            hex = hex.Replace(",", String.Empty);
             hex = hex.Replace("\\", "");
 
             if (hex.Length % 2 != 0)
             {
                 hex += "20";//blank space
             }
-            
-            byte[] bytes = new byte[hex.Length / 2];
+
+            Byte[] bytes = new Byte[hex.Length / 2];
 
             for (int i = 0; i < bytes.Length; i++)
             {
                 try
                 {
-                    bytes[i] = byte.Parse(hex.Substring(i * 2, 2), System.Globalization.NumberStyles.HexNumber);
+                    bytes[i] = Byte.Parse(hex.Substring(i * 2, 2), System.Globalization.NumberStyles.HexNumber);
                 }
                 catch
                 {
@@ -104,6 +108,26 @@ namespace Simple.Common.Extensions
             }
 
             return encoding.GetString(bytes);
+        }
+
+        public static Boolean IsAllWhiteSpace(this String value)
+        {
+            if (value == null || value.Length == 0)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < value.Length; i++)
+            {
+                if (Char.IsWhiteSpace(value[i]) || value[i] == '\u3000')
+                {
+                    continue;
+                }
+
+                return false;
+            }
+
+            return true;
         }
     }
 }
