@@ -25,7 +25,11 @@ namespace Thrift.Demo.Hosting
 
         public AddressDTO Get(long ADDR_ID)
         {
-            return new AddressDTO { ADDR_ID = id, ADDRESS = ADDR_ID + ":" + Guid.NewGuid().ToString(), REMARK = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") };
+            return new AddressDTO { ADDR_ID = id, ADDRESS = ADDR_ID + ":" + Guid.NewGuid().ToString(), 
+                REMARK = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"),
+                Time = DateTime.Now.AddHours(-1),
+                Time2 = DateTime.Now.AddDays(-1)
+            };
         }
 
         public bool Add(AddressDTO dto)
@@ -66,6 +70,12 @@ namespace Thrift.Demo.Hosting
         public bool DeleteMulti(List<AddressDTO> dtoList)
         {
             return true;
+        }
+
+
+        public bool Add2(List<AddressDTO> list2)
+        {
+            throw new NotImplementedException();
         }
     }
 }
