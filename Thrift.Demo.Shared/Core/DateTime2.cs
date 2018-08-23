@@ -12,6 +12,11 @@ namespace Thrift.Demo.Shared
 
         public static implicit operator Int64(DateTime2 time)
         {
+            if (time == null)
+            {
+                return default(Int64);
+            }
+
             return time.Value;
         }
 
@@ -22,6 +27,11 @@ namespace Thrift.Demo.Shared
 
         public static implicit operator DateTime(DateTime2 time)
         {
+            if (time == null)
+            {
+                return default(DateTime);
+            }
+
             return _startTime.AddMilliseconds(time.Value);
         }
 
