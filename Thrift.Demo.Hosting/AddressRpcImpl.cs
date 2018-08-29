@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Thrift.Demo.Shared;
 using System.Threading;
+using Thrift.Demo.Shared;
 
 namespace Thrift.Demo.Hosting
 {

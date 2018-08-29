@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // 有关程序集的常规信息通过以下
 // 特性集控制。更改这些特性值可修改
 // 与程序集关联的信息。
-[assembly: AssemblyTitle("Thrift.Extensions")]
+[assembly: AssemblyTitle("Thrift.Common")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("微软中国")]
-[assembly: AssemblyProduct("Thrift.Extensions")]
+[assembly: AssemblyProduct("Thrift.Common")]
 [assembly: AssemblyCopyright("Copyright © 微软中国 2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // 如果此项目向 COM 公开，则下列 GUID 用于类型库的 ID
-[assembly: Guid("f3e34e0c-2eec-4c74-ad1e-72526a635ec2")]
+[assembly: Guid("707f3142-541e-435c-af9a-14a9ddbb8f77")]
 
 // 程序集的版本信息由下面四个值组成:
 //
