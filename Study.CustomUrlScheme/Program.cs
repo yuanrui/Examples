@@ -36,13 +36,13 @@ namespace Study.CustomUrlScheme
                 if (args[0] == "-u")
                 {
                     Console.WriteLine("UnRegister " + ProgramName);
-                    UrlProtocolHelper.UnRegister(PROTOCOL);
+                    WinUrlProtocolHelper.UnRegister(PROTOCOL);
                 }
 
                 if (args[0] == "-i")
                 {
                     Console.WriteLine("Register " + ProgramName);
-                    UrlProtocolHelper.Register(PROTOCOL, Process.GetCurrentProcess().MainModule.FileName, "Banana Test Program");
+                    WinUrlProtocolHelper.Register(PROTOCOL, Process.GetCurrentProcess().MainModule.FileName, "Banana Test Program");
                 }
             }
 

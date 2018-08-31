@@ -69,6 +69,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -83,6 +84,10 @@
     <Compile Include="SmsSendShortMessageRpcImpl.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Thrift.Common\Thrift.Common.csproj">
+      <Project>{1347F8CC-5F0F-48F3-8670-B6609D5ED29C}</Project>
+      <Name>Thrift.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Thrift.Demo.Shared\Thrift.Demo.Shared.csproj">
       <Project>{1F535EC9-7DA7-40BC-8DF8-C1750F2863CC}</Project>
       <Name>Thrift.Demo.Shared</Name>
@@ -94,6 +99,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="thrift.hosts.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

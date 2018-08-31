@@ -33,6 +33,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -40,9 +41,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration\HostSetion.cs" />
     <Compile Include="DateTime2.cs" />
     <Compile Include="gen-csharp\DateTime2.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ThriftServer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Thrift\Thrift.csproj">

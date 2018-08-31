@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using Microsoft.Win32;
-using System.Diagnostics;
 
 namespace Study.CustomUrlScheme
 {
-    public static class UrlProtocolHelper
+    public static class WinUrlProtocolHelper
     {
         public static void Register(String protocol, String exePath, String description)
         {

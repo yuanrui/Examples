@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Thrift.Transport;
-using Thrift.Protocol;
-using Thrift.Demo.Shared;
 using Banana.RPC;
+using Thrift.Demo.Shared;
+using Thrift.Protocol;
+using Thrift.Transport;
 
 namespace Thrift.Demo.Client
 {
@@ -13,7 +13,7 @@ namespace Thrift.Demo.Client
     {
         static void Main(string[] args)
         {
-            var transport = new TSocket("localhost", 6011);
+            var transport = new TSocket("localhost", 20188);
             var protocol = new TBinaryProtocol(transport);
 
             TMultiplexedProtocol protocol1 = new TMultiplexedProtocol(protocol, typeof(AddressRpc).FullName);
