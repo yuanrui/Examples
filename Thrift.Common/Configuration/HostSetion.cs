@@ -22,9 +22,9 @@ namespace Thrift.Configuration
     public class HostSetion : ConfigurationSection
     {
         [ConfigurationProperty("defaultHost")]
-        public string DefaultHost
+        public String DefaultHost
         {
-            get { return (string)this["defaultHost"]; }
+            get { return (String)this["defaultHost"]; }
             set { this["defaultHost"] = value; }
         }
 
@@ -37,7 +37,7 @@ namespace Thrift.Configuration
 
     public class HostElements : ConfigurationElementCollection, IEnumerable<HostElement>
     {
-        protected override string ElementName
+        protected override String ElementName
         {
             get
             {
@@ -142,7 +142,7 @@ namespace Thrift.Configuration
 
     public class ServiceElements : ConfigurationElementCollection, IEnumerable<ServiceElement>
     {
-        protected override string ElementName
+        protected override String ElementName
         {
             get
             {

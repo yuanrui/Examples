@@ -15,7 +15,7 @@ namespace Thrift
     {
         const String SECTION_NAME = "thrift.hosts";
         private static HostSetion hostConfiguration = null;
-        private static Dictionary<string, Assembly> assemblyCache = new Dictionary<string, Assembly>();
+        private static Dictionary<String, Assembly> assemblyCache = new Dictionary<String, Assembly>();
 
         private TMultiplexedProcessor _multiplexedProcessor = new TMultiplexedProcessor();
         private TThreadPoolServer _threadPoolServer = null;
@@ -79,7 +79,7 @@ namespace Thrift
 
         public TProcessor GetProcessor(String contractTypeName, String contractAssemblyName, String implTypeName, String implAssemblyName)
         {
-            const string Processor = "+Processor";
+            const String Processor = "+Processor";
             var contractType = GetAssembly(contractAssemblyName).GetType(contractTypeName + Processor);
             var handlerType = GetAssembly(implAssemblyName).GetType(implTypeName);
             
