@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Simple.ServiceBus.Client")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("微软中国")]
+[assembly: AssemblyCompany("Banana")]
 [assembly: AssemblyProduct("Simple.ServiceBus.Client")]
-[assembly: AssemblyCopyright("Copyright © 微软中国 2017")]
+[assembly: AssemblyCopyright("Copyright © Banana 2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

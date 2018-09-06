@@ -33,7 +33,7 @@ namespace _Local.ConsoleApp
                         //read post data
                         var body = reader.ReadToEnd() ?? string.Empty;
                         var list = HttpUtility.ParseQueryString(body);//key value list
-                        Console.WriteLine(body);                        
+                        Console.WriteLine(body);
                     }
 
                     //Response

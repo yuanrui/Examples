@@ -1,21 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Sockets;
-using System.Security.Permissions;
 using System.Text;
 using System.Threading;
-using System.Web;
-using System.Windows;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using Simple.ServiceBus.Client;
-using Simple.ServiceBus.Messages;
 
 namespace _Local.ConsoleApp
 {
@@ -23,75 +12,38 @@ namespace _Local.ConsoleApp
     {
         static void Main(string[] args)
         {
-            var input = Console.ReadLine();
-
-            if (input == "s")
+            byte[] _jpgHeader = { 0xff, 0xd8 };
+            byte[] _pngHeader = { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
+            byte[] _bmpHeader = { 0x42, 0x4D };
+            foreach (var item in _jpgHeader)
             {
-                SubscribeClient client = new SubscribeClient();
-                client.Register(new CallHandler());
+                Console.WriteLine(item);
+            }
 
-                client.Subscribe("call");
-            }
-            else
+            var url = "http://192.168.1.170:33119/BigFileApi";
+            if (!File.Exists("url.txt"))
             {
-                PublishClient client = new PublishClient();
-                
-                do
-                {
-                    var inputMsg = new Message<CallCommand>(new CallCommand(), new MessageHeader() { RequestKey = "call" });
-                    var result = client.Send<CallCommand, Call2Command>(inputMsg);
-                    Console.WriteLine(result.Body);
-                    Thread.Sleep(1000);
-                    input = Console.ReadLine();
-                } while (input != "q");
+                File.Create("url.txt");
             }
+            var rd = new Random(Guid.NewGuid().GetHashCode());
+            WebClient webClient = new WebClient();
+            var input = string.Empty;
+            do
+            {
+                var value = rd.Next(0, 1000);
+                var fileName = (value % 10) + ".jpg";
+                var rsp = webClient.UploadFile(url, "POST", fileName);
+                var rspTxt = Encoding.UTF8.GetString(rsp);
+                var fileUrl = url + "/" + rspTxt;
+                Console.WriteLine(rspTxt + " " + fileName);
+                Console.WriteLine(fileUrl);
+                File.AppendAllText("url.txt", fileUrl, Encoding.UTF8);
+                input = Console.ReadLine();
+            } while (input != "q");
+            
 
             Console.WriteLine("\nPress Any Key To Exit...");
             Console.ReadLine();
-        }
-    }
-
-    public class CallCommand : ICommand
-    {
-        public string Id { get; set; }
-
-        public DateTime Time { get; set; }
-
-        public CallCommand()
-        {
-            Id = Guid.NewGuid().ToString();
-            Time = DateTime.Now;
-        }
-        public override string ToString()
-        {
-            return Id + " " + Time.ToString();
-        }
-    }
-
-    public class Call2Command : ICommand
-    {
-        public string Id { get; set; }
-
-        public DateTime Time { get; set; }
-
-        public Call2Command()
-        {
-            Id = Guid.NewGuid().ToString();
-            Time = DateTime.Now;
-        }
-
-        public override string ToString()
-        {
-            return Id + " " + Time.ToString();
-        }
-    }
-
-    public class CallHandler : ICommandHandler<CallCommand, Call2Command>
-    {
-
-        public Call2Command Handle(CallCommand message)
-        {
-            return new Call2Command() { Id = "abc", Time = message.Time };
         }
     }
 }

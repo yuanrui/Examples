@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("AdminLTE.WebUI")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("微软中国")]
+[assembly: AssemblyCompany("Banana")]
 [assembly: AssemblyProduct("AdminLTE.WebUI")]
-[assembly: AssemblyCopyright("版权所有(C) 微软中国 2017")]
+[assembly: AssemblyCopyright("版权所有(C) Banana 2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Thrift.Demo.Client")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("微软中国")]
+[assembly: AssemblyCompany("Banana")]
 [assembly: AssemblyProduct("Thrift.Demo.Client")]
-[assembly: AssemblyCopyright("Copyright © 微软中国 2018")]
+[assembly: AssemblyCopyright("Copyright © Banana 2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

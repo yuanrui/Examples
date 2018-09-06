@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Simple.MvcPlugins")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("微软中国")]
+[assembly: AssemblyCompany("Banana")]
 [assembly: AssemblyProduct("Simple.MvcPlugins")]
-[assembly: AssemblyCopyright("Copyright © 微软中国 2018")]
+[assembly: AssemblyCopyright("Copyright © Banana 2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // 有关程序集的常规信息通过以下
 // 特性集控制。更改这些特性值可修改
 // 与程序集关联的信息。
-[assembly: AssemblyTitle("Simple.ServiceBus.Host")]
+[assembly: AssemblyTitle("Study.BigFiles")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Banana")]
-[assembly: AssemblyProduct("Simple.ServiceBus.Host")]
-[assembly: AssemblyCopyright("Copyright © Banana 2017")]
+[assembly: AssemblyProduct("Study.BigFiles")]
+[assembly: AssemblyCopyright("Copyright © Banana 2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // 如果此项目向 COM 公开，则下列 GUID 用于类型库的 ID
-[assembly: Guid("494c1c4e-b46d-4d6d-a33a-64629c302f29")]
+[assembly: Guid("d184e423-defc-4455-b978-94dd19320ff8")]
 
 // 程序集的版本信息由下面四个值组成:
 //
