@@ -9,7 +9,7 @@
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Study.BigFiles</RootNamespace>
-    <AssemblyName>Study.BigFiles</AssemblyName>
+    <AssemblyName>BigFile</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
@@ -72,6 +72,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Web" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -79,12 +80,16 @@
   <ItemGroup>
     <Compile Include="BigFile.cs" />
     <Compile Include="BigFileHttpHost.cs" />
+    <Compile Include="HostConfig.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="app.manifest" />
+    <None Include="bigfile.hosts.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

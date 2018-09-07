@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // 有关程序集的常规信息通过以下
 // 特性集控制。更改这些特性值可修改
 // 与程序集关联的信息。
-[assembly: AssemblyTitle("Study.BigFiles")]
+[assembly: AssemblyTitle("BigFile Http Server")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Banana")]
-[assembly: AssemblyProduct("Study.BigFiles")]
+[assembly: AssemblyProduct("BigFile Http Server")]
 [assembly: AssemblyCopyright("Copyright © Banana 2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

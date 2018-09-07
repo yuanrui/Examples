@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 
@@ -9,52 +11,67 @@ namespace Study.BigFiles
 {
     class Program
     {
-        const Int32 BIG_FILE_PORT = 33119;
-        const String BIG_FILE_NAME = "BigFile.data";
-        const Int64 BIG_FILE_SIZE = 1073741824;
-
-        static void Main(string[] args)
+        static void Main(String[] args)
         {
-            Console.Title = "BigFile Http Server";
-            Trace.Listeners.Add(new BigFileTraceListener());
-            
-            BigFileHttpHost host = new BigFileHttpHost(BIG_FILE_PORT, BIG_FILE_NAME, BIG_FILE_SIZE);
-            host.Start();
+            FileVersionInfo fileVer = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location);
+            Console.Title = fileVer.ProductName;
 
+            Trace.Listeners.Add(new BigFileTraceListener());
+
+            InitHosts();
+
+            EndlessLoop();
+            
+            Trace.WriteLine("Exiting...");
+            Thread.Sleep(3000);
+        }
+
+        private static void InitHosts()
+        {
+            try
+            {
+                HostConfig section = ConfigurationManager.GetSection(BigFileHttpHost.HOST_CONFIG_SECTION) as HostConfig;
+
+                if (section == null)
+                {
+                    Trace.WriteLine("配置节点[" + BigFileHttpHost.HOST_CONFIG_SECTION + "]不存在，无法运行程序。");
+                    Trace.WriteLine("Exiting...");
+                    Thread.Sleep(3000);
+                    Environment.Exit(0);
+                    return;
+                }
+
+                foreach (HostElement setting in section.Hosts)
+                {
+                    BigFileHttpHost host = new BigFileHttpHost(setting.Port, setting.FilePath, setting.FileSize);
+                    host.Start();
+                }
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(ex);
+            }
+        }
+
+        private static void EndlessLoop()
+        {
             Trace.WriteLine("Press 'q' to exit.");
+
             try
             {
                 var input = string.Empty;
                 do
                 {
                     input = Console.ReadLine();
-
-                    if (input == "start")
-                    {
-                        host.Start();
-                    }
-
-                    if (input == "stop")
-                    {
-                        host.Stop();
-                    }
-
-                    if (input == "dispose")
-                    {
-                        host.Dispose();
-                    }
                 } while (input != "q");
             }
             catch (Exception ex)
             {
                 Trace.WriteLine(ex.ToString());
             }
-            
-            Trace.WriteLine(Environment.NewLine + "Exiting...");
-            Thread.Sleep(3000);
         }
 
-        public class BigFileTraceListener : TraceListener
+        protected class BigFileTraceListener : TraceListener
         {
             public override void Write(string message)
             {
@@ -68,6 +85,10 @@ namespace Study.BigFiles
         }
 
         #region Test Code
+
+        const Int32 BIG_FILE_PORT = 33119;
+        const String BIG_FILE_NAME = "BigFile.data";
+        const Int64 BIG_FILE_SIZE = 10737418240;
 
         private static byte Checksum(byte[] data)
         {
