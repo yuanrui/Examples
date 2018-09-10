@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
@@ -12,8 +13,11 @@ namespace Study.BigFiles
 {
     public class BigFileHttpHost : IDisposable
     {
+        public const String HOST_CONFIG_SECTION = "bigfile.hosts";
         const String URI_PREFIX_FORMAT = "http://{0}:{1}/";
         const String API_NAME = "BigFileApi";
+        const String TIME_FORMAT = "yyyy-MM-dd HH:mm:ss.fff";
+
         public Int32 Port { get; private set; }
         public String FilePath { get; private set; }
         public Int64 FileSize { get; private set; }
@@ -102,9 +106,9 @@ namespace Study.BigFiles
                 HttpListener http = (HttpListener)obj;
                 Run(http);
             });
-            ListernerThread.Name = "HttpServer";
+            ListernerThread.Name = "HttpServer:" + this.Port;
             ListernerThread.IsBackground = true;
-
+            
             Listerner.Start();
             ListernerThread.Start(this.Listerner);
             IsDisposed = false;
@@ -188,6 +192,10 @@ namespace Study.BigFiles
                 writer.Close();
             }
 
+            IPEndPoint clientIp = ctx.Request.RemoteEndPoint;
+            String fileUrl = fileId == 0L ? String.Empty : String.Format(URI_PREFIX_FORMAT, clientIp.Address, clientIp.Port) + API_NAME + "/" + fileId;
+
+            ctx.Response.AppendHeader("File-Url", fileUrl);
             ctx.Response.StatusCode = (Int32)HttpStatusCode.OK;
             ctx.Response.ContentType = "text/plain";
             ctx.Response.Close();
@@ -308,6 +316,7 @@ namespace Study.BigFiles
             String fileIdUrl = ctx.Request.RawUrl.Replace(API_NAME, String.Empty).Trim('/');
             Int64 fileId = 0L;
             Int64.TryParse(fileIdUrl, out fileId);
+            DateTime uploadDate = DateTime.MinValue;
 
             using (BinaryWriter writer = new BinaryWriter(ctx.Response.OutputStream))
             {
@@ -319,19 +328,20 @@ namespace Study.BigFiles
                 {
                     using (BigFile bigFile = new BigFile(this.FilePath, this.FileSize))
                     {
-                        Byte[] buffer = bigFile.Read(fileId) ?? new Byte[0];
+                        Byte[] buffer = bigFile.Read(fileId, out uploadDate) ?? new Byte[0];
                         writer.Write(buffer, 0, buffer.Length);
                     }
                 }
             }
 
+            ctx.Response.AppendHeader("File-Date", uploadDate.ToString(TIME_FORMAT));
             ctx.Response.StatusCode = (Int32)HttpStatusCode.OK;
             ctx.Response.Close();
         }
 
         private void StartInfo(HttpListenerContext ctx)
-        {
-            const String TIME_FORMAT = "yyyy-MM-dd HH:mm:ss.fff";
+        {            
+            const Int32 MB_SIZE = 1048576;
             Process process = Process.GetCurrentProcess();
 
             PerformanceCounter pcMemory = new PerformanceCounter("Process", "Working Set - Private", process.ProcessName);
@@ -342,6 +352,7 @@ namespace Study.BigFiles
             Thread.Sleep(200);
             CounterSample cs2 = pcCpuLoad.NextSample();
             Single finalCpuCounter = CounterSample.Calculate(cs1, cs2);
+            HostConfig section = ConfigurationManager.GetSection(HOST_CONFIG_SECTION) as HostConfig;
 
             using (StreamWriter writer = new StreamWriter(ctx.Response.OutputStream, Encoding.UTF8))
             {
@@ -351,8 +362,31 @@ namespace Study.BigFiles
                 writer.WriteLine("请求地址:" + ctx.Request.RawUrl);
                 writer.WriteLine("客户端IP:" + ctx.Request.RemoteEndPoint.Address);
                 writer.WriteLine("线程数量:" + process.Threads.Count);
-                writer.WriteLine("程序内存:" + Math.Round(pcMemory.NextValue() / (1024 * 1024), 2) + "MB");
+                writer.WriteLine("程序内存:" + Math.Round(pcMemory.NextValue() / MB_SIZE, 2) + "MB");
                 writer.WriteLine("系统CPU:" + Math.Round(finalCpuCounter, 0) + "%");
+                
+                if (section != null && section.Hosts != null)
+                {
+                    writer.WriteLine();
+                    foreach (HostElement setting in section.Hosts)
+                    {
+                        writer.WriteLine("文件路径:" + setting.FilePath + " 文件大小:" + setting.Size + " Http端口:" + setting.Port);
+
+                        BigFile.Header header = null;
+                        using (BigFile file = new BigFile(setting.FilePath, setting.FileSize))
+                        {
+                            header = file.GetHeader();
+                        }
+
+                        writer.WriteLine("剩余容量:" + Math.Round((Decimal)header.FreeStorage / MB_SIZE, 2) + "MB");
+                        writer.WriteLine("文件个数:" + header.FileCount + " 上一周期文件个数:" + header.CycleTotalFileCount);
+                        writer.WriteLine("文件覆盖次数:" + header.OverwriteCount);
+                        writer.WriteLine("上一文件刻度:" + header.PrevOffset + " 上一文件存储时间:" + header.ActiveTime.ToString(TIME_FORMAT));
+                        writer.WriteLine("末尾文件刻度:" + header.LastOffset + " 末尾文件存储时间:" + header.LastFileTime.ToString(TIME_FORMAT));
+                        writer.WriteLine("当前文件刻度:" + header.CurrentOffset);
+                        writer.WriteLine();
+                    }
+                }
 
                 writer.Close();
             }
