@@ -26,10 +26,8 @@ namespace Study.BigFiles
             public const Int32 Int32_SIZE = 4;
 
             public const Int32 Int64_SIZE = 8;
-
-            public const Int32 CHECKSUM_SIZE = 3;
-
-            public const Int32 BLOCK_HEADER_SIZE = 32;
+            
+            public const Int32 BLOCK_HEADER_SIZE = 64;
             
             public Int32 VersionToken;
 
@@ -118,6 +116,21 @@ namespace Study.BigFiles
                 value = BitConverter.ToInt64(buffer, 0);
             }
 
+            public static Byte[] Read(Stream stream, Int32 bufferSize, ref Int64 index)
+            {
+                Byte[] buffer = new Byte[bufferSize];
+                Read(stream, buffer, ref index);
+
+                return buffer;
+            }
+
+            public static void Read(Stream stream, Byte[] buffer, ref Int64 index)
+            {
+                stream.Seek(index, SeekOrigin.Begin);
+                stream.Read(buffer, 0, buffer.Length);
+                index += buffer.Length;
+            }
+
             #endregion
 
             #region Write
@@ -151,19 +164,58 @@ namespace Study.BigFiles
                 Write(stream, BitConverter.GetBytes(value), ref index);
             }
 
-            private void Write(Stream stream, Byte[] buffer, ref Int64 index)
+            public static void Write(Stream stream, Byte value, ref Int64 index)
+            {
+                Byte[] buffer = new Byte[] { value };
+                Write(stream, buffer, ref index);
+            }
+            
+            public static void Write(Stream stream, Byte[] buffer, ref Int64 index)
             {
                 stream.Seek(index, SeekOrigin.Begin);
                 stream.Write(buffer, 0, buffer.Length);
                 index += buffer.Length;
             }
-            
+
             #endregion
 
-            #region Datetime Help
+            #region Help
+
+            public static Boolean ArrayCompare(Byte[] a1, Byte[] a2)
+            {
+                if (a1 == a2)
+                {
+                    return true;
+                }
+
+                if (a1 == null || a2 == null)
+                {
+                    return false;
+                }
+
+                if (a1.Length != a2.Length)
+                {
+                    return false;
+                }
+
+                for (Int32 i = 0; i < a1.Length; i++)
+                {
+                    if (a1[i] != a2[i])
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
 
             public static DateTime ToDateTime(Int64 value)
             {
+                if (value < 0L)
+                {
+                    return StartTime;
+                }
+
                 return StartTime.AddMilliseconds(value);
             }
 
@@ -236,30 +288,34 @@ namespace Study.BigFiles
                 throw new ArgumentOutOfRangeException("buffer", "文件太大，超出容量。"); 
             }
 
-            Int64 result = 0;
+            if (buffer.Length == 0)
+            {
+                return 0L;
+            }
+
+            Int64 result = 0L;
+            Int64 index = 0L;
             Byte[] lengthArray = BitConverter.GetBytes(buffer.Length);
             Byte[] timeArray = BitConverter.GetBytes(Header.ToInt64(DateTime.Now));
             Byte lengthChecksum = Checksum(lengthArray);
             Byte dataChecksum = Checksum(buffer);
             Byte timeChecksum = Checksum(timeArray);
-            Int64 dataLength = buffer.Length + lengthArray.Length + timeArray.Length + Header.CHECKSUM_SIZE;
+            Int64 dataLength = buffer.Length + Header.BLOCK_HEADER_SIZE;
             Int64 endOffset = SetOffset(dataLength, DateTime.Now);
             
             result = endOffset - dataLength;
+            index = result;
 
-            _stream.Seek(result, SeekOrigin.Begin);
-            _stream.Write(lengthArray, 0, lengthArray.Length);
+            Header.Write(_stream, Header.MagicCode, ref index);
+            Header.Write(_stream, lengthArray, ref index);
+            Header.Write(_stream, lengthChecksum, ref index);
+            Header.Write(_stream, dataChecksum, ref index);
+            
+            Header.Write(_stream, timeArray, ref index);
+            Header.Write(_stream, timeChecksum, ref index);
 
-            _stream.Seek(result + lengthArray.Length, SeekOrigin.Begin);
-            _stream.Write(timeArray, 0, timeArray.Length);
-
-            _stream.Seek(result + lengthArray.Length + timeArray.Length, SeekOrigin.Begin);
-            _stream.WriteByte(lengthChecksum);
-            _stream.WriteByte(dataChecksum);
-            _stream.WriteByte(timeChecksum);
-
-            _stream.Seek(result + lengthArray.Length + timeArray.Length + Header.CHECKSUM_SIZE, SeekOrigin.Begin);
-            _stream.Write(buffer, 0, buffer.Length);
+            index = result + Header.BLOCK_HEADER_SIZE;
+            Header.Write(_stream, buffer, ref index);
 
             _stream.Flush();
 
@@ -268,33 +324,33 @@ namespace Study.BigFiles
 
         public Byte[] Read(Int64 offset, out DateTime uploadDate)
         {
+            Byte[] emptyResult = new Byte[0];
+            Int64 index = offset;
             uploadDate = DateTime.Now;
-            if (offset >= _length)
+            if (offset >= _length || offset == 0L)
             {
-                return new Byte[0];
+                return emptyResult;
             }
-            
-            Byte[] lengthArray = new Byte[Header.Int32_SIZE];
-            Byte[] timeArray = new Byte[Header.Int64_SIZE];
-            Byte[] lengthChecksum = new Byte[1];
-            Byte[] dataChecksum = new Byte[1];
-            Byte[] timeChecksum = new Byte[1];
 
-            _stream.Seek(offset, SeekOrigin.Begin);
-            _stream.Read(lengthArray, 0, lengthArray.Length);
+            Byte[] magicCode = Header.Read(_stream, Header.MagicCode.Length, ref index);
+
+            if (! Header.ArrayCompare(magicCode, Header.MagicCode))
+            {
+                return emptyResult;
+            }
+
+            Byte[] lengthArray = Header.Read(_stream, Header.Int32_SIZE, ref index);
+            Byte[] lengthChecksum = Header.Read(_stream, 1, ref index);
+            Byte[] dataChecksum = Header.Read(_stream, 1, ref index);
+
+            Byte[] timeArray = Header.Read(_stream, Header.Int64_SIZE, ref index);
+            Byte[] timeChecksum = Header.Read(_stream, 1, ref index);
+            
             Int32 dataLength = BitConverter.ToInt32(lengthArray, 0);
-
-            _stream.Seek(offset + lengthArray.Length, SeekOrigin.Begin);
-            _stream.Read(timeArray, 0, timeArray.Length);
-            
-            _stream.Seek(offset + lengthArray.Length + timeArray.Length, SeekOrigin.Begin);
-            _stream.Read(lengthChecksum, 0, 1);
-            _stream.Read(dataChecksum, 0, 1);
-            _stream.Read(timeChecksum, 0, 1);
             
             if (lengthChecksum[0] != Checksum(lengthArray))
             {
-                return new Byte[0];
+                return emptyResult;
             }
 
             if (timeArray[0] == Checksum(timeArray))
@@ -302,19 +358,18 @@ namespace Study.BigFiles
                 Int64 timeValue = BitConverter.ToInt64(timeArray, 0);
                 uploadDate = Header.ToDateTime(timeValue);
             }
-
-            Byte[] result = new Byte[dataLength];
-            _stream.Seek(offset + lengthArray.Length + timeArray.Length + Header.CHECKSUM_SIZE, SeekOrigin.Begin);
-            _stream.Read(result, 0, result.Length);
-
+            
+            index = offset + Header.BLOCK_HEADER_SIZE;
+            Byte[] result = Header.Read(_stream, dataLength, ref index);
+            
             if (dataChecksum[0] != Checksum(result))
             {
-                return new Byte[0];
+                return emptyResult;
             }
 
             return result;
         }
-
+        
         public Header GetHeader()
         {
             Header header = _headerDict[_filePath];

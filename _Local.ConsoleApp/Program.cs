@@ -12,32 +12,67 @@ namespace _Local.ConsoleApp
     {
         static void Main(string[] args)
         {
-            byte[] _jpgHeader = { 0xff, 0xd8 };
-            byte[] _pngHeader = { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
-            byte[] _bmpHeader = { 0x42, 0x4D };
-            foreach (var item in _jpgHeader)
-            {
-                Console.WriteLine(item);
-            }
-
-            var url = "http://192.168.1.170:33119/BigFileApi";
+            var url = "http://192.168.1.108:33119/BigFileApi";
             if (!File.Exists("url.txt"))
             {
                 File.Create("url.txt");
             }
+            Dictionary<string, Byte[]> cache = new Dictionary<string, byte[]>();
             var rd = new Random(Guid.NewGuid().GetHashCode());
             WebClient webClient = new WebClient();
             var input = string.Empty;
+            Byte[] buffer = null;
             do
             {
-                var value = rd.Next(0, 1000);
-                var fileName = (value % 10) + ".jpg";
-                var rsp = webClient.UploadFile(url, "POST", fileName);
-                var rspTxt = Encoding.UTF8.GetString(rsp);
-                var fileUrl = url + "/" + rspTxt;
-                Console.WriteLine(rspTxt + " " + fileName);
-                Console.WriteLine(fileUrl);
-                File.AppendAllText("url.txt", fileUrl, Encoding.UTF8);
+                DateTime now = DateTime.Now;
+                var lines = new List<string>();
+                for (int i = 0; i < 100; i++)
+                {
+                    try
+                    {
+                        url = "http://192.168.1.108:33119/BigFileApi";
+                        var value = rd.Next(0, 1000);
+                        var fileName = (value % 10) + ".jpg";
+                        
+                        if (! cache.ContainsKey(fileName))
+                        {
+                            cache.Add(fileName, File.ReadAllBytes(fileName));
+                        }
+                        buffer = cache[fileName];
+                        var rsp = webClient.UploadData(url, "POST", buffer);
+
+                        var rspTxt = Encoding.UTF8.GetString(rsp);
+                        var fileUrl = url + "/" + rspTxt;
+                        Console.WriteLine(rspTxt.Replace(Environment.NewLine, string.Empty) + " " + fileName);
+                        //Console.WriteLine(fileUrl);
+                        lines.Add(rspTxt);
+
+                        url = "http://192.168.1.108:33120/BigFileApi";
+                        value = rd.Next(0, 1000);
+                        fileName = (value % 10) + ".jpg";
+                        if (!cache.ContainsKey(fileName))
+                        {
+                            cache.Add(fileName, File.ReadAllBytes(fileName));
+                        }
+                        buffer = cache[fileName];
+
+                        rsp = webClient.UploadData(url, "POST", buffer);
+                        rspTxt = Encoding.UTF8.GetString(rsp);
+                        fileUrl = url + "/" + rspTxt;
+                        Console.WriteLine(rspTxt.Replace(Environment.NewLine, string.Empty) + " " + fileName);
+                        //Console.WriteLine(fileUrl);
+                        lines.Add(rspTxt);
+                        
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex);
+                    }
+                }
+                Console.WriteLine("总共耗时:{0}s", (DateTime.Now - now).Seconds);
+                
+                File.AppendAllLines("url.txt", lines, Encoding.UTF8);
+
                 input = Console.ReadLine();
             } while (input != "q");
             

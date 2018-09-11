@@ -15,7 +15,7 @@ namespace Study.BigFiles
         {
             FileVersionInfo fileVer = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location);
             Console.Title = fileVer.ProductName;
-
+            
             Trace.Listeners.Add(new BigFileTraceListener());
 
             InitHosts();

@@ -176,8 +176,8 @@ namespace Study.BigFiles
         private void UploadFile(HttpListenerContext ctx)
         {
             Int64 fileId = 0L;
-
-            Byte[] buffer = GetFile(ctx.Request.ContentEncoding, GetBoundary(ctx.Request.ContentType), ctx.Request.InputStream);
+            
+            Byte[] buffer = GetFile(ctx);
             //File.WriteAllBytes(Guid.NewGuid().ToString("N") + ".jpg", buffer);
             using (BigFile bigFile = new BigFile(this.FilePath, this.FileSize))
             {
@@ -185,17 +185,16 @@ namespace Study.BigFiles
             }
             buffer = null;
             Debug.WriteLine(fileId);
+            
+            String fileUrl = String.Format(URI_PREFIX_FORMAT, ctx.Request.Url.Host, ctx.Request.Url.Port) + API_NAME + "/" + fileId;
 
             using (StreamWriter writer = new StreamWriter(ctx.Response.OutputStream))
             {
-                writer.WriteLine(fileId);
+                writer.Write(fileUrl);
                 writer.Close();
             }
 
-            IPEndPoint clientIp = ctx.Request.RemoteEndPoint;
-            String fileUrl = fileId == 0L ? String.Empty : String.Format(URI_PREFIX_FORMAT, clientIp.Address, clientIp.Port) + API_NAME + "/" + fileId;
-
-            ctx.Response.AppendHeader("File-Url", fileUrl);
+            ctx.Response.AppendHeader("File-Id", fileId.ToString());
             ctx.Response.StatusCode = (Int32)HttpStatusCode.OK;
             ctx.Response.ContentType = "text/plain";
             ctx.Response.Close();
@@ -203,7 +202,47 @@ namespace Study.BigFiles
         
         private String GetBoundary(String ctype)
         {
+            if (ctype == null)
+            {
+                return String.Empty;
+            }
+
             return "--" + ctype.Split(';')[1].Split('=')[1];
+        }
+
+        private Byte[] GetFile(HttpListenerContext ctx)
+        {            
+            String contentType = ctx.Request.ContentType;
+
+            if (contentType == null)
+            {
+                Int64 bufferSize = ctx.Request.ContentLength64;
+                Int64 total = 0L;
+                Byte[] result = new Byte[bufferSize];
+
+                BinaryReader reader = new BinaryReader(ctx.Request.InputStream, ctx.Request.ContentEncoding);
+                
+                while (true)
+                {
+                    Int32 dataleft = result.Length - (Int32)total;
+                    Int32 offset = (Int32)total;
+
+                    Int32 cnt = reader.Read(result, offset, dataleft);
+                    if (cnt <= 0)
+                    {
+                        break;
+                    }
+                    total += cnt;
+                    if (bufferSize <= total)
+                    {
+                        break;
+                    }
+                }
+
+                return result;
+            }
+
+            return GetFile(ctx.Request.ContentEncoding, GetBoundary(contentType), ctx.Request.InputStream);
         }
 
         private Byte[] GetFile(Encoding enc, String boundary, Stream input)
@@ -212,7 +251,7 @@ namespace Study.BigFiles
             {
                 return new Byte[0];
             }
-
+            
             Byte[] boundaryBytes = enc.GetBytes(boundary);
             Int32 boundaryLen = boundaryBytes.Length;
 
