@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("BigFile Http Server")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Banana")]
+[assembly: AssemblyCompany("https://github.com/yuanrui")]
 [assembly: AssemblyProduct("BigFile Http Server")]
-[assembly: AssemblyCopyright("Copyright © Banana 2018")]
+[assembly: AssemblyCopyright("Copyright © YuanRui 2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

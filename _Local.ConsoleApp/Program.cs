@@ -24,9 +24,23 @@ namespace _Local.ConsoleApp
             Byte[] buffer = null;
             do
             {
+                input = Console.ReadLine();
+
+                if (input == "q")
+                {
+                    break;
+                }
+                int total = 100;
+
+                if (! int.TryParse(input, out total))
+                {
+                    total = 100;
+                }
+
                 DateTime now = DateTime.Now;
                 var lines = new List<string>();
-                for (int i = 0; i < 100; i++)
+                var totalBytes = 0L;
+                for (int i = 0; i < total; i++)
                 {
                     try
                     {
@@ -40,7 +54,7 @@ namespace _Local.ConsoleApp
                         }
                         buffer = cache[fileName];
                         var rsp = webClient.UploadData(url, "POST", buffer);
-
+                        totalBytes += buffer.Length;
                         var rspTxt = Encoding.UTF8.GetString(rsp);
                         var fileUrl = url + "/" + rspTxt;
                         Console.WriteLine(rspTxt.Replace(Environment.NewLine, string.Empty) + " " + fileName);
@@ -57,6 +71,7 @@ namespace _Local.ConsoleApp
                         buffer = cache[fileName];
 
                         rsp = webClient.UploadData(url, "POST", buffer);
+                        totalBytes += buffer.Length;
                         rspTxt = Encoding.UTF8.GetString(rsp);
                         fileUrl = url + "/" + rspTxt;
                         Console.WriteLine(rspTxt.Replace(Environment.NewLine, string.Empty) + " " + fileName);
@@ -69,11 +84,13 @@ namespace _Local.ConsoleApp
                         Console.WriteLine(ex);
                     }
                 }
-                Console.WriteLine("总共耗时:{0}s", (DateTime.Now - now).Seconds);
+                var sizeMb = Math.Round((Decimal)totalBytes / (1024 * 1024), 2);
+                double totalSec = (DateTime.Now - now).TotalMilliseconds;
+
+                Console.WriteLine("发送{0}个文件, 总大小:{1}mb, 总共耗时:{2}s 平均{3}mb/s", lines.Count, sizeMb, Math.Round((Decimal)totalSec / 1000, 2), Math.Round(((double)totalBytes / (1024 * 1024)) / (totalSec / 1000), 2));
                 
                 File.AppendAllLines("url.txt", lines, Encoding.UTF8);
 
-                input = Console.ReadLine();
             } while (input != "q");
             
 

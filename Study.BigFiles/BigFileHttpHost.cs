@@ -178,16 +178,15 @@ namespace Study.BigFiles
             Int64 fileId = 0L;
             
             Byte[] buffer = GetFile(ctx);
-            //File.WriteAllBytes(Guid.NewGuid().ToString("N") + ".jpg", buffer);
+            
             using (BigFile bigFile = new BigFile(this.FilePath, this.FileSize))
             {
                 fileId = bigFile.Write(buffer);
             }
             buffer = null;
-            Debug.WriteLine(fileId);
+            String fileUrl = GetApiUrl(ctx.Request.Url.Host, ctx.Request.Url.Port) + "/" + fileId;
+            Trace.Write(fileUrl);
             
-            String fileUrl = String.Format(URI_PREFIX_FORMAT, ctx.Request.Url.Host, ctx.Request.Url.Port) + API_NAME + "/" + fileId;
-
             using (StreamWriter writer = new StreamWriter(ctx.Response.OutputStream))
             {
                 writer.Write(fileUrl);
@@ -352,6 +351,7 @@ namespace Study.BigFiles
 
         private void DownloadFile(HttpListenerContext ctx)
         {
+            Byte[] emptyBuffer = new Byte[0];
             String fileIdUrl = ctx.Request.RawUrl.Replace(API_NAME, String.Empty).Trim('/');
             Int64 fileId = 0L;
             Int64.TryParse(fileIdUrl, out fileId);
@@ -361,13 +361,13 @@ namespace Study.BigFiles
             {
                 if (fileId == 0)
                 {
-                    writer.Write(new Byte[0], 0, 0);
+                    writer.Write(emptyBuffer, 0, 0);
                 }
                 else
                 {
                     using (BigFile bigFile = new BigFile(this.FilePath, this.FileSize))
                     {
-                        Byte[] buffer = bigFile.Read(fileId, out uploadDate) ?? new Byte[0];
+                        Byte[] buffer = bigFile.Read(fileId, out uploadDate) ?? emptyBuffer;
                         writer.Write(buffer, 0, buffer.Length);
                     }
                 }
@@ -378,6 +378,12 @@ namespace Study.BigFiles
             ctx.Response.Close();
         }
 
+        private String GetApiUrl(String ip, Int32 port)
+        {
+            String url = String.Format(URI_PREFIX_FORMAT, ip, port) + API_NAME;
+            return url;
+        }
+        
         private void StartInfo(HttpListenerContext ctx)
         {            
             const Int32 MB_SIZE = 1048576;
@@ -409,6 +415,7 @@ namespace Study.BigFiles
                     writer.WriteLine();
                     foreach (HostElement setting in section.Hosts)
                     {
+                        writer.WriteLine("API:" + GetApiUrl(ctx.Request.Url.Host, setting.Port));
                         writer.WriteLine("文件路径:" + setting.FilePath + " 文件大小:" + setting.Size + " Http端口:" + setting.Port);
 
                         BigFile.Header header = null;
@@ -421,7 +428,12 @@ namespace Study.BigFiles
                         writer.WriteLine("文件个数:" + header.FileCount + " 上一周期文件个数:" + header.CycleTotalFileCount);
                         writer.WriteLine("文件覆盖次数:" + header.OverwriteCount);
                         writer.WriteLine("上一文件刻度:" + header.PrevOffset + " 上一文件存储时间:" + header.ActiveTime.ToString(TIME_FORMAT));
-                        writer.WriteLine("末尾文件刻度:" + header.LastOffset + " 末尾文件存储时间:" + header.LastFileTime.ToString(TIME_FORMAT));
+
+                        if (header.LastOffset > 0)
+                        {
+                            writer.WriteLine("末尾文件刻度:" + header.LastOffset + " 末尾文件存储时间:" + header.LastFileTime.ToString(TIME_FORMAT));
+                        }
+                        
                         writer.WriteLine("当前文件刻度:" + header.CurrentOffset);
                         writer.WriteLine();
                     }
