@@ -6,6 +6,7 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using Simple.Common.Logging;
 
 namespace Study.BigFiles
 {
@@ -55,7 +56,7 @@ namespace Study.BigFiles
 
         private static void EndlessLoop()
         {
-            Trace.WriteLine("Press 'q' to exit.");
+            Trace.Write("Press 'q' to exit.");
 
             try
             {
@@ -80,6 +81,7 @@ namespace Study.BigFiles
 
             public override void WriteLine(string message)
             {
+                SimpleLogger.Info(message);
                 Console.WriteLine("{0}>>{1}", DateTime.Now.ToString("HH:mm:ss"), message);
             }
         }

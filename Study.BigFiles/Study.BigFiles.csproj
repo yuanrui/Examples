@@ -78,9 +78,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BigFile.cs" />
-    <Compile Include="BigFileHttpHost.cs" />
-    <Compile Include="HostConfig.cs" />
+    <Compile Include="..\Simple.Common\Logging\SimpleLogger.cs">
+      <Link>Shared\SimpleLogger.cs</Link>
+    </Compile>
+    <Compile Include="..\Simple.Common\Logging\TraceHelper.cs">
+      <Link>Shared\TraceHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\Simple.Common\Utility\AutoStartupUtils.cs">
+      <Link>Shared\AutoStartupUtils.cs</Link>
+    </Compile>
+    <Compile Include="..\Simple.Common\Utility\VersionUtils.cs">
+      <Link>Shared\VersionUtils.cs</Link>
+    </Compile>
+    <Compile Include="Core\BigFile.cs" />
+    <Compile Include="Core\BigFileHttpHost.cs" />
+    <Compile Include="Core\HostConfig.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

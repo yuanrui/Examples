@@ -62,7 +62,7 @@ namespace Study.BigFiles
         {
             while (listerner.IsListening)
             {
-                Trace.WriteLine("waiting request...");
+                Trace.Write("waiting request...");
                 HttpListenerContext ctx = listerner.GetContext();
 
                 ThreadPool.QueueUserWorkItem(obj =>
@@ -156,7 +156,7 @@ namespace Study.BigFiles
         protected void DoHandler(HttpListenerContext ctx)
         {
             String url = (ctx.Request.RawUrl ?? String.Empty).Trim('/');
-            Trace.WriteLine(String.Format("Client:{0} {1} Request:{2}", ctx.Request.RemoteEndPoint.Address, ctx.Request.HttpMethod, ctx.Request.Url));
+            Trace.Write(String.Format("Client:{0} {1} Request:{2}", ctx.Request.RemoteEndPoint.Address, ctx.Request.HttpMethod, ctx.Request.Url));
 
             if (String.Equals(url, API_NAME, StringComparison.OrdinalIgnoreCase) && ctx.Request.HttpMethod == "POST")
             {
