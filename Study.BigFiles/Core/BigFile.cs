@@ -7,8 +7,8 @@ namespace Study.BigFiles
 {
     public class BigFile : IDisposable
     {
-        private String _filePath;
-        private Int64 _length;
+        private readonly String _filePath;
+        private readonly Int64 _length;
         private Stream _stream;
         private static Object _syncObj = new Object();
         private static Dictionary<String, Header> _headerDict = new Dictionary<String, Header>();
@@ -71,12 +71,27 @@ namespace Study.BigFiles
 
             public Int64 OverwriteCount;
 
+            protected Int64 OverwriteTimeValue;
+
+            public DateTime OverwriteTime 
+            {
+                get
+                {
+                    return ToDateTime(OverwriteTimeValue);
+                }
+                set
+                {
+                    OverwriteTimeValue = ToInt64(value);
+                }
+            }
+
             public Int64 FreeStorage;
 
             public Header()
             {
-                ActiveTime = DateTime.MinValue;
-                LastFileTime = DateTime.MinValue;
+                ActiveTime = default(DateTime);
+                LastFileTime = default(DateTime);
+                OverwriteTime = default(DateTime);
             }
 
             #endregion
@@ -96,6 +111,7 @@ namespace Study.BigFiles
                 Read(stream, ref LastFileTimeValue, ref index);
                 Read(stream, ref CycleTotalFileCount, ref index);
                 Read(stream, ref OverwriteCount, ref index);
+                Read(stream, ref OverwriteTimeValue, ref index);                
             }
 
             private void Read(Stream stream, ref Int32 value, ref Int64 index)
@@ -150,6 +166,7 @@ namespace Study.BigFiles
                 Write(stream, LastFileTimeValue, ref index);
                 Write(stream, CycleTotalFileCount, ref index);
                 Write(stream, OverwriteCount, ref index);
+                Write(stream, OverwriteTimeValue, ref index);
 
                 stream.Flush();
             }
@@ -239,7 +256,7 @@ namespace Study.BigFiles
 
         protected void Init()
         {
-            lock (_syncObj)
+            lock (String.Intern(_filePath))
             {
                 _stream = new FileStream(_filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
 
@@ -381,7 +398,7 @@ namespace Study.BigFiles
 
         private Int64 SetOffset(Int64 offset, DateTime time)
         {
-            lock (_syncObj)
+            lock (String.Intern(_filePath))
             {
                 Header header = GetHeader();
 
@@ -393,6 +410,7 @@ namespace Study.BigFiles
                     header.LastOffset = header.PrevOffset;
                     header.LastFileTime = header.ActiveTime;
                     header.OverwriteCount = header.OverwriteCount + 1;
+                    header.OverwriteTime = DateTime.Now;
                     header.CycleTotalFileCount = header.FileCount;
                     header.FileCount = 0;
                 }

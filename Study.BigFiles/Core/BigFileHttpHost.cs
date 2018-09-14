@@ -36,19 +36,7 @@ namespace Study.BigFiles
         {
             HttpListener listerner = new HttpListener();
             listerner.AuthenticationSchemes = AuthenticationSchemes.Anonymous;
-            IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
-
-            foreach (IPAddress ip in host.AddressList)
-            {
-                if (ip.AddressFamily != AddressFamily.InterNetwork)
-                {
-                    continue;
-                }
-                listerner.Prefixes.Add(GetURI(ip.ToString()));
-            }
-
-            listerner.Prefixes.Add(GetURI("localhost"));
-            listerner.Prefixes.Add(GetURI("127.0.0.1"));
+            listerner.Prefixes.Add(GetURI("*"));
 
             return listerner;
         }
@@ -77,16 +65,22 @@ namespace Study.BigFiles
                     {
                         String exMsg = String.Format("Request Url:{0} Http Method:{1} Exception:{2}", ctx.Request.Url, ctx.Request.HttpMethod, ex.ToString());
                         Trace.WriteLine(exMsg);
-                        using (StreamWriter writer = new StreamWriter(ctx.Response.OutputStream, Encoding.UTF8))
+                        try
                         {
-                            writer.WriteLine(exMsg);
-                            writer.Close();
-                        }
+                            using (StreamWriter writer = new StreamWriter(ctx.Response.OutputStream, Encoding.UTF8))
+                            {
+                                writer.WriteLine(exMsg);
 
-                        httpCtx.Response.StatusCode = (Int32)HttpStatusCode.InternalServerError;
-                        httpCtx.Response.ContentType = "text/plain";
-                        httpCtx.Response.ContentEncoding = Encoding.UTF8;
-                        httpCtx.Response.Close();
+                                httpCtx.Response.StatusCode = (Int32)HttpStatusCode.InternalServerError;
+                                httpCtx.Response.ContentType = "text/plain";
+                                httpCtx.Response.ContentEncoding = Encoding.UTF8;
+                                writer.Close();
+                            }
+                        }
+                        catch (Exception ctxEx)
+                        {
+                            Console.WriteLine(ctxEx);
+                        }                        
                     }
                 }, ctx);
             }
@@ -190,13 +184,12 @@ namespace Study.BigFiles
             using (StreamWriter writer = new StreamWriter(ctx.Response.OutputStream))
             {
                 writer.Write(fileUrl);
+
+                ctx.Response.AppendHeader("File-Id", fileId.ToString());
+                ctx.Response.StatusCode = (Int32)HttpStatusCode.OK;
+                ctx.Response.ContentType = "text/plain";
                 writer.Close();
             }
-
-            ctx.Response.AppendHeader("File-Id", fileId.ToString());
-            ctx.Response.StatusCode = (Int32)HttpStatusCode.OK;
-            ctx.Response.ContentType = "text/plain";
-            ctx.Response.Close();
         }
         
         private String GetBoundary(String ctype)
@@ -371,11 +364,12 @@ namespace Study.BigFiles
                         writer.Write(buffer, 0, buffer.Length);
                     }
                 }
-            }
 
-            ctx.Response.AppendHeader("File-Date", uploadDate.ToString(TIME_FORMAT));
-            ctx.Response.StatusCode = (Int32)HttpStatusCode.OK;
-            ctx.Response.Close();
+                ctx.Response.AppendHeader("File-Date", uploadDate.ToString(TIME_FORMAT));
+                ctx.Response.StatusCode = (Int32)HttpStatusCode.OK;
+                ctx.Response.Close();
+                writer.Close();
+            }
         }
 
         private String GetApiUrl(String ip, Int32 port)
@@ -397,6 +391,7 @@ namespace Study.BigFiles
             Thread.Sleep(200);
             CounterSample cs2 = pcCpuLoad.NextSample();
             Single finalCpuCounter = CounterSample.Calculate(cs1, cs2);
+
             HostConfig section = ConfigurationManager.GetSection(HOST_CONFIG_SECTION) as HostConfig;
 
             using (StreamWriter writer = new StreamWriter(ctx.Response.OutputStream, Encoding.UTF8))
@@ -409,7 +404,8 @@ namespace Study.BigFiles
                 writer.WriteLine("线程数量:" + process.Threads.Count);
                 writer.WriteLine("程序内存:" + Math.Round(pcMemory.NextValue() / MB_SIZE, 2) + "MB");
                 writer.WriteLine("系统CPU:" + Math.Round(finalCpuCounter, 0) + "%");
-                
+                writer.WriteLine("OS版本:" + Environment.OSVersion.VersionString);
+
                 if (section != null && section.Hosts != null)
                 {
                     writer.WriteLine();
@@ -425,8 +421,8 @@ namespace Study.BigFiles
                         }
 
                         writer.WriteLine("剩余容量:" + Math.Round((Decimal)header.FreeStorage / MB_SIZE, 2) + "MB");
-                        writer.WriteLine("文件个数:" + header.FileCount + " 上一周期文件个数:" + header.CycleTotalFileCount);
-                        writer.WriteLine("文件覆盖次数:" + header.OverwriteCount);
+                        writer.WriteLine("文件个数:" + header.FileCount);
+                        writer.WriteLine("覆盖前文件个数:" + header.CycleTotalFileCount + " 覆盖次数:" + header.OverwriteCount + " 覆盖时间:" + header.OverwriteTime.ToString(TIME_FORMAT));
                         writer.WriteLine("上一文件刻度:" + header.PrevOffset + " 上一文件存储时间:" + header.ActiveTime.ToString(TIME_FORMAT));
 
                         if (header.LastOffset > 0)
@@ -439,13 +435,11 @@ namespace Study.BigFiles
                     }
                 }
 
+                ctx.Response.StatusCode = (Int32)HttpStatusCode.OK;
+                ctx.Response.ContentType = "text/plain";
+                ctx.Response.ContentEncoding = Encoding.UTF8;
                 writer.Close();
             }
-
-            ctx.Response.StatusCode = (Int32)HttpStatusCode.OK;
-            ctx.Response.ContentType = "text/plain";
-            ctx.Response.ContentEncoding = Encoding.UTF8;
-            ctx.Response.Close();
         }
     }
 }
