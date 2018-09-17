@@ -318,9 +318,15 @@ namespace Study.BigFiles
             Byte dataChecksum = Checksum(buffer);
             Byte timeChecksum = Checksum(timeArray);
             Int64 dataLength = buffer.Length + Header.BLOCK_HEADER_SIZE;
-            Int64 endOffset = SetOffset(dataLength, DateTime.Now);
-            
-            result = endOffset - dataLength;
+            Int64 prevOffset = 0;
+            Int64 nextOffset = SetOffset(dataLength, DateTime.Now, out prevOffset);
+
+            Byte[] prevOffsetArray = BitConverter.GetBytes(prevOffset);
+            Byte prevOffsetChecksum = Checksum(prevOffsetArray);
+            Byte[] nextOffsetArray = BitConverter.GetBytes(nextOffset);
+            Byte nextOffsetChecksum = Checksum(nextOffsetArray);
+
+            result = nextOffset - dataLength;
             index = result;
 
             Header.Write(_stream, Header.MagicCode, ref index);
@@ -330,6 +336,11 @@ namespace Study.BigFiles
             
             Header.Write(_stream, timeArray, ref index);
             Header.Write(_stream, timeChecksum, ref index);
+
+            Header.Write(_stream, prevOffsetArray, ref index);
+            Header.Write(_stream, prevOffsetChecksum, ref index);
+            Header.Write(_stream, nextOffsetArray, ref index);
+            Header.Write(_stream, nextOffsetChecksum, ref index);
 
             index = result + Header.BLOCK_HEADER_SIZE;
             Header.Write(_stream, buffer, ref index);
@@ -396,12 +407,12 @@ namespace Study.BigFiles
             return header;
         }
 
-        private Int64 SetOffset(Int64 offset, DateTime time)
+        private Int64 SetOffset(Int64 offset, DateTime time, out Int64 prevOffset)
         {
             lock (String.Intern(_filePath))
             {
                 Header header = GetHeader();
-
+                prevOffset = header.PrevOffset;
                 Int64 @newOffset = header.CurrentOffset + offset;
 
                 if (@newOffset > _stream.Length)
