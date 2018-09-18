@@ -122,36 +122,11 @@ namespace Study.BigFiles
             Trace.WriteLine(ListernerThread.Name + " stopped.");
         }
 
-        public void Dispose()
-        {
-            try
-            {
-                if (ListernerThread != null)
-                {
-                    ListernerThread.Abort();
-
-                    Trace.WriteLine(ListernerThread.Name + " disposed.");
-                }
-
-                if (Listerner != null)
-                {
-                    Listerner.Stop();
-                    Listerner.Close();
-                }
-
-                IsDisposed = true;
-            }
-            catch (Exception ex)
-            {
-                Trace.WriteLine(ex);
-            }
-        }
-
         protected void DoHandler(HttpListenerContext ctx)
         {
             String url = (ctx.Request.RawUrl ?? String.Empty).Trim('/');
             Trace.Write(String.Format("Client:{0} {1} Request:{2}", ctx.Request.RemoteEndPoint.Address, ctx.Request.HttpMethod, ctx.Request.Url));
-
+            
             if (String.Equals(url, API_NAME, StringComparison.OrdinalIgnoreCase) && ctx.Request.HttpMethod == "POST")
             {
                 UploadFile(ctx);
@@ -440,6 +415,51 @@ namespace Study.BigFiles
                 ctx.Response.ContentEncoding = Encoding.UTF8;
                 writer.Close();
             }
+        }
+        
+        ~BigFileHttpHost()
+        {
+            Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(Boolean disposing)
+        {
+            if (IsDisposed || !disposing)
+            {
+                return;
+            }
+
+            try
+            {
+                if (ListernerThread != null)
+                {
+                    ListernerThread.Abort();
+
+                    Trace.WriteLine(ListernerThread.Name + " disposed.");
+                }
+
+                if (Listerner != null)
+                {
+                    Listerner.Stop();
+                    Listerner.Close();
+                }
+
+                IsDisposed = true;
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(ex);
+            }
+            finally 
+            {
+                IsDisposed = true;
+            }            
         }
     }
 }

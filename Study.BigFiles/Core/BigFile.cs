@@ -12,6 +12,7 @@ namespace Study.BigFiles
         private Stream _stream;
         private static Object _syncObj = new Object();
         private static Dictionary<String, Header> _headerDict = new Dictionary<String, Header>();
+        public Boolean IsDisposed { get; private set; }
 
         public class Header 
         {
@@ -283,16 +284,6 @@ namespace Study.BigFiles
             }
         }
 
-        public void Dispose()
-        {
-            if (_stream == null)
-            {
-                return;
-            }
-
-            _stream.Dispose();
-        }
-
         public Int64 Write(Byte[] buffer)
         {
             if (buffer == null)
@@ -449,6 +440,32 @@ namespace Study.BigFiles
                 }
             }
             return sum;
+        }
+
+        ~BigFile()
+        {
+            Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(Boolean disposing)
+        {
+            if (IsDisposed || !disposing)
+            {
+                return;
+            }
+
+            if (_stream != null)
+            {
+                _stream.Dispose();
+            }
+            
+            IsDisposed = true;
         }
     }
 }
