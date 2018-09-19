@@ -29,7 +29,9 @@ namespace Study.BigFiles
             public const Int32 Int64_SIZE = 8;
             
             public const Int32 BLOCK_HEADER_SIZE = 64;
-            
+
+            public Boolean FeatureMatch;
+
             public Int32 VersionToken;
 
             public Int64 CurrentOffset;
@@ -52,11 +54,11 @@ namespace Study.BigFiles
                 }
             }
 
-            public Int64 LastOffset;
+            public Int64 FinalOffset;
             
             protected Int64 LastFileTimeValue;
 
-            public DateTime LastFileTime
+            public DateTime FinalFileTime
             {
                 get
                 {
@@ -91,7 +93,7 @@ namespace Study.BigFiles
             public Header()
             {
                 ActiveTime = default(DateTime);
-                LastFileTime = default(DateTime);
+                FinalFileTime = default(DateTime);
                 OverwriteTime = default(DateTime);
             }
 
@@ -101,18 +103,22 @@ namespace Study.BigFiles
 
             internal void Read(Stream stream)
             {
-                Int64 index = MagicCode.LongLength;
-                
+                Int64 index = 0L;
+                Byte[] magicCodeArray = new Byte[MagicCode.Length];
+
+                Read(stream, magicCodeArray, ref index);
                 Read(stream, ref VersionToken, ref index);
                 Read(stream, ref CurrentOffset, ref index);
                 Read(stream, ref PrevOffset, ref index);
                 Read(stream, ref FileCount, ref index);
                 Read(stream, ref ActiveTimeValue, ref index);
-                Read(stream, ref LastOffset, ref index);
+                Read(stream, ref FinalOffset, ref index);
                 Read(stream, ref LastFileTimeValue, ref index);
                 Read(stream, ref CycleTotalFileCount, ref index);
                 Read(stream, ref OverwriteCount, ref index);
-                Read(stream, ref OverwriteTimeValue, ref index);                
+                Read(stream, ref OverwriteTimeValue, ref index);
+
+                FeatureMatch = ArrayCompare(magicCodeArray, MagicCode);
             }
 
             private void Read(Stream stream, ref Int32 value, ref Int64 index)
@@ -163,7 +169,7 @@ namespace Study.BigFiles
                 Write(stream, PrevOffset, ref index);
                 Write(stream, FileCount, ref index);
                 Write(stream, ActiveTimeValue, ref index);
-                Write(stream, LastOffset, ref index);
+                Write(stream, FinalOffset, ref index);
                 Write(stream, LastFileTimeValue, ref index);
                 Write(stream, CycleTotalFileCount, ref index);
                 Write(stream, OverwriteCount, ref index);
@@ -229,7 +235,10 @@ namespace Study.BigFiles
 
             public static DateTime ToDateTime(Int64 value)
             {
-                if (value < 0L)
+                const Int64 MIN_VALUE = 0L;
+                const Int64 MAX_VALUE = 315537897599999L;
+
+                if (value < MIN_VALUE || value > MAX_VALUE)
                 {
                     return StartTime;
                 }
@@ -393,7 +402,7 @@ namespace Study.BigFiles
         {
             Header header = _headerDict[_filePath];
             header.Read(_stream);
-            header.FreeStorage = _stream.Length - header.CurrentOffset;
+            header.FreeStorage = _length - header.CurrentOffset;
 
             return header;
         }
@@ -406,14 +415,29 @@ namespace Study.BigFiles
                 prevOffset = header.PrevOffset;
                 Int64 @newOffset = header.CurrentOffset + offset;
 
-                if (@newOffset > _stream.Length)
+                if (@newOffset > _length)
                 {
                     @newOffset = Header.OFFSET_SIZE + offset;
-                    header.LastOffset = header.PrevOffset;
-                    header.LastFileTime = header.ActiveTime;
+                    header.FinalOffset = header.PrevOffset;
+                    header.FinalFileTime = header.ActiveTime;
                     header.OverwriteCount = header.OverwriteCount + 1;
+                    if (header.OverwriteCount > _length)
+                    {
+                        header.OverwriteCount = 0;
+                    }
                     header.OverwriteTime = DateTime.Now;
                     header.CycleTotalFileCount = header.FileCount;
+                    header.FileCount = 0;
+                }
+
+                if (@newOffset < Header.OFFSET_SIZE)
+                {
+                    @newOffset = Header.OFFSET_SIZE + offset;
+                    header.FinalOffset = 0;
+                    header.FinalFileTime = DateTime.MinValue;
+                    header.OverwriteCount = 0;
+                    header.OverwriteTime = DateTime.MinValue;
+                    header.CycleTotalFileCount = 0;
                     header.FileCount = 0;
                 }
                 
@@ -421,7 +445,7 @@ namespace Study.BigFiles
                 header.PrevOffset = header.CurrentOffset;
                 header.CurrentOffset = @newOffset;
                 header.ActiveTime = time;
-                header.FreeStorage = _stream.Length - header.CurrentOffset;
+                header.FreeStorage = _length - header.CurrentOffset;
 
                 header.Write(_stream);
 

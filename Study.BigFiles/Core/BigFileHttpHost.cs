@@ -63,8 +63,11 @@ namespace Study.BigFiles
                     }
                     catch (Exception ex)
                     {
-                        String exMsg = String.Format("Request Url:{0} Http Method:{1} Exception:{2}", ctx.Request.Url, ctx.Request.HttpMethod, ex.ToString());
+                        String exMsg = String.Format("Request Url:{0}, Http Method:{1}, File Path:{2}, Exception:{3}", 
+                            ctx.Request.Url, ctx.Request.HttpMethod, this.FilePath, ex.ToString());
+
                         Trace.WriteLine(exMsg);
+
                         try
                         {
                             using (StreamWriter writer = new StreamWriter(ctx.Response.OutputStream, Encoding.UTF8))
@@ -153,7 +156,7 @@ namespace Study.BigFiles
                 fileId = bigFile.Write(buffer);
             }
             buffer = null;
-            String fileUrl = GetApiUrl(ctx.Request.Url.Host, ctx.Request.Url.Port) + "/" + fileId;
+            String fileUrl = GetApiUrl(ctx.Request.LocalEndPoint.Address.ToString(), ctx.Request.LocalEndPoint.Port) + "/" + fileId;
             Trace.Write(fileUrl);
             
             using (StreamWriter writer = new StreamWriter(ctx.Response.OutputStream))
@@ -400,9 +403,9 @@ namespace Study.BigFiles
                         writer.WriteLine("覆盖前文件个数:" + header.CycleTotalFileCount + " 覆盖次数:" + header.OverwriteCount + " 覆盖时间:" + header.OverwriteTime.ToString(TIME_FORMAT));
                         writer.WriteLine("上一文件刻度:" + header.PrevOffset + " 上一文件存储时间:" + header.ActiveTime.ToString(TIME_FORMAT));
 
-                        if (header.LastOffset > 0)
+                        if (header.FinalOffset > 0)
                         {
-                            writer.WriteLine("末尾文件刻度:" + header.LastOffset + " 末尾文件存储时间:" + header.LastFileTime.ToString(TIME_FORMAT));
+                            writer.WriteLine("末尾文件刻度:" + header.FinalOffset + " 末尾文件存储时间:" + header.FinalFileTime.ToString(TIME_FORMAT));
                         }
                         
                         writer.WriteLine("当前文件刻度:" + header.CurrentOffset);
