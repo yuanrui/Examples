@@ -389,7 +389,7 @@ namespace Study.BigFiles
                     writer.WriteLine();
                     foreach (HostElement setting in section.Hosts)
                     {
-                        writer.WriteLine("API:" + GetApiUrl(ctx.Request.Url.Host, setting.Port));
+                        writer.WriteLine("API:" + GetApiUrl(ctx.Request.LocalEndPoint.Address.ToString(), ctx.Request.LocalEndPoint.Port));
                         writer.WriteLine("文件路径:" + setting.FilePath + " 文件大小:" + setting.Size + " Http端口:" + setting.Port);
 
                         BigFile.Header header = null;
