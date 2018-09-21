@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.ServiceProcess;
 using System.Text;
 using System.Threading;
 using Simple.Common.Logging;
@@ -14,44 +15,45 @@ namespace Study.BigFiles
     {
         static void Main(String[] args)
         {
-            FileVersionInfo fileVer = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location);
-            Console.Title = fileVer.ProductName;
-            
+            String productName = GetProductName();
             Trace.Listeners.Add(new BigFileTraceListener());
 
-            InitHosts();
+            if (Environment.UserInteractive)
+            {
+                StartApp(productName);
+            }
+            else
+            {
+                StartWinService(productName);
+            }
+        }
+
+        private static void StartApp(String productName)
+        {
+            Console.Title = productName;
+
+            HttpHostManager hostManager = new HttpHostManager();
+            hostManager.Start();
 
             EndlessLoop();
-            
+
             Trace.WriteLine("Exiting...");
             Thread.Sleep(3000);
         }
 
-        private static void InitHosts()
+        private static void StartWinService(String productName)
         {
-            try
+            using (HttpWinService service = new HttpWinService())
             {
-                HostConfig section = ConfigurationManager.GetSection(BigFileHttpHost.HOST_CONFIG_SECTION) as HostConfig;
-
-                if (section == null)
-                {
-                    Trace.WriteLine("配置节点[" + BigFileHttpHost.HOST_CONFIG_SECTION + "]不存在，无法运行程序。");
-                    Trace.WriteLine("Exiting...");
-                    Thread.Sleep(3000);
-                    Environment.Exit(0);
-                    return;
-                }
-
-                foreach (HostElement setting in section.Hosts)
-                {
-                    BigFileHttpHost host = new BigFileHttpHost(setting.Port, setting.FilePath, setting.FileSize);
-                    host.Start();
-                }
+                ServiceBase.Run(service);
             }
-            catch (Exception ex)
-            {
-                Trace.WriteLine(ex);
-            }
+        }
+
+        private static String GetProductName()
+        {
+            FileVersionInfo fileVer = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location);
+
+            return fileVer.ProductName;
         }
 
         private static void EndlessLoop()
@@ -87,6 +89,8 @@ namespace Study.BigFiles
         }
 
         #region Test Code
+
+#if NET40
 
         const Int32 BIG_FILE_PORT = 33119;
         const String BIG_FILE_NAME = "BigFile.data";
@@ -185,6 +189,8 @@ namespace Study.BigFiles
                 File.WriteAllBytes(filePath, data);
             }
         }
+
+#endif
 
         #endregion
     }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
 using System.Text;
 
 namespace Study.BigFiles
@@ -65,7 +66,7 @@ namespace Study.BigFiles
 
         protected override object GetElementKey(ConfigurationElement element)
         {
-            return ((HostElement)element).FilePath;
+            return ((HostElement)element)._FilePath;
         }
 
         public new IEnumerator<HostElement> GetEnumerator()
@@ -80,7 +81,7 @@ namespace Study.BigFiles
     public class HostElement : ConfigurationElement
     {
         [ConfigurationProperty("path", IsRequired = true)]
-        public String FilePath
+        public String _FilePath
         {
             get { return this["path"].ToString(); }
             set { this["path"] = value; }
@@ -110,7 +111,19 @@ namespace Study.BigFiles
 
         public override String ToString()
         {
-            return this.FilePath;
+            return this._FilePath;
+        }
+
+        public String GetFilePath()
+        {
+            FileInfo fileInfo = new FileInfo(this._FilePath);
+
+            if (fileInfo.DirectoryName == Environment.SystemDirectory)
+            {
+                return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileInfo.Name);
+            }
+
+            return fileInfo.FullName;
         }
 
         private Int64 GetFileSize(String size)

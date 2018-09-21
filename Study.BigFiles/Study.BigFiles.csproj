@@ -73,6 +73,9 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
+    <Reference Include="System.Configuration.Install" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Web" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -84,16 +87,26 @@
     <Compile Include="..\Simple.Common\Logging\TraceHelper.cs">
       <Link>Shared\TraceHelper.cs</Link>
     </Compile>
-    <Compile Include="..\Simple.Common\Utility\AutoStartupUtils.cs">
-      <Link>Shared\AutoStartupUtils.cs</Link>
-    </Compile>
     <Compile Include="..\Simple.Common\Utility\VersionUtils.cs">
       <Link>Shared\VersionUtils.cs</Link>
     </Compile>
     <Compile Include="Core\BigFile.cs" />
     <Compile Include="Core\BigFileHttpHost.cs" />
     <Compile Include="Core\HostConfig.cs" />
+    <Compile Include="Core\HttpHostManager.cs" />
+    <Compile Include="Core\HttpWinService.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Core\HttpWinService.Designer.cs">
+      <DependentUpon>HttpWinService.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
+    <Compile Include="Core\ProjectInstaller.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Core\ProjectInstaller.Designer.cs">
+      <DependentUpon>ProjectInstaller.cs</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

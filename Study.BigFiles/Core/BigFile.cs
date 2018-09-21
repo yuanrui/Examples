@@ -14,20 +14,20 @@ namespace Study.BigFiles
         private static Dictionary<String, Header> _headerDict = new Dictionary<String, Header>();
         public Boolean IsDisposed { get; private set; }
 
-        public class Header 
+        public class Header
         {
             #region Member
 
             public static readonly Byte[] MagicCode = new Byte[] { 0x59, 0x52, 0x46, 0x53 };
 
             protected static readonly DateTime StartTime = new DateTime(1, 1, 1);
-            
+
             public const Int32 OFFSET_SIZE = 65536;//64kb
 
             public const Int32 Int32_SIZE = 4;
 
             public const Int32 Int64_SIZE = 8;
-            
+
             public const Int32 BLOCK_HEADER_SIZE = 64;
 
             public Boolean FeatureMatch;
@@ -55,7 +55,7 @@ namespace Study.BigFiles
             }
 
             public Int64 FinalOffset;
-            
+
             protected Int64 LastFileTimeValue;
 
             public DateTime FinalFileTime
@@ -76,7 +76,7 @@ namespace Study.BigFiles
 
             protected Int64 OverwriteTimeValue;
 
-            public DateTime OverwriteTime 
+            public DateTime OverwriteTime
             {
                 get
                 {
@@ -193,7 +193,7 @@ namespace Study.BigFiles
                 Byte[] buffer = new Byte[] { value };
                 Write(stream, buffer, ref index);
             }
-            
+
             public static void Write(Stream stream, Byte[] buffer, ref Int64 index)
             {
                 stream.Seek(index, SeekOrigin.Begin);
@@ -260,7 +260,7 @@ namespace Study.BigFiles
         {
             _filePath = filePath;
             _length = length;
-            
+
             Init();
         }
 
@@ -270,7 +270,7 @@ namespace Study.BigFiles
             {
                 _stream = new FileStream(_filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
 
-                if (! _headerDict.ContainsKey(_filePath))
+                if (!_headerDict.ContainsKey(_filePath))
                 {
                     _headerDict.Add(_filePath, new Header());
                 }
@@ -287,7 +287,7 @@ namespace Study.BigFiles
                 {
                     header.CurrentOffset = Header.OFFSET_SIZE;
                 }
-                
+
                 header.VersionToken = Int32.Parse(DateTime.Now.ToString("yyyyMMdd"));
                 header.Write(_stream);
             }
@@ -302,7 +302,7 @@ namespace Study.BigFiles
 
             if (buffer.LongLength >= (_length - Header.OFFSET_SIZE))
             {
-                throw new ArgumentOutOfRangeException("buffer", "文件太大，超出容量。"); 
+                throw new ArgumentOutOfRangeException("buffer", "文件太大，超出容量。");
             }
 
             if (buffer.Length == 0)
@@ -328,15 +328,19 @@ namespace Study.BigFiles
 
             result = nextOffset - dataLength;
             index = result;
-
+            Byte[] dataPositionArray = BitConverter.GetBytes(result + Header.BLOCK_HEADER_SIZE);
+            Byte dataPositionChecksum = Checksum(dataPositionArray);
+            
             Header.Write(_stream, Header.MagicCode, ref index);
             Header.Write(_stream, lengthArray, ref index);
             Header.Write(_stream, lengthChecksum, ref index);
             Header.Write(_stream, dataChecksum, ref index);
-            
+
             Header.Write(_stream, timeArray, ref index);
             Header.Write(_stream, timeChecksum, ref index);
 
+            Header.Write(_stream, dataPositionArray, ref index);
+            Header.Write(_stream, dataPositionChecksum, ref index);
             Header.Write(_stream, prevOffsetArray, ref index);
             Header.Write(_stream, prevOffsetChecksum, ref index);
             Header.Write(_stream, nextOffsetArray, ref index);
@@ -362,7 +366,7 @@ namespace Study.BigFiles
 
             Byte[] magicCode = Header.Read(_stream, Header.MagicCode.Length, ref index);
 
-            if (! Header.ArrayCompare(magicCode, Header.MagicCode))
+            if (!Header.ArrayCompare(magicCode, Header.MagicCode))
             {
                 return emptyResult;
             }
@@ -373,9 +377,9 @@ namespace Study.BigFiles
 
             Byte[] timeArray = Header.Read(_stream, Header.Int64_SIZE, ref index);
             Byte[] timeChecksum = Header.Read(_stream, 1, ref index);
-            
+
             Int32 dataLength = BitConverter.ToInt32(lengthArray, 0);
-            
+
             if (lengthChecksum[0] != Checksum(lengthArray))
             {
                 return emptyResult;
@@ -386,10 +390,10 @@ namespace Study.BigFiles
                 Int64 timeValue = BitConverter.ToInt64(timeArray, 0);
                 uploadDate = Header.ToDateTime(timeValue);
             }
-            
+
             index = offset + Header.BLOCK_HEADER_SIZE;
             Byte[] result = Header.Read(_stream, dataLength, ref index);
-            
+
             if (dataChecksum[0] != Checksum(result))
             {
                 return emptyResult;
@@ -397,7 +401,7 @@ namespace Study.BigFiles
 
             return result;
         }
-        
+
         public Header GetHeader()
         {
             Header header = _headerDict[_filePath];
@@ -407,17 +411,17 @@ namespace Study.BigFiles
             return header;
         }
 
-        private Int64 SetOffset(Int64 offset, DateTime time, out Int64 prevOffset)
+        private Int64 SetOffset(Int64 dataSize, DateTime time, out Int64 prevOffset)
         {
             lock (String.Intern(_filePath))
             {
                 Header header = GetHeader();
                 prevOffset = header.PrevOffset;
-                Int64 @newOffset = header.CurrentOffset + offset;
+                Int64 @newOffset = header.CurrentOffset + dataSize;
 
                 if (@newOffset > _length)
                 {
-                    @newOffset = Header.OFFSET_SIZE + offset;
+                    @newOffset = Header.OFFSET_SIZE + dataSize;
                     header.FinalOffset = header.PrevOffset;
                     header.FinalFileTime = header.ActiveTime;
                     header.OverwriteCount = header.OverwriteCount + 1;
@@ -432,7 +436,7 @@ namespace Study.BigFiles
 
                 if (@newOffset < Header.OFFSET_SIZE)
                 {
-                    @newOffset = Header.OFFSET_SIZE + offset;
+                    @newOffset = Header.OFFSET_SIZE + dataSize;
                     header.FinalOffset = 0;
                     header.FinalFileTime = DateTime.MinValue;
                     header.OverwriteCount = 0;
@@ -440,7 +444,7 @@ namespace Study.BigFiles
                     header.CycleTotalFileCount = 0;
                     header.FileCount = 0;
                 }
-                
+
                 header.FileCount = header.FileCount + 1;
                 header.PrevOffset = header.CurrentOffset;
                 header.CurrentOffset = @newOffset;
@@ -488,7 +492,7 @@ namespace Study.BigFiles
             {
                 _stream.Dispose();
             }
-            
+
             IsDisposed = true;
         }
     }

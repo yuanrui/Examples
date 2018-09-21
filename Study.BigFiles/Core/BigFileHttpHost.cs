@@ -390,10 +390,10 @@ namespace Study.BigFiles
                     foreach (HostElement setting in section.Hosts)
                     {
                         writer.WriteLine("API:" + GetApiUrl(ctx.Request.LocalEndPoint.Address.ToString(), ctx.Request.LocalEndPoint.Port));
-                        writer.WriteLine("文件路径:" + setting.FilePath + " 文件大小:" + setting.Size + " Http端口:" + setting.Port);
+                        writer.WriteLine("文件路径:" + setting.GetFilePath() + " 文件大小:" + setting.Size + " Http端口:" + setting.Port);
 
                         BigFile.Header header = null;
-                        using (BigFile file = new BigFile(setting.FilePath, setting.FileSize))
+                        using (BigFile file = new BigFile(setting.GetFilePath(), setting.FileSize))
                         {
                             header = file.GetHeader();
                         }
