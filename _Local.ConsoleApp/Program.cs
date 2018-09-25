@@ -17,6 +17,20 @@ namespace _Local.ConsoleApp
             Console.ReadLine();
         }
 
+        private static void TestBigFile2()
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                Study.BigFiles.BigFile2 bf2 = new Study.BigFiles.BigFile2("img.data", 100 * 1024 * 1024);
+                var buffer = File.ReadAllBytes(i.ToString() + ".jpg");
+                var id = bf2.Write(buffer);
+                DateTime time = DateTime.MinValue;
+                var result = bf2.Read(id, out time);
+
+                File.WriteAllBytes(Path.Combine("Images", id + ".jpg"), result);
+            }
+        }
+
         private static void TestUploadFile()
         {
             if (!File.Exists("url.txt"))
