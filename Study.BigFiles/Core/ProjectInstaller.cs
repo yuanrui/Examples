@@ -13,5 +13,37 @@ namespace Study.BigFiles
         {
             InitializeComponent();
         }
+
+        public override void Install(IDictionary stateSaver)
+        {
+            var displayName = this.Context.Parameters["DN"].ToString();
+            var serviceName = this.Context.Parameters["SN"].ToString();
+            if (!String.IsNullOrEmpty(displayName))
+            {
+                this.serviceInstaller.DisplayName = displayName;
+            }
+            if (!String.IsNullOrEmpty(serviceName))
+            {
+                this.serviceInstaller.ServiceName = serviceName;
+            }
+
+            base.Install(stateSaver);
+        }
+
+        public override void Uninstall(IDictionary savedState)
+        {
+            var displayName = this.Context.Parameters["DN"].ToString();
+            var serviceName = this.Context.Parameters["SN"].ToString();
+            if (!String.IsNullOrEmpty(displayName))
+            {
+                this.serviceInstaller.DisplayName = displayName;
+            }
+            if (!String.IsNullOrEmpty(serviceName))
+            {
+                this.serviceInstaller.ServiceName = serviceName;
+            }
+
+            base.Uninstall(savedState);
+        }
     }
 }
