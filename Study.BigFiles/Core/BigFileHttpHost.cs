@@ -147,13 +147,13 @@ namespace Study.BigFiles
 
         private void UploadFile(HttpListenerContext ctx)
         {
-            Int64 fileId = 0L;
+            String fileId = String.Empty;
             
             Byte[] buffer = GetFile(ctx);
             
             using (BigFile bigFile = new BigFile(this.FilePath, this.FileSize))
             {
-                fileId = bigFile.Write(buffer);
+                fileId = bigFile.Write(buffer).ToString();
             }
             buffer = null;
             String fileUrl = GetApiUrl(ctx.Request.LocalEndPoint.Address.ToString(), ctx.Request.LocalEndPoint.Port) + "/" + fileId;
@@ -163,7 +163,7 @@ namespace Study.BigFiles
             {
                 writer.Write(fileUrl);
 
-                ctx.Response.AppendHeader("File-Id", fileId.ToString());
+                ctx.Response.AppendHeader("File-Id", fileId);
                 ctx.Response.StatusCode = (Int32)HttpStatusCode.OK;
                 ctx.Response.ContentType = "text/plain";
                 writer.Close();
@@ -326,8 +326,7 @@ namespace Study.BigFiles
             String fileIdUrl = ctx.Request.RawUrl.Replace(API_NAME, String.Empty).Trim('/');
             Int64 fileId = 0L;
             Int64.TryParse(fileIdUrl, out fileId);
-            DateTime uploadDate = DateTime.MinValue;
-
+            
             using (BinaryWriter writer = new BinaryWriter(ctx.Response.OutputStream))
             {
                 if (fileId == 0)
@@ -338,12 +337,11 @@ namespace Study.BigFiles
                 {
                     using (BigFile bigFile = new BigFile(this.FilePath, this.FileSize))
                     {
-                        Byte[] buffer = bigFile.Read(fileId, out uploadDate) ?? emptyBuffer;
+                        Byte[] buffer = bigFile.Read(fileId) ?? emptyBuffer;
                         writer.Write(buffer, 0, buffer.Length);
                     }
                 }
 
-                ctx.Response.AppendHeader("File-Date", uploadDate.ToString(TIME_FORMAT));
                 ctx.Response.StatusCode = (Int32)HttpStatusCode.OK;
                 ctx.Response.Close();
                 writer.Close();

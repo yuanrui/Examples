@@ -164,7 +164,6 @@ namespace Study.BigFiles
             {
                 Directory.CreateDirectory("Images");
             }
-            DateTime uploadDate;
             var index = 0;
             foreach (var line in lines)
             {
@@ -177,7 +176,7 @@ namespace Study.BigFiles
                 var fileName = string.Format("{0}-{2}-{1}", arry[0], arry[2], Guid.NewGuid().ToString("N"));
                 var filePath = Path.Combine("Images", fileName);
                 
-                var data = bigFile.Read(Convert.ToInt64(arry[0]), out uploadDate);
+                var data = bigFile.Read(Convert.ToInt64(arry[0]));
 
                 if (data == null || data.Length == 0)
                 {

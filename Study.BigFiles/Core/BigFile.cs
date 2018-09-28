@@ -354,11 +354,11 @@ namespace Study.BigFiles
             return result;
         }
 
-        public Byte[] Read(Int64 offset, out DateTime uploadDate)
+        public Byte[] Read(Int64 offset)
         {
             Byte[] emptyResult = new Byte[0];
             Int64 index = offset;
-            uploadDate = DateTime.Now;
+            
             if (offset >= _length || offset == 0L)
             {
                 return emptyResult;
@@ -375,20 +375,11 @@ namespace Study.BigFiles
             Byte[] lengthChecksum = Header.Read(_stream, 1, ref index);
             Byte[] dataChecksum = Header.Read(_stream, 1, ref index);
 
-            Byte[] timeArray = Header.Read(_stream, Header.Int64_SIZE, ref index);
-            Byte[] timeChecksum = Header.Read(_stream, 1, ref index);
-
             Int32 dataLength = BitConverter.ToInt32(lengthArray, 0);
 
             if (lengthChecksum[0] != Checksum(lengthArray))
             {
                 return emptyResult;
-            }
-
-            if (timeArray[0] == Checksum(timeArray))
-            {
-                Int64 timeValue = BitConverter.ToInt64(timeArray, 0);
-                uploadDate = Header.ToDateTime(timeValue);
             }
 
             index = offset + Header.BLOCK_HEADER_SIZE;
