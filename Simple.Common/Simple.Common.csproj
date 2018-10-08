@@ -62,6 +62,8 @@
     <Compile Include="Logging\TraceHelper.cs" />
     <Compile Include="Net\NetworkInformation\IPSemantics.cs" />
     <Compile Include="Threading\IWorker.cs" />
+    <Compile Include="Threading\QueueWorker.cs" />
+    <Compile Include="Threading\SelfQueueWorker.cs" />
     <Compile Include="Threading\TaskWorker.cs" />
     <Compile Include="Threading\ThreadWorker.cs" />
     <Compile Include="Utility\ActivatorHelper.cs" />
