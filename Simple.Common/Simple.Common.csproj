@@ -74,6 +74,7 @@
     <Compile Include="Drawing\ImageResizer.cs" />
     <Compile Include="Drawing\ImageUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utility\ExpressionUtils.cs" />
     <Compile Include="Utility\MachineInfoUtils.cs" />
     <Compile Include="Utility\SHA1Utils.cs" />
     <Compile Include="Utility\StructureConverter.cs" />
