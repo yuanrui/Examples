@@ -54,6 +54,7 @@
     <Compile Include="Extensions\DictionaryExtension.cs" />
     <Compile Include="Extensions\HttpContextBaseExtension.cs" />
     <Compile Include="Extensions\NameValueCollectionExtension.cs" />
+    <Compile Include="Extensions\StreamExtension.cs" />
     <Compile Include="Extensions\StringExtension.cs" />
     <Compile Include="Extensions\XmlExtension.cs" />
     <Compile Include="Generic\EntityBinder.cs" />
