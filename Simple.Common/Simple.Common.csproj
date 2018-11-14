@@ -65,6 +65,7 @@
     <Compile Include="IO\DirectoryMonitor.cs" />
     <Compile Include="Logging\SimpleLogger.cs" />
     <Compile Include="Logging\TraceHelper.cs" />
+    <Compile Include="Net\NetworkInformation\FreePort.cs" />
     <Compile Include="Net\NetworkInformation\IPSemantics.cs" />
     <Compile Include="Threading\IWorker.cs" />
     <Compile Include="Threading\QueueWorker.cs" />
