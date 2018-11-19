@@ -67,6 +67,7 @@
     <Compile Include="Logging\TraceHelper.cs" />
     <Compile Include="Net\NetworkInformation\FreePort.cs" />
     <Compile Include="Net\NetworkInformation\IPSemantics.cs" />
+    <Compile Include="Text\HexEncoding.cs" />
     <Compile Include="Threading\IWorker.cs" />
     <Compile Include="Threading\QueueWorker.cs" />
     <Compile Include="Threading\SelfQueueWorker.cs" />
