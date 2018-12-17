@@ -62,6 +62,7 @@
     <Compile Include="Extensions\StringExtension.cs" />
     <Compile Include="Extensions\XmlExtension.cs" />
     <Compile Include="Generic\EntityBinder.cs" />
+    <Compile Include="Generic\ParamDictionary.cs" />
     <Compile Include="IO\DirectoryMonitor.cs" />
     <Compile Include="Logging\SimpleLogger.cs" />
     <Compile Include="Logging\TraceHelper.cs" />
