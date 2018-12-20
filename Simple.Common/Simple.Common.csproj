@@ -86,6 +86,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utility\ExpressionUtils.cs" />
     <Compile Include="Utility\MachineInfoUtils.cs" />
+    <Compile Include="Utility\MiniJSON.cs" />
     <Compile Include="Utility\SHA1Utils.cs" />
     <Compile Include="Utility\StructureConverter.cs" />
     <Compile Include="Utility\UrlUtils.cs" />
