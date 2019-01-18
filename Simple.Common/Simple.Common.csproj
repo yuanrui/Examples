@@ -54,6 +54,7 @@
     <Compile Include="Checksum\IChecksum.cs" />
     <Compile Include="Core\LocalContext.cs" />
     <Compile Include="Drawing\CaptchaImage.cs" />
+    <Compile Include="Extensions\ArrayExtension.cs" />
     <Compile Include="Extensions\DateTimeExtension.cs" />
     <Compile Include="Extensions\DictionaryExtension.cs" />
     <Compile Include="Extensions\HttpContextBaseExtension.cs" />
