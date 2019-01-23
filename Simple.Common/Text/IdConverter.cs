@@ -53,5 +53,16 @@
 
             return "0x" + id.ToString("X4");
         }
+
+        public static Guid ToGuid(DateTime time)
+        {
+            var input = Guid.NewGuid().ToString("N");
+            var timeToken = time.Year.ToString("x4") + time.Month.ToString("x2") + time.Day.ToString("x2")
+                + time.Hour.ToString("x2") + time.Minute.ToString("x2") + time.Second.ToString("x2")
+                + time.Millisecond.ToString("x4");
+            input = timeToken + input.Substring(timeToken.Length);
+
+            return Guid.ParseExact(input, "N");
+        }
     }
 }
