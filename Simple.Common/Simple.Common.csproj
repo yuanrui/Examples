@@ -53,6 +53,7 @@
     <Compile Include="Checksum\Crc32.cs" />
     <Compile Include="Checksum\IChecksum.cs" />
     <Compile Include="Core\LocalContext.cs" />
+    <Compile Include="Cryptography\CryptoUtils.cs" />
     <Compile Include="Drawing\CaptchaImage.cs" />
     <Compile Include="Extensions\ArrayExtension.cs" />
     <Compile Include="Extensions\DateTimeExtension.cs" />
