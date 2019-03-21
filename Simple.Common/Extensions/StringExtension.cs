@@ -129,5 +129,21 @@ namespace Simple.Common.Extensions
 
             return true;
         }
+
+        public static bool HasValue(this string input) 
+        {
+            return !string.IsNullOrEmpty(input);
+        }
+
+        public static string IsNullOrEmptyReturn(this string value, string toReturn) 
+        {
+            return value.HasValue() ? value : toReturn;
+        }
+
+        public static bool IsNullOrEmpty(this string input)
+        {
+            return string.IsNullOrEmpty(input);
+        }
+
     }
 }
