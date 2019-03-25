@@ -74,7 +74,7 @@ namespace Study.BigFiles
                             {
                                 writer.WriteLine(exMsg);
 
-                                httpCtx.Response.StatusCode = (Int32)HttpStatusCode.InternalServerError;
+                                httpCtx.Response.StatusCode = (Int32)HttpStatusCode.OK;
                                 httpCtx.Response.ContentType = "text/plain";
                                 httpCtx.Response.ContentEncoding = Encoding.UTF8;
                                 writer.Close();
