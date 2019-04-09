@@ -52,6 +52,7 @@
     <Compile Include="Checksum\BZip2Crc.cs" />
     <Compile Include="Checksum\Crc32.cs" />
     <Compile Include="Checksum\IChecksum.cs" />
+    <Compile Include="Core\DataCache.cs" />
     <Compile Include="Core\LocalContext.cs" />
     <Compile Include="Core\Singleton.cs" />
     <Compile Include="Cryptography\CryptoUtils.cs" />
