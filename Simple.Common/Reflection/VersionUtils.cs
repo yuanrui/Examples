@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Simple.Common.Utility
+namespace Simple.Common.Reflection
 {
     public class VersionUtils
     {

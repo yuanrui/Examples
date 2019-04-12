@@ -72,6 +72,7 @@
     <Compile Include="Logging\TraceHelper.cs" />
     <Compile Include="Net\NetworkInformation\FreePort.cs" />
     <Compile Include="Net\NetworkInformation\IPSemantics.cs" />
+    <Compile Include="Reflection\AssemblyInfoHelper.cs" />
     <Compile Include="Text\Base64Url.cs" />
     <Compile Include="Text\ByteSize.cs" />
     <Compile Include="Text\HexEncoding.cs" />
