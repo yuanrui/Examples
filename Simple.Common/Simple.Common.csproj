@@ -98,7 +98,7 @@
     <Compile Include="Utility\SHA1Utils.cs" />
     <Compile Include="Utility\StructureConverter.cs" />
     <Compile Include="Utility\UrlUtils.cs" />
-    <Compile Include="Utility\VersionUtils.cs" />
+    <Compile Include="Reflection\VersionUtils.cs" />
     <Compile Include="Validation\Argument.cs" />
   </ItemGroup>
   <ItemGroup>
