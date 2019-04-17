@@ -177,5 +177,19 @@ namespace Simple.Common.Extensions
 
             return value;
         }
+
+        public static void CopyTo(this NameValueCollection fromCollection, NameValueCollection toCollection)
+        {
+            if (fromCollection == null || fromCollection.Count == 0)
+            {
+                return;
+            }
+
+            for (int i = 0; i < fromCollection.Count; i++)
+            {
+                var key = fromCollection.GetKey(i);
+                toCollection[key] = fromCollection[key];
+            }
+        }
     }
 }
