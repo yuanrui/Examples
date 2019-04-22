@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Simple.Common.Logging
 {
@@ -40,13 +42,31 @@ namespace Simple.Common.Logging
             }
         }
 
+        internal static void Write(String text)
+        {
+            Write(text, LogControl.GetFileFullName());
+        }
+
         public static void Info(String text)
         {
             LogControl.TryResetFileName();
 
             String nowPrefix = DateTime.Now.ToString(TEXT_PREFIX_FORMAT);
             text = nowPrefix + text;
-            Write(text, LogControl.GetFileFullName());
+            Write(text);
+        }
+
+        public static void Info(IEnumerable<String> texts)
+        {
+            if (texts == null || texts.Count() == 0)
+            {
+                return;
+            }
+
+            LogControl.TryResetFileName();
+
+            String inputTxt = String.Join(Environment.NewLine, texts.Select(m => DateTime.Now.ToString(TEXT_PREFIX_FORMAT) + m));
+            Write(inputTxt);
         }
 
         protected class SimpleLogControl
