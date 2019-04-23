@@ -19,41 +19,41 @@ namespace Simple.Common.Reflection
 
         protected void Init(Assembly assembly)
         {
-            AssemblyFileVersionAttribute fileVersionAttr = assembly.GetCustomAttributes(typeof(AssemblyFileVersionAttribute), false)[0] as AssemblyFileVersionAttribute;
-            if (fileVersionAttr != null)
+            this.Version = GetAttributeProperty<AssemblyVersionAttribute, String>(assembly, m => m.Version);
+            this.FileVersion = GetAttributeProperty<AssemblyFileVersionAttribute, String>(assembly, m => m.Version) ?? this.Version;
+            this.Company = GetAttributeProperty<AssemblyCompanyAttribute, String>(assembly, m => m.Company);
+            this.Product = GetAttributeProperty<AssemblyProductAttribute, String>(assembly, m => m.Product);
+            this.Title = GetAttributeProperty<AssemblyTitleAttribute, String>(assembly, m => m.Title);
+            this.Copyright = GetAttributeProperty<AssemblyCopyrightAttribute, String>(assembly, m => m.Copyright);
+            this.Description = GetAttributeProperty<AssemblyDescriptionAttribute, String>(assembly, m => m.Description);
+        }
+
+        protected TAttr GetAttribute<TAttr>(Assembly assembly) where TAttr : Attribute
+        {
+            var attrs = assembly.GetCustomAttributes(typeof(TAttr), false);
+            if (attrs == null || attrs.Length == 0)
             {
-                this.FileVersion = fileVersionAttr.Version;
+                return default(TAttr);
             }
 
-            AssemblyCompanyAttribute companyAttr = assembly.GetCustomAttributes(typeof(AssemblyCompanyAttribute), false)[0] as AssemblyCompanyAttribute;
-            if (companyAttr != null)
+            return attrs[0] as TAttr;
+        }
+
+        protected TProperty GetAttributeProperty<TAttr, TProperty>(Assembly assembly, Func<TAttr, TProperty> selector) where TAttr : Attribute
+        {
+            var attr = GetAttribute<TAttr>(assembly);
+            if (attr == null || attr == default(TAttr))
             {
-                this.Company = companyAttr.Company;
+                return default(TProperty);
             }
 
-            AssemblyProductAttribute productAttr = assembly.GetCustomAttributes(typeof(AssemblyProductAttribute), false)[0] as AssemblyProductAttribute;
-            if (productAttr != null)
-            {
-                this.Product = productAttr.Product;
-            }
+            return selector(attr);
+        }
 
-            AssemblyTitleAttribute titleAttr = assembly.GetCustomAttributes(typeof(AssemblyTitleAttribute), false)[0] as AssemblyTitleAttribute;
-            if (titleAttr != null)
-            {
-                this.Title = titleAttr.Title;
-            }
-
-            AssemblyCopyrightAttribute copyrightAttr = assembly.GetCustomAttributes(typeof(AssemblyCopyrightAttribute), false)[0] as AssemblyCopyrightAttribute;
-            if (companyAttr != null)
-            {
-                this.Company = companyAttr.Company;
-            }
-
-            AssemblyDescriptionAttribute descriptionAttr = assembly.GetCustomAttributes(typeof(AssemblyDescriptionAttribute), false)[0] as AssemblyDescriptionAttribute;
-            if (descriptionAttr != null)
-            {
-                this.Description = descriptionAttr.Description;
-            }
+        public String Version
+        {
+            get;
+            private set;
         }
 
         public String FileVersion
