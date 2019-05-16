@@ -188,7 +188,7 @@ namespace Simple.Common.Extensions
             for (int i = 0; i < fromCollection.Count; i++)
             {
                 var key = fromCollection.GetKey(i);
-                toCollection[key] = fromCollection[key];
+                toCollection[key] = fromCollection[i];
             }
         }
     }
