@@ -6,7 +6,7 @@ using Microsoft.Win32;
 
 namespace Study.CustomUrlScheme
 {
-    public static class WinUrlProtocolHelper
+    public static class UriSchemeHelper
     {
         public static void Register(String protocol, String exePath, String description)
         {
