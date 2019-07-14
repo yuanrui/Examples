@@ -12,7 +12,7 @@ namespace Simple.Data
     /// Copy From EnterpriseLibrary.Data.Database
     /// The Database class can replaced by DatabaseWrapper
     /// </summary>
-    public class DatabaseWrapper
+    public class Database
     {
         readonly DbProviderFactory dbProviderFactory;
 
@@ -23,7 +23,7 @@ namespace Simple.Data
         /// <param name="connectionString">The connection string for the database.</param>
         /// <param name="dbProviderFactory">A <see cref="DbProviderFactory"/> object.</param>
         /// <param name="instrumentationProvider">Instrumentation provider to use.</param>
-        public DatabaseWrapper(DbProviderFactory dbProviderFactory)
+        public Database(DbProviderFactory dbProviderFactory)
         {
             this.dbProviderFactory = dbProviderFactory;
         }

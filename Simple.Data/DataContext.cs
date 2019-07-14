@@ -18,9 +18,9 @@ namespace Simple.Data
 
         private readonly DbProviderFactory _dbProviderFactory;
 
-        private DatabaseWrapper _database;
+        private Database _database;
 
-        public virtual DatabaseWrapper DatabaseObject
+        public virtual Database DatabaseObject
         {
             get { return _database; }
         }
@@ -42,10 +42,16 @@ namespace Simple.Data
         public DataContext(String connectionName)
         {
             var connSetting = ConfigurationManager.ConnectionStrings[connectionName];
+            var connectionString = Environment.GetEnvironmentVariable(connectionName);
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                connectionString = connSetting.ConnectionString;
+            }
+
             _dbProviderFactory = DbProviderFactories.GetFactory(connSetting.ProviderName);
-            _database = new DatabaseWrapper(_dbProviderFactory);
+            _database = new Database(_dbProviderFactory);
             _dbConnection = _dbProviderFactory.CreateConnection();
-            _dbConnection.ConnectionString = connSetting.ConnectionString;
+            _dbConnection.ConnectionString = connectionString;
         }
 
         public virtual void OpenConnection()
@@ -149,9 +155,9 @@ namespace Simple.Data
         /// <param name="param"></param>
         /// <param name="cmdType"></param>
         /// <returns></returns>
-        public virtual List<TEntity> Query<TEntity>(String sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
+        public virtual List<TEntity> Query<TEntity>(String sql, object param = null, CommandType? cmdType = CommandType.Text)
         {
-            return _dbConnection.Query<TEntity>(sql, (object)param, transaction: _dbTransaction, commandType: cmdType).ToList();
+            return _dbConnection.Query<TEntity>(sql, param, transaction: _dbTransaction, commandType: cmdType).ToList();
         }
 
         /// <summary>
@@ -165,9 +171,9 @@ namespace Simple.Data
         /// <param name="param"></param>
         /// <param name="cmdType"></param>
         /// <returns></returns>
-        public virtual List<TFirst> Query<TFirst, TSecond>(String sql, Func<TFirst, TSecond, TFirst> map, String splitOn, dynamic param = null, CommandType? cmdType = CommandType.Text)
+        public virtual List<TFirst> Query<TFirst, TSecond>(String sql, Func<TFirst, TSecond, TFirst> map, String splitOn, object param = null, CommandType? cmdType = CommandType.Text)
         {
-            return _dbConnection.Query<TFirst, TSecond, TFirst>(sql, map, (object)param, transaction: _dbTransaction, splitOn: splitOn, commandType: cmdType).ToList();
+            return _dbConnection.Query<TFirst, TSecond, TFirst>(sql, map, param, transaction: _dbTransaction, splitOn: splitOn, commandType: cmdType).ToList();
         }
 
         /// <summary>
@@ -183,7 +189,7 @@ namespace Simple.Data
         /// <param name="param"></param>
         /// <param name="cmdType"></param>
         /// <returns></returns>
-        public virtual List<TParent> Query<TParent, TChild, TParentKey>(String sql, Func<TParent, TParentKey> parentKeySelector, Func<TParent, ICollection<TChild>> childSelector, String splitOn = "ID", dynamic param = null, CommandType? cmdType = CommandType.Text)
+        public virtual List<TParent> Query<TParent, TChild, TParentKey>(String sql, Func<TParent, TParentKey> parentKeySelector, Func<TParent, ICollection<TChild>> childSelector, String splitOn = "ID", object param = null, CommandType? cmdType = CommandType.Text)
         {
             var cache = new Dictionary<TParentKey, TParent>();
 
@@ -198,14 +204,14 @@ namespace Simple.Data
                 var children = childSelector(cachedParent);
                 children.Add(child);
                 return cachedParent;
-            }, param as object, _dbTransaction, splitOn: splitOn, commandType: cmdType);
+            }, param, _dbTransaction, splitOn: splitOn, commandType: cmdType);
 
             return cache.Values.ToList();
         }
 
-        public virtual Tuple<IEnumerable<TFirst>, IEnumerable<TSecond>> QueryMultiple<TFirst, TSecond>(String sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
+        public virtual Tuple<IEnumerable<TFirst>, IEnumerable<TSecond>> QueryMultiple<TFirst, TSecond>(String sql, object param = null, CommandType? cmdType = CommandType.Text)
         {
-            SqlMapper.GridReader gridReader = _dbConnection.QueryMultiple(sql, (object)param, transaction: _dbTransaction, commandType: cmdType);
+            SqlMapper.GridReader gridReader = _dbConnection.QueryMultiple(sql, param, transaction: _dbTransaction, commandType: cmdType);
 
             using (gridReader)
             {
@@ -213,9 +219,9 @@ namespace Simple.Data
             }
         }
 
-        public virtual List<dynamic> QueryDynamic(String sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
+        public virtual List<dynamic> QueryDynamic(String sql, object param = null, CommandType? cmdType = CommandType.Text)
         {
-            return _dbConnection.Query(sql, (object)param, transaction: _dbTransaction, commandType: cmdType).ToList();
+            return _dbConnection.Query(sql, param, transaction: _dbTransaction, commandType: cmdType).ToList();
         }
 
         public virtual DataTable QueryDataTable(String sql)
@@ -242,19 +248,19 @@ namespace Simple.Data
             }
         }
 
-        public virtual Int32 Execute(String sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
+        public virtual Int32 Execute(String sql, object param = null, CommandType? cmdType = CommandType.Text)
         {
-            return _dbConnection.Execute(sql, (object)param, transaction: _dbTransaction, commandType: cmdType);
+            return _dbConnection.Execute(sql, param, transaction: _dbTransaction, commandType: cmdType);
         }
 
-        public virtual Object ExecuteScalar(String sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
+        public virtual Object ExecuteScalar(String sql, object param = null, CommandType? cmdType = CommandType.Text)
         {
-            return _dbConnection.ExecuteScalar(sql, (object)param, transaction: _dbTransaction, commandType: cmdType);
+            return _dbConnection.ExecuteScalar(sql, param, transaction: _dbTransaction, commandType: cmdType);
         }
 
-        public virtual TEntity ExecuteScalar<TEntity>(String sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
+        public virtual TEntity ExecuteScalar<TEntity>(String sql, object param = null, CommandType? cmdType = CommandType.Text)
         {
-            return _dbConnection.ExecuteScalar<TEntity>(sql, (object)param, transaction: _dbTransaction, commandType: cmdType);
+            return _dbConnection.ExecuteScalar<TEntity>(sql, param, transaction: _dbTransaction, commandType: cmdType);
         }
 
         public void Dispose()

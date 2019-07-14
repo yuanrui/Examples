@@ -17,7 +17,7 @@ namespace Banana.DataAccess
 #endif
         protected const String DefaultDatabase = "DefaultConnectionString";
         private readonly String _connectionName;
-        private readonly DatabaseWrapper _db;
+        private readonly Database _db;
         private readonly DataContext _dataContext;
 
         protected const String PagerDataFormatSql = @"
@@ -65,7 +65,7 @@ ORDER BY rn__ ";
         /// <summary>
         /// 数据库对象
         /// </summary>
-        protected DatabaseWrapper DatabaseObject
+        protected Database DatabaseObject
         {
             get
             {
