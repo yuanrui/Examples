@@ -10,12 +10,12 @@ namespace Simple.Data
     {
         public const string ConnectionName = "DefaultConnectionString";
 
-        public static List<TEntity> Query<TEntity>(string sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
+        public static List<TEntity> Query<TEntity>(string sql, object param = null, CommandType? cmdType = CommandType.Text)
         {
             return new DbUtils<TEntity>(ConnectionName).Query(sql, param, cmdType);
         }
 
-        public static List<dynamic> QueryDynamic(string sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
+        public static List<dynamic> QueryDynamic(string sql, object param = null, CommandType? cmdType = CommandType.Text)
         {
             return new DbUtils<IEntityWrapper>(ConnectionName).QueryDynamic(sql, param, cmdType);
         }
@@ -30,17 +30,17 @@ namespace Simple.Data
             return new DbUtils<IEntityWrapper>(ConnectionName).QueryDataTable(sql, tableName, cmdType);
         }
 
-        public static int Execute(string sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
+        public static int Execute(string sql, object param = null, CommandType? cmdType = CommandType.Text)
         {
             return new DbUtils<IEntityWrapper>(ConnectionName).Execute(sql, param, cmdType);
         }
 
-        public static Object ExecuteScalar(string sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
+        public static Object ExecuteScalar(string sql, object param = null, CommandType? cmdType = CommandType.Text)
         {
             return new DbUtils<IEntityWrapper>(ConnectionName).ExecuteScalar(sql, param, cmdType);
         }
 
-        public static TEntity ExecuteScalar<TEntity>(string sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
+        public static TEntity ExecuteScalar<TEntity>(string sql, object param = null, CommandType? cmdType = CommandType.Text)
         {
             return new DbUtils<TEntity>(ConnectionName).ExecuteScalar<TEntity>(sql, param, cmdType);
         }
@@ -57,7 +57,7 @@ namespace Simple.Data
             ConnectionName = connectionName;
         }
 
-        public List<TEntity> Query(string sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
+        public List<TEntity> Query(string sql, object param = null, CommandType? cmdType = CommandType.Text)
         {
             using (var scope = DataContextScope.GetCurrent(ConnectionName).Begin())
             {
@@ -65,7 +65,7 @@ namespace Simple.Data
             }
         }
 
-        public List<dynamic> QueryDynamic(string sql, dynamic param = null, CommandType? cmdType = CommandType.Text)
+        public List<dynamic> QueryDynamic(string sql, object param = null, CommandType? cmdType = CommandType.Text)
         {
             using (var scope = DataContextScope.GetCurrent(ConnectionName).Begin())
             {
@@ -73,7 +73,7 @@ namespace Simple.Data
             }
         }
 
-        public int Execute(string sql, dynamic param = null, CommandType? cmdType = CommandType.Text, bool useTran = true)
+        public int Execute(string sql, object param = null, CommandType? cmdType = CommandType.Text, bool useTran = true)
         {
             using (var scope = DataContextScope.GetCurrent(ConnectionName).Begin(useTran))
             {
@@ -84,7 +84,7 @@ namespace Simple.Data
             }
         }
 
-        public Object ExecuteScalar(string sql, dynamic param = null, CommandType? cmdType = CommandType.Text, bool useTran = false)
+        public Object ExecuteScalar(string sql, object param = null, CommandType? cmdType = CommandType.Text, bool useTran = false)
         {
             using (var scope = DataContextScope.GetCurrent(ConnectionName).Begin(useTran))
             {
@@ -95,7 +95,7 @@ namespace Simple.Data
             }
         }
 
-        public TObject ExecuteScalar<TObject>(string sql, dynamic param = null, CommandType? cmdType = CommandType.Text, bool useTran = false) where TObject : TEntity
+        public TObject ExecuteScalar<TObject>(string sql, object param = null, CommandType? cmdType = CommandType.Text, bool useTran = false) where TObject : TEntity
         {
             using (var scope = DataContextScope.GetCurrent(ConnectionName).Begin(useTran))
             {
