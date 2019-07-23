@@ -43,12 +43,18 @@ namespace Simple.Data
         {
             var connSetting = ConfigurationManager.ConnectionStrings[connectionName];
             var connectionString = Environment.GetEnvironmentVariable(connectionName);
-            if (string.IsNullOrWhiteSpace(connectionString))
+            if (string.IsNullOrWhiteSpace(connectionString) && connSetting != null)
             {
                 connectionString = connSetting.ConnectionString;
             }
 
-            _dbProviderFactory = DbProviderFactories.GetFactory(connSetting.ProviderName);
+            var providerName = Environment.GetEnvironmentVariable(connectionName + ".ProviderName");
+            if (string.IsNullOrWhiteSpace(providerName) && connSetting != null)
+            {
+                providerName = connSetting.ProviderName;
+            }
+
+            _dbProviderFactory = DbProviderFactories.GetFactory(providerName);
             _database = new Database(_dbProviderFactory);
             _dbConnection = _dbProviderFactory.CreateConnection();
             _dbConnection.ConnectionString = connectionString;
