@@ -61,7 +61,16 @@ namespace Simple.Common.Extensions
 
         internal static T GetValue<T>(NameValueCollection collection, string key, Func<string, T> parseValue, T @defaultValue) where T : struct
         {
-            string value = collection[key].IsNullOrEmptyReturn(defaultValue.ToString());
+            if (collection == null)
+            {
+                return defaultValue;
+            }
+
+            string value = collection[key];
+            if (String.IsNullOrWhiteSpace(value))
+            {
+                return defaultValue;
+            }
 
             try
             {
