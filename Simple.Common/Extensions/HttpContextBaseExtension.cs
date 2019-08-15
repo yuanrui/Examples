@@ -10,36 +10,17 @@ namespace Simple.Common.Extensions
     {
         public static string GetClientIp(this HttpRequestBase request)
         {
-            string ip = string.Empty;
-            try
+            var ipAddress = request.ServerVariables["HTTP_X_FORWARDED_FOR"];
+            if (!string.IsNullOrEmpty(ipAddress))
             {
-                if (request.IsSecureConnection)
+                var addresses = ipAddress.Split(',');
+                if (addresses.Length != 0)
                 {
-                    ip = request.ServerVariables["REMOTE_ADDR"];
+                    return addresses[0];
                 }
+            }
 
-                if (string.IsNullOrEmpty(ip))
-                {
-                    ip = request.ServerVariables["HTTP_X_FORWARDED_FOR"];
-                    if (!string.IsNullOrEmpty(ip))
-                    {
-                        if (ip.Any(m => m == ','))
-                        {
-                            ip = ip.Split(',').Last();
-                        }
-                    }
-                    else
-                    {
-                        ip = request.UserHostAddress;
-                    }
-                }
-            }
-            catch
-            {
-                ip = string.Empty;
-            }
-            
-            return ip;
+            return request.ServerVariables["REMOTE_ADDR"];
         }
 
         public static string GetClientIp(this HttpRequest request)
