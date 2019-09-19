@@ -73,7 +73,7 @@ namespace Simple.Data
             //}
 
             _dbConnection.Open();
-
+            _dbTransaction = null;
             IsDisposed = false;
         }
 
@@ -281,6 +281,7 @@ namespace Simple.Data
                 if (_dbTransaction != null)
                 {
                     _dbTransaction.Dispose();
+                    _dbTransaction = null;
                 }
 
                 _dbConnection.Close();
