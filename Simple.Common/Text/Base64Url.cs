@@ -1,7 +1,8 @@
 ﻿namespace Simple.Common.Text
 {
     using System;
-    
+    using System.Text;
+
     public static class Base64Url
     {
         public static string Encode(byte[] input)
@@ -11,6 +12,11 @@
             output = output.Replace('+', '-');
             output = output.Replace('/', '_');
             return output;
+        }
+
+        public static string Encode(string input)
+        {
+            return Encode(Encoding.UTF8.GetBytes(input));
         }
 
         public static byte[] Decode(string input)
