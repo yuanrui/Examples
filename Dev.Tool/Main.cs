@@ -119,5 +119,13 @@ namespace Dev.Tool
             childForm.Text = childForm.Text;
             childForm.Show();
         }
+
+        private void bitandToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var childForm = new BitAndForm();
+            childForm.MdiParent = this;
+            childForm.Text = childForm.Text;
+            childForm.Show();
+        }
     }
 }

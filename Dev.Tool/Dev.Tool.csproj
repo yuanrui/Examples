@@ -75,6 +75,12 @@
     <Compile Include="Base64Form.Designer.cs">
       <DependentUpon>Base64Form.cs</DependentUpon>
     </Compile>
+    <Compile Include="BitAndForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="BitAndForm.Designer.cs">
+      <DependentUpon>BitAndForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Main.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -91,6 +97,9 @@
     </Compile>
     <EmbeddedResource Include="Base64Form.resx">
       <DependentUpon>Base64Form.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BitAndForm.resx">
+      <DependentUpon>BitAndForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Main.resx">
       <DependentUpon>Main.cs</DependentUpon>
