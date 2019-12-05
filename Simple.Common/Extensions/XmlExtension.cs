@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Xml;
+using System.Xml.Linq;
 
 namespace Simple.Common.Extensions
 {
@@ -29,5 +30,21 @@ namespace Simple.Common.Extensions
 
             return singleNode.InnerText;
         }
+
+        public static List<XElement> AddElement(this List<XElement> list, string name, string value)
+        {
+            if (list == null)
+            {
+                return list;
+            }
+            if (string.IsNullOrEmpty(value))
+            {
+                return list;
+            }
+
+            list.Add(new XElement(name, value));
+            return list;
+        }
+
     }
 }
