@@ -108,7 +108,7 @@ namespace Simple.Common.Drawing
             return newBitmap;
         }
 
-        public static byte[] Compress(byte[] byteImageIn, int targetSize)
+        public static byte[] Compress(byte[] byteImageIn, int targetSize, int quality = 35)
         {
             if (byteImageIn == null)
             {
@@ -125,23 +125,16 @@ namespace Simple.Common.Drawing
 
             var stream = new MemoryStream();
             var newBitmap = LoadBitmapImage(byteImageIn);
+            var scale = 0.99d;
             try
             {
                 while (length > targetSize)
                 {
-                    var scale = Math.Sqrt((double)targetSize / ((double)length));
-                    //scale = Math.Round(scale, 8, MidpointRounding.AwayFromZero);
-                    scale = scale - 0.03;
-
-                    if (scale >= 1)
-                    {
-                        scale = 0.97;
-                    }
                     var width = (int)(newBitmap.PixelWidth * scale);
                     var height = (int)(newBitmap.PixelHeight * scale);
 
                     newBitmap = ResizeImage(byteImageIn, height, width);
-                    var encoder = new JpegBitmapEncoder() { QualityLevel = 80 };
+                    var encoder = new JpegBitmapEncoder() { QualityLevel = quality };
                     var bitmapFrame = BitmapFrame.Create(newBitmap as BitmapSource);
                     encoder.Frames.Add(bitmapFrame);
                     encoder.Save(stream);
