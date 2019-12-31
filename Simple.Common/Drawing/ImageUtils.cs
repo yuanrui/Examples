@@ -121,7 +121,7 @@ namespace Simple.Common.Drawing
             {
                 return byteImageIn;
             }
-            byte[] reault = null;
+            byte[] result = null;
 
             var stream = new MemoryStream();
             var newBitmap = LoadBitmapImage(byteImageIn);
@@ -149,7 +149,7 @@ namespace Simple.Common.Drawing
 
                     if (!(length > targetSize))
                     {
-                        reault = stream.ToArray();
+                        result = stream.ToArray();
                         break;
                     }
 
@@ -172,7 +172,7 @@ namespace Simple.Common.Drawing
                 newBitmap = null;
             }
 
-            return reault;
+            return result;
         }
 
         #endregion
