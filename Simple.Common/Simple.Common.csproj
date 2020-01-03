@@ -66,6 +66,7 @@
     <Compile Include="Extensions\NameValueCollectionExtension.cs" />
     <Compile Include="Extensions\StreamExtension.cs" />
     <Compile Include="Extensions\StringExtension.cs" />
+    <Compile Include="Extensions\UriExtension.cs" />
     <Compile Include="Extensions\XmlExtension.cs" />
     <Compile Include="Generic\EntityBinder.cs" />
     <Compile Include="Generic\ParamDictionary.cs" />
