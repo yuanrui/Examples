@@ -94,6 +94,7 @@ namespace Simple.Common.Threading
                 catch (Exception ex)
                 {
                     Trace.WriteLine(this.ThreadName + " run exception:" + ex.Message);
+                    Thread.Sleep(1);
                 }
             }
         }
