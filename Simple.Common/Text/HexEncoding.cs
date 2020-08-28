@@ -7,7 +7,7 @@
 
     public class HexEncoding
     {
-        public Byte[] GetBytes(String input)
+        public static Byte[] GetBytes(String input)
         {
             if (input.Length % 2 == 1)
             {
@@ -21,11 +21,11 @@
                 var b = (byte)((Hex(input[textIndex++]) << 4) + Hex(input[textIndex++]));
                 output[outputIndex] = b;
             }
-            return output;
 
+            return output;
         }
 
-        public String GetString(Byte[] bytes)
+        public static String GetString(Byte[] bytes)
         {
             var output = new char[bytes.Length * 2];
             var outputIndex = 0;
@@ -36,8 +36,33 @@
                 output[outputIndex++] = hex[0];
                 output[outputIndex++] = hex[1];
             }
-
+            
             return new string(output);
+        }
+
+        public static String GetString(Byte[] bytes, String separator)
+        {
+            var output = new char[bytes.Length * 2];
+            var outputIndex = 0;
+
+            for (var byteIndex = 0; byteIndex < bytes.Length; byteIndex++)
+            {
+                var hex = bytes[byteIndex].ToString("X2");
+                output[outputIndex++] = hex[0];
+                output[outputIndex++] = hex[1];
+            }
+            return string.Join(separator, output);
+        }
+
+        public static string GetString(Byte ib)
+        {
+            char[] Digit = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+                'A', 'B', 'C', 'D', 'E', 'F'};
+            char[] ob = new char[2];
+            ob[0] = Digit[(ib >> 4) & 0X0F];
+            ob[1] = Digit[ib & 0X0F];
+
+            return new String(ob);
         }
 
         private static int Hex(char a)
