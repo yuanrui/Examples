@@ -37,8 +37,16 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.cboxKeyFmt = new System.Windows.Forms.ComboBox();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.txtPlaintext = new System.Windows.Forms.TextBox();
+            this.txtCiphertext = new System.Windows.Forms.TextBox();
+            this.txtPublicEncrypt = new System.Windows.Forms.Button();
+            this.btnPrivateDecrypt = new System.Windows.Forms.Button();
             this.gboxPrivate.SuspendLayout();
             this.gboxPublic.SuspendLayout();
+            this.groupBox1.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnGenerate
@@ -75,9 +83,9 @@
             // gboxPublic
             // 
             this.gboxPublic.Controls.Add(this.txtPublic);
-            this.gboxPublic.Location = new System.Drawing.Point(12, 185);
+            this.gboxPublic.Location = new System.Drawing.Point(453, 41);
             this.gboxPublic.Name = "gboxPublic";
-            this.gboxPublic.Size = new System.Drawing.Size(423, 111);
+            this.gboxPublic.Size = new System.Drawing.Size(420, 135);
             this.gboxPublic.TabIndex = 2;
             this.gboxPublic.TabStop = false;
             this.gboxPublic.Text = "公钥";
@@ -90,7 +98,7 @@
             this.txtPublic.Name = "txtPublic";
             this.txtPublic.ReadOnly = true;
             this.txtPublic.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtPublic.Size = new System.Drawing.Size(417, 91);
+            this.txtPublic.Size = new System.Drawing.Size(414, 115);
             this.txtPublic.TabIndex = 0;
             // 
             // cboxKeyStrength
@@ -141,11 +149,71 @@
             this.cboxKeyFmt.TabIndex = 6;
             this.cboxKeyFmt.Text = "pkcs#1";
             // 
-            // Main
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.txtPlaintext);
+            this.groupBox1.Location = new System.Drawing.Point(10, 185);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(422, 145);
+            this.groupBox1.TabIndex = 7;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "原文";
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.txtCiphertext);
+            this.groupBox2.Location = new System.Drawing.Point(12, 388);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(420, 145);
+            this.groupBox2.TabIndex = 8;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "密文";
+            // 
+            // txtPlaintext
+            // 
+            this.txtPlaintext.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.txtPlaintext.Location = new System.Drawing.Point(3, 17);
+            this.txtPlaintext.Multiline = true;
+            this.txtPlaintext.Name = "txtPlaintext";
+            this.txtPlaintext.Size = new System.Drawing.Size(416, 125);
+            this.txtPlaintext.TabIndex = 0;
+            // 
+            // txtCiphertext
+            // 
+            this.txtCiphertext.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.txtCiphertext.Location = new System.Drawing.Point(3, 17);
+            this.txtCiphertext.Multiline = true;
+            this.txtCiphertext.Name = "txtCiphertext";
+            this.txtCiphertext.Size = new System.Drawing.Size(414, 125);
+            this.txtCiphertext.TabIndex = 0;
+            // 
+            // txtPublicEncrypt
+            // 
+            this.txtPublicEncrypt.Location = new System.Drawing.Point(118, 347);
+            this.txtPublicEncrypt.Name = "txtPublicEncrypt";
+            this.txtPublicEncrypt.Size = new System.Drawing.Size(75, 23);
+            this.txtPublicEncrypt.TabIndex = 9;
+            this.txtPublicEncrypt.Text = "↓公钥加密";
+            this.txtPublicEncrypt.UseVisualStyleBackColor = true;
+            // 
+            // btnPrivateDecrypt
+            // 
+            this.btnPrivateDecrypt.Location = new System.Drawing.Point(199, 347);
+            this.btnPrivateDecrypt.Name = "btnPrivateDecrypt";
+            this.btnPrivateDecrypt.Size = new System.Drawing.Size(75, 23);
+            this.btnPrivateDecrypt.TabIndex = 10;
+            this.btnPrivateDecrypt.Text = "↑私钥解密";
+            this.btnPrivateDecrypt.UseVisualStyleBackColor = true;
+            // 
+            // RsaForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(450, 311);
+            this.ClientSize = new System.Drawing.Size(890, 582);
+            this.Controls.Add(this.btnPrivateDecrypt);
+            this.Controls.Add(this.txtPublicEncrypt);
+            this.Controls.Add(this.groupBox2);
+            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.cboxKeyFmt);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
@@ -155,12 +223,16 @@
             this.Controls.Add(this.btnGenerate);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "Main";
+            this.Name = "RsaForm";
             this.Text = "RSA工具";
             this.gboxPrivate.ResumeLayout(false);
             this.gboxPrivate.PerformLayout();
             this.gboxPublic.ResumeLayout(false);
             this.gboxPublic.PerformLayout();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -177,6 +249,12 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ComboBox cboxKeyFmt;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.TextBox txtPlaintext;
+        private System.Windows.Forms.TextBox txtCiphertext;
+        private System.Windows.Forms.Button txtPublicEncrypt;
+        private System.Windows.Forms.Button btnPrivateDecrypt;
     }
 }
 
