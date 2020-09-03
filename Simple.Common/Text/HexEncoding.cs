@@ -7,6 +7,8 @@
 
     public class HexEncoding
     {
+        static char[] Digit = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+
         public static Byte[] GetBytes(String input)
         {
             if (input.Length % 2 == 1)
@@ -42,22 +44,23 @@
 
         public static String GetString(Byte[] bytes, String separator)
         {
-            var output = new char[bytes.Length * 2];
-            var outputIndex = 0;
+            var builder = new StringBuilder(bytes.Length * 3 - 1);
 
             for (var byteIndex = 0; byteIndex < bytes.Length; byteIndex++)
             {
                 var hex = bytes[byteIndex].ToString("X2");
-                output[outputIndex++] = hex[0];
-                output[outputIndex++] = hex[1];
+                builder.Append(hex);
+                if (byteIndex + 1 < bytes.Length)
+                {
+                    builder.Append(separator);
+                }
             }
-            return string.Join(separator, output);
+
+            return builder.ToString();
         }
 
         public static string GetString(Byte ib)
         {
-            char[] Digit = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-                'A', 'B', 'C', 'D', 'E', 'F'};
             char[] ob = new char[2];
             ob[0] = Digit[(ib >> 4) & 0X0F];
             ob[1] = Digit[ib & 0X0F];
