@@ -69,7 +69,9 @@
     <Compile Include="Extensions\UriExtension.cs" />
     <Compile Include="Extensions\XmlExtension.cs" />
     <Compile Include="Generic\EntityBinder.cs" />
+    <Compile Include="Generic\InvertedComparer.cs" />
     <Compile Include="Generic\ParamDictionary.cs" />
+    <Compile Include="Generic\PriorityQueue.cs" />
     <Compile Include="IO\DirectoryMonitor.cs" />
     <Compile Include="Logging\SimpleLogger.cs" />
     <Compile Include="Logging\TraceHelper.cs" />
