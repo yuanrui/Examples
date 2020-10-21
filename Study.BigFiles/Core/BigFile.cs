@@ -9,6 +9,7 @@ namespace Study.BigFiles
     {
         private readonly String _filePath;
         private readonly Int64 _length;
+        public Int64 Token { get; private set; }
         private Stream _stream;
         private static Object _syncObj = new Object();
         private static Dictionary<String, Header> _headerDict = new Dictionary<String, Header>();
@@ -32,7 +33,7 @@ namespace Study.BigFiles
 
             public Boolean FeatureMatch;
 
-            public Int32 VersionToken;
+            public Int64 VersionToken;
 
             public Int64 CurrentOffset;
 
@@ -56,17 +57,17 @@ namespace Study.BigFiles
 
             public Int64 FinalOffset;
 
-            protected Int64 LastFileTimeValue;
+            protected Int64 FinalFileTimeValue;
 
             public DateTime FinalFileTime
             {
                 get
                 {
-                    return ToDateTime(LastFileTimeValue);
+                    return ToDateTime(FinalFileTimeValue);
                 }
                 set
                 {
-                    LastFileTimeValue = ToInt64(value);
+                    FinalFileTimeValue = ToInt64(value);
                 }
             }
 
@@ -113,7 +114,7 @@ namespace Study.BigFiles
                 Read(stream, ref FileCount, ref index);
                 Read(stream, ref ActiveTimeValue, ref index);
                 Read(stream, ref FinalOffset, ref index);
-                Read(stream, ref LastFileTimeValue, ref index);
+                Read(stream, ref FinalFileTimeValue, ref index);
                 Read(stream, ref CycleTotalFileCount, ref index);
                 Read(stream, ref OverwriteCount, ref index);
                 Read(stream, ref OverwriteTimeValue, ref index);
@@ -170,7 +171,7 @@ namespace Study.BigFiles
                 Write(stream, FileCount, ref index);
                 Write(stream, ActiveTimeValue, ref index);
                 Write(stream, FinalOffset, ref index);
-                Write(stream, LastFileTimeValue, ref index);
+                Write(stream, FinalFileTimeValue, ref index);
                 Write(stream, CycleTotalFileCount, ref index);
                 Write(stream, OverwriteCount, ref index);
                 Write(stream, OverwriteTimeValue, ref index);
@@ -260,7 +261,7 @@ namespace Study.BigFiles
         {
             _filePath = filePath;
             _length = length;
-
+            
             Init();
         }
 
@@ -275,21 +276,23 @@ namespace Study.BigFiles
                     _headerDict.Add(_filePath, new Header());
                 }
 
+                Header header = GetHeader();
                 if (_stream.Length >= _length)
                 {
+                    Token = header.VersionToken;
                     return;
                 }
 
                 _stream.SetLength(_length);
 
-                Header header = GetHeader();
                 if (header.CurrentOffset == 0L)
                 {
                     header.CurrentOffset = Header.OFFSET_SIZE;
                 }
 
-                header.VersionToken = Int32.Parse(DateTime.Now.ToString("yyyyMMdd"));
+                header.VersionToken = Header.ToInt64(DateTime.Now);
                 header.Write(_stream);
+                Token = header.VersionToken;
             }
         }
 

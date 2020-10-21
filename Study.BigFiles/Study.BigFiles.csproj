@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Study.BigFiles</RootNamespace>
     <AssemblyName>BigFile</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -87,11 +87,12 @@
     <Compile Include="..\Simple.Common\Logging\TraceHelper.cs">
       <Link>Shared\TraceHelper.cs</Link>
     </Compile>
-    <Compile Include="..\Simple.Common\Utility\VersionUtils.cs">
+    <Compile Include="..\Simple.Common\Reflection\VersionUtils.cs">
       <Link>Shared\VersionUtils.cs</Link>
     </Compile>
     <Compile Include="Core\BigFile.cs" />
     <Compile Include="Core\BigFileHttpHost.cs" />
+    <Compile Include="Core\BigFileManager.cs" />
     <Compile Include="Core\HostConfig.cs" />
     <Compile Include="Core\HttpHostManager.cs" />
     <Compile Include="Core\HttpWinService.cs">
