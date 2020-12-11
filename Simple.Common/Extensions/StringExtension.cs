@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Simple.Common.Extensions
 {
@@ -143,6 +144,66 @@ namespace Simple.Common.Extensions
         public static bool IsNullOrEmpty(this string input)
         {
             return string.IsNullOrEmpty(input);
+        }
+
+        public static bool Contains(this string source, string compare, StringComparison comparison)
+        {
+            if (source == null)
+            {
+                return false;
+            }
+
+            return source.IndexOf(compare, comparison) >= 0;
+        }
+
+        public static bool ToBoolean(this string source)
+        {
+            if (string.IsNullOrEmpty(source))
+            {
+                return false;
+            }
+
+            return Boolean.Parse(source);
+        }
+
+        public static string ToLowerFirstChar(this string input)
+        {
+            if (input == null)
+            {
+                return string.Empty;
+            }
+
+            if (input.Length < 1)
+            {
+                return input;
+            }
+
+            return Char.ToLowerInvariant(input[0]) + input.Substring(1);
+        }
+
+        public static string ToUpperFirstChar(this string input)
+        {
+            if (input == null)
+            {
+                return string.Empty;
+            }
+
+            if (input.Length < 1)
+            {
+                return input;
+            }
+
+            return Char.ToUpperInvariant(input[0]) + input.Substring(1);
+        }
+
+        public static String SplitCamelCase(this String input)
+        {
+            if (string.IsNullOrEmpty(input))
+            {
+                return string.Empty;
+            }
+
+            return Regex.Replace(input, "(?<=[a-z])([A-Z])", " $1", RegexOptions.Compiled);
         }
 
     }
