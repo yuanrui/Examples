@@ -85,7 +85,7 @@ namespace Simple.Common.Test._Tests
             {
                 var targetFile = Path.Combine(_imgResult, Path.GetFileNameWithoutExtension(filePath) + "_wpf" + Path.GetExtension(filePath));
                 var watch = Stopwatch.StartNew();
-                var result = DownloadDataByUrl(filePath, MaxSize, ImageUtils.Compress);
+                var result = DownloadDataByUrl(filePath, MaxSize, (m, n) => ImageUtils.CompressByGdi(m, n));
                 watch.Stop();
                 File.WriteAllBytes(targetFile, result);
                 Console.WriteLine("Wpf Compressed File:{0} Time:{1}s", targetFile, watch.Elapsed.TotalSeconds);
@@ -102,7 +102,7 @@ namespace Simple.Common.Test._Tests
             {
                 var targetFile = Path.Combine(_imgResult, Path.GetFileNameWithoutExtension(filePath) + "_gdi" + Path.GetExtension(filePath));
                 var watch = Stopwatch.StartNew();
-                var result = DownloadDataByUrl(filePath, MaxSize, ImageUtils.CompressByGdi);
+                var result = DownloadDataByUrl(filePath, MaxSize, (m, n) => ImageUtils.CompressByGdi(m, n));
                 watch.Stop();
                 File.WriteAllBytes(targetFile, result);
                 Console.WriteLine("Gdi Compressed File:{0} Time:{1}s", targetFile, watch.Elapsed.TotalSeconds);
