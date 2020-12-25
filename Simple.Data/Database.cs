@@ -15,6 +15,7 @@ namespace Simple.Data
     public class Database
     {
         readonly DbProviderFactory dbProviderFactory;
+        readonly string ConnectionString;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Database"/> class with a connection string,
@@ -23,8 +24,9 @@ namespace Simple.Data
         /// <param name="connectionString">The connection string for the database.</param>
         /// <param name="dbProviderFactory">A <see cref="DbProviderFactory"/> object.</param>
         /// <param name="instrumentationProvider">Instrumentation provider to use.</param>
-        public Database(DbProviderFactory dbProviderFactory)
+        public Database(string connectionString, DbProviderFactory dbProviderFactory)
         {
+            ConnectionString = connectionString;
             this.dbProviderFactory = dbProviderFactory;
         }
 
@@ -419,6 +421,23 @@ namespace Simple.Data
         protected virtual int UserParametersStartIndex()
         {
             return 0;
+        }
+
+        public virtual DbConnection CreateConnection()
+        {
+            DbConnection dbConnection = this.dbProviderFactory.CreateConnection();
+            dbConnection.ConnectionString = this.ConnectionString;
+            return dbConnection;
+        }
+
+        public DbParameter CreateParameter(string name, DbType dbType, object value)
+        {
+            DbParameter param = dbProviderFactory.CreateParameter();
+            param.ParameterName = BuildParameterName(name);
+            param.DbType = dbType;
+            param.Value = value;
+
+            return param;
         }
     }
 }

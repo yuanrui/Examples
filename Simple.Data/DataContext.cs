@@ -12,6 +12,8 @@ namespace Simple.Data
     public class DataContext : IDisposable
     {
         protected const String ConnectionName = "DefaultConnectionString";
+        private String _connectionString;
+
         private DbConnection _dbConnection;
 
         private DbTransaction _dbTransaction;
@@ -30,40 +32,46 @@ namespace Simple.Data
             get { return _dbProviderFactory; }
         }
 
-        public Boolean IsDisposed { get; private set; }
-        public Boolean IsTransactionOpened { get; private set; }
+        public virtual Boolean IsDisposed { get; private set; }
+        public virtual Boolean IsTransactionOpened { get; private set; }
 
         public DataContext() : this(ConnectionName)
         {
-            //_database = DatabaseFactory.CreateDatabase();
-            //_dbConnection = _database.CreateConnection();
+
         }
 
         public DataContext(String connectionName)
         {
             var connSetting = ConfigurationManager.ConnectionStrings[connectionName];
-            var connectionString = Environment.GetEnvironmentVariable(connectionName);
-            if (string.IsNullOrWhiteSpace(connectionString) && connSetting != null)
+            _connectionString = Environment.GetEnvironmentVariable(connectionName);
+            if (String.IsNullOrWhiteSpace(_connectionString) && connSetting != null)
             {
-                connectionString = connSetting.ConnectionString;
+                _connectionString = connSetting.ConnectionString;
             }
 
             var providerName = Environment.GetEnvironmentVariable(connectionName + ".ProviderName");
-            if (string.IsNullOrWhiteSpace(providerName) && connSetting != null)
+            if (String.IsNullOrWhiteSpace(providerName) && connSetting != null)
             {
                 providerName = connSetting.ProviderName;
             }
 
             _dbProviderFactory = DbProviderFactories.GetFactory(providerName);
-            _database = new Database(_dbProviderFactory);
+            _database = new Database(_connectionString, _dbProviderFactory);
             _dbConnection = _dbProviderFactory.CreateConnection();
-            _dbConnection.ConnectionString = connectionString;
+            _dbConnection.ConnectionString = _connectionString;
         }
 
         public virtual void OpenConnection()
         {
+            if (_dbConnection == null || IsDisposed)
+            {
+                _dbConnection = _database.CreateConnection();
+                _dbConnection.ConnectionString = _connectionString;
+            }
+
             if (_dbConnection.State == ConnectionState.Open)
             {
+                IsDisposed = false;
                 return;
             }
 
@@ -73,7 +81,6 @@ namespace Simple.Data
             //}
 
             _dbConnection.Open();
-            _dbTransaction = null;
             IsDisposed = false;
         }
 
@@ -133,7 +140,7 @@ namespace Simple.Data
         {
             dbCommand.Connection = _dbConnection;
             dbCommand.Transaction = _dbTransaction;
-            
+
             return dbCommand.ExecuteReader();
         }
 
@@ -141,7 +148,7 @@ namespace Simple.Data
         {
             dbCommand.Connection = _dbConnection;
             dbCommand.Transaction = _dbTransaction;
-            
+
             return dbCommand.ExecuteScalar();
         }
 
@@ -161,9 +168,9 @@ namespace Simple.Data
         /// <param name="param"></param>
         /// <param name="cmdType"></param>
         /// <returns></returns>
-        public virtual List<TEntity> Query<TEntity>(String sql, object param = null, CommandType? cmdType = CommandType.Text)
+        public virtual List<TEntity> Query<TEntity>(String sql, Object param = null, CommandType? cmdType = CommandType.Text)
         {
-            return _dbConnection.Query<TEntity>(sql, param, transaction: _dbTransaction, commandType: cmdType).ToList();
+            return _dbConnection.Query<TEntity>(sql, (Object)param, transaction: _dbTransaction, commandType: cmdType).ToList();
         }
 
         /// <summary>
@@ -177,9 +184,9 @@ namespace Simple.Data
         /// <param name="param"></param>
         /// <param name="cmdType"></param>
         /// <returns></returns>
-        public virtual List<TFirst> Query<TFirst, TSecond>(String sql, Func<TFirst, TSecond, TFirst> map, String splitOn, object param = null, CommandType? cmdType = CommandType.Text)
+        public virtual List<TFirst> Query<TFirst, TSecond>(String sql, Func<TFirst, TSecond, TFirst> map, String splitOn, Object param = null, CommandType? cmdType = CommandType.Text)
         {
-            return _dbConnection.Query<TFirst, TSecond, TFirst>(sql, map, param, transaction: _dbTransaction, splitOn: splitOn, commandType: cmdType).ToList();
+            return _dbConnection.Query<TFirst, TSecond, TFirst>(sql, map, (Object)param, transaction: _dbTransaction, splitOn: splitOn, commandType: cmdType).ToList();
         }
 
         /// <summary>
@@ -195,7 +202,7 @@ namespace Simple.Data
         /// <param name="param"></param>
         /// <param name="cmdType"></param>
         /// <returns></returns>
-        public virtual List<TParent> Query<TParent, TChild, TParentKey>(String sql, Func<TParent, TParentKey> parentKeySelector, Func<TParent, ICollection<TChild>> childSelector, String splitOn = "ID", object param = null, CommandType? cmdType = CommandType.Text)
+        public virtual List<TParent> Query<TParent, TChild, TParentKey>(String sql, Func<TParent, TParentKey> parentKeySelector, Func<TParent, ICollection<TChild>> childSelector, String splitOn = "ID", Object param = null, CommandType? cmdType = CommandType.Text)
         {
             var cache = new Dictionary<TParentKey, TParent>();
 
@@ -210,14 +217,14 @@ namespace Simple.Data
                 var children = childSelector(cachedParent);
                 children.Add(child);
                 return cachedParent;
-            }, param, _dbTransaction, splitOn: splitOn, commandType: cmdType);
+            }, param as Object, _dbTransaction, splitOn: splitOn, commandType: cmdType);
 
             return cache.Values.ToList();
         }
 
-        public virtual Tuple<IEnumerable<TFirst>, IEnumerable<TSecond>> QueryMultiple<TFirst, TSecond>(String sql, object param = null, CommandType? cmdType = CommandType.Text)
+        public virtual Tuple<IEnumerable<TFirst>, IEnumerable<TSecond>> QueryMultiple<TFirst, TSecond>(String sql, Object param = null, CommandType? cmdType = CommandType.Text)
         {
-            SqlMapper.GridReader gridReader = _dbConnection.QueryMultiple(sql, param, transaction: _dbTransaction, commandType: cmdType);
+            SqlMapper.GridReader gridReader = _dbConnection.QueryMultiple(sql, (Object)param, transaction: _dbTransaction, commandType: cmdType);
 
             using (gridReader)
             {
@@ -225,9 +232,9 @@ namespace Simple.Data
             }
         }
 
-        public virtual List<dynamic> QueryDynamic(String sql, object param = null, CommandType? cmdType = CommandType.Text)
+        public virtual List<dynamic> QueryDynamic(String sql, Object param = null, CommandType? cmdType = CommandType.Text)
         {
-            return _dbConnection.Query(sql, param, transaction: _dbTransaction, commandType: cmdType).ToList();
+            return _dbConnection.Query(sql, (Object)param, transaction: _dbTransaction, commandType: cmdType).ToList();
         }
 
         public virtual DataTable QueryDataTable(String sql)
@@ -235,63 +242,86 @@ namespace Simple.Data
             return QueryDataTable(sql, String.Empty);
         }
 
+        public virtual DataTable QueryDataTable(String sql, DbParameter[] parameters)
+        {
+            return QueryDataTable(sql, String.Empty, parameters);
+        }
+
         public virtual DataTable QueryDataTable(String sql, String tableName, CommandType cmdType = CommandType.Text)
+        {
+            return QueryDataTable(sql, tableName, null, cmdType);
+        }
+
+        public virtual DataTable QueryDataTable(String sql, String tableName, DbParameter[] parameters, CommandType cmdType = CommandType.Text)
         {
             using (var cmd = _dbConnection.CreateCommand())
             {
                 cmd.CommandText = sql;
                 cmd.CommandType = cmdType;
-                
-                using (var adapter = _dbProviderFactory.CreateDataAdapter())
+
+                if (parameters != null && parameters.Length > 0)
+                {
+                    cmd.Parameters.AddRange(parameters);
+                }
+
+                using (var adapter = _database.GetDataAdapter())
                 {
                     var table = String.IsNullOrEmpty(tableName) ? new DataTable() : new DataTable(tableName);
 
                     adapter.SelectCommand = cmd;
                     adapter.Fill(table);
-                    
+
                     return table;
                 }
             }
         }
 
-        public virtual Int32 Execute(String sql, object param = null, CommandType? cmdType = CommandType.Text)
+        public virtual Object ExecuteScalar(String sql, Object param = null, CommandType? cmdType = CommandType.Text)
         {
-            return _dbConnection.Execute(sql, param, transaction: _dbTransaction, commandType: cmdType);
+            return _dbConnection.ExecuteScalar(sql, (Object)param, transaction: _dbTransaction, commandType: cmdType);
         }
 
-        public virtual Object ExecuteScalar(String sql, object param = null, CommandType? cmdType = CommandType.Text)
+        public virtual TEntity ExecuteScalar<TEntity>(String sql, Object param = null, CommandType? cmdType = CommandType.Text)
         {
-            return _dbConnection.ExecuteScalar(sql, param, transaction: _dbTransaction, commandType: cmdType);
+            return _dbConnection.ExecuteScalar<TEntity>(sql, (Object)param, transaction: _dbTransaction, commandType: cmdType);
         }
 
-        public virtual TEntity ExecuteScalar<TEntity>(String sql, object param = null, CommandType? cmdType = CommandType.Text)
+        public virtual int Execute(String sql, Object param = null, CommandType? cmdType = CommandType.Text)
         {
-            return _dbConnection.ExecuteScalar<TEntity>(sql, param, transaction: _dbTransaction, commandType: cmdType);
+            return _dbConnection.Execute(sql, (Object)param, transaction: _dbTransaction, commandType: cmdType);
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
-            DoDispose(false);
+            DoDispose(true);
         }
 
         internal void DoDispose(bool disposeConnection)
         {
             if (!IsDisposed)
             {
-                if (_dbTransaction != null)
+                if (_dbConnection != null)
                 {
-                    _dbTransaction.Dispose();
-                    _dbTransaction = null;
+                    _dbConnection.Close();
                 }
 
-                _dbConnection.Close();
+                //IsDisposed = false;
+            }
 
-                IsDisposed = true;
+            if (_dbTransaction != null)
+            {
+                _dbTransaction.Dispose();
+                _dbTransaction = null;
             }
 
             if (disposeConnection)
             {
-                _dbConnection.Dispose();
+                if (_dbConnection != null)
+                {
+                    _dbConnection.Dispose();
+                    _dbConnection = null;
+                }
+
                 IsDisposed = true;
             }
         }

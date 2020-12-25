@@ -4,7 +4,9 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading;
+#if NET
 using System.Web;
+#endif
 
 namespace Simple.Data
 {
@@ -12,6 +14,11 @@ namespace Simple.Data
     {
         private const string KeyPrefix = "Simple.DataContextScope.";
         private const string DefaultConnectionName = "DefaultConnectionString";
+#if NETCOREAPP2_1 || NETSTANDARD
+        static AsyncLocal<DataContextScope> Local = new AsyncLocal<DataContextScope>();
+#else
+        static ThreadLocal<DataContextScope> Local = new ThreadLocal<DataContextScope>();
+#endif
 
         public DataContext DataContext { get; private set; }
 
@@ -33,28 +40,43 @@ namespace Simple.Data
             var key = KeyPrefix + connectionName;
             
             DataContextScope ctx = null;
+#if NETCOREAPP2_1 || NETSTANDARD
+            ctx = Local.Value;
+
+            if (ctx == null)
+            {
+                ctx = new UnitOfWork(connectionName);
+                Local.Value = ctx;
+            }
+
+            return ctx;
+#elif NET
             if (HttpContext.Current != null)
             {
-                ctx = HttpContext.Current.Items[key] as DataContextScope;
+                ctx = HttpContext.Current.Items[key] as UnitOfWork;
 
                 if (ctx == null)
                 {
-                    ctx = new DataContextScope(connectionName);
+                    ctx = new UnitOfWork(connectionName);
                     HttpContext.Current.Items[key] = ctx;
                 }
+
+                return ctx;
             }
             else
             {
-                LocalDataStoreSlot slot = Thread.GetNamedDataSlot(key);
-                ctx = Thread.GetData(slot) as DataContextScope;
+                ctx = Local.Value;
 
                 if (ctx == null)
                 {
-                    ctx = new DataContextScope(connectionName);
-                    Thread.SetData(slot, ctx);
+                    ctx = new UnitOfWork(connectionName);
+                    Local.Value = ctx;
                 }
+
+                return ctx;
             }
 
+#endif
             return ctx;
         }
 
