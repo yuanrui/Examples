@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions\StringExtension.cs" />
+    <Compile Include="Utility\DateTimeUtils.cs" />
     <Compile Include="Utility\ImageResizer.cs" />
     <Compile Include="Utility\ImageUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
