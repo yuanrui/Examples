@@ -32,7 +32,7 @@ namespace Study.BigFiles
 
                 foreach (HostElement setting in this.Config.Hosts)
                 {
-                    BigFileHttpHost host = new BigFileHttpHost(setting.Port, setting.GetFilePath(), setting.FileSize);
+                    BigFileHttpHost host = new BigFileHttpHost(setting.Port, setting.GetFilePath(), setting.FileSize, setting.User, setting.Passwd);
                     host.Start();
                 }
             }
@@ -54,7 +54,7 @@ namespace Study.BigFiles
             {                
                 foreach (HostElement setting in this.Config.Hosts)
                 {
-                    BigFileHttpHost host = new BigFileHttpHost(setting.Port, setting.GetFilePath(), setting.FileSize);
+                    BigFileHttpHost host = new BigFileHttpHost(setting.Port, setting.GetFilePath(), setting.FileSize, setting.User, setting.Passwd);
                     host.Stop();
                 }
             }

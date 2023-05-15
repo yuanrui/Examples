@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>上传文件测试</title>
+    <script type="text/javascript">
+        function iframeLoad(ifame) {
+
+            var doc;
+            if (document.all) {//IE
+                doc = document.frames["uploadFrame"].document;
+            } else {//Firefox
+                doc = document.getElementById("uploadFrame");
+            }
+
+            var doc = ifame.contentWindow.document;
+            var url = doc.body.innerText;
+            
+            document.getElementById("fileImg").src = url
+            document.getElementById("fileUrl").innerHTML = url;
+        }
+    </script>
+</head>
+<body>
+    <iframe id="uploadFrame" name="FORMSUBMIT" style="display:none" onload="iframeLoad(this)"></iframe>
+
+    <form id="form1" action="http://localhost/BigFileApi" target="FORMSUBMIT" enctype="multipart/form-data" method="post">
+        <input type="file" name="file" />
+        <input type="submit" value="上传文件" />
+    </form>
+    图片地址:<span id="fileUrl"></span>
+    <br />
+    <img id="fileImg" />
+</body>
+</html>

@@ -109,6 +109,20 @@ namespace Study.BigFiles
             set { this["port"] = value; }
         }
 
+        [ConfigurationProperty("user", IsRequired = false)]
+        public String User
+        {
+            get { return this["user"].ToString(); }
+            set { this["user"] = value; }
+        }
+
+        [ConfigurationProperty("passwd", IsRequired = false)]
+        public String Passwd
+        {
+            get { return this["passwd"].ToString(); }
+            set { this["passwd"] = value; }
+        }
+
         public override String ToString()
         {
             return this.FilePath;

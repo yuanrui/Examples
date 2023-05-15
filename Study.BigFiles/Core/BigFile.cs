@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 
@@ -9,6 +10,9 @@ namespace Study.BigFiles
     {
         private readonly String _filePath;
         private readonly Int64 _length;
+        private readonly String _user;
+        private readonly String _passwd;
+
         public Int64 Token { get; private set; }
         private Stream _stream;
         private static Object _syncObj = new Object();
@@ -90,6 +94,8 @@ namespace Study.BigFiles
             }
 
             public Int64 FreeStorage;
+
+            public Boolean ConnectState;
 
             public Header()
             {
@@ -257,26 +263,121 @@ namespace Study.BigFiles
             #endregion
         }
 
-        public BigFile(String filePath, Int64 length)
+        public BigFile(String filePath, Int64 length) : this(filePath, length, string.Empty, string.Empty)
+        {
+        }
+
+        public BigFile(String filePath, Int64 length, string user, string passwd)
         {
             _filePath = filePath;
             _length = length;
-            
+            _user = user;
+            _passwd = passwd;
+
             Init();
         }
+
+        #region 连接共享文件夹
+        //TODO: 使用 https://github.com/baruchiro/NetworkConnection 或将初始化放到外部
+
+        /// <summary>
+        /// 连接共享文件夹
+        /// </summary>
+        public Boolean ConnectToSharedFolder(string fileName, string user, string pwd)
+        {
+            if (string.IsNullOrEmpty(fileName))
+            {
+                return false;
+            }
+
+            if (!fileName.StartsWith("\\\\"))
+            {
+                return true;
+            }
+
+            try
+            {
+                Boolean status = ConnectState(fileName, user, pwd);
+                return status;
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(ex);
+                return false;
+            }
+        }
+
+        private bool ConnectState(string path, string userName, string passWord)
+        {
+            bool Flag = false;
+            string dosLine = string.Empty;
+            System.Diagnostics.Process proc = new System.Diagnostics.Process();
+            try
+            {
+                proc.StartInfo.FileName = "cmd.exe";
+                proc.StartInfo.UseShellExecute = false;
+                proc.StartInfo.RedirectStandardInput = true;
+                proc.StartInfo.RedirectStandardOutput = true;
+                proc.StartInfo.RedirectStandardError = true;
+                proc.StartInfo.CreateNoWindow = true;
+                proc.Start();
+                if (string.IsNullOrWhiteSpace(userName) || string.IsNullOrWhiteSpace(passWord))
+                    dosLine = "net use " + path + " "; // + passWord + " /user:" + userName;
+                else
+                    dosLine = "net use " + path + " " + passWord + " /user:" + userName;
+                proc.StandardInput.WriteLine(dosLine);
+                proc.StandardInput.WriteLine("exit");
+                while (!proc.HasExited)
+                {
+                    proc.WaitForExit(1000);
+                }
+                string errormsg = proc.StandardError.ReadToEnd();
+                proc.StandardError.Close();
+                if (string.IsNullOrEmpty(errormsg))
+                {
+                    Flag = true;
+                }
+                else
+                {
+                    throw new Exception(errormsg);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                proc.Close();
+                proc.Dispose();
+            }
+            return Flag;
+        }
+
+        #endregion
 
         protected void Init()
         {
             lock (String.Intern(_filePath))
             {
-                _stream = new FileStream(_filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
-
                 if (!_headerDict.ContainsKey(_filePath))
                 {
                     _headerDict.Add(_filePath, new Header());
                 }
 
-                Header header = GetHeader();
+                Header header = _headerDict[_filePath];
+                if (! header.ConnectState)
+                {
+                    if (!(string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_passwd)))
+                    {
+                        var dir = Path.GetDirectoryName(_filePath);
+                        header.ConnectState = ConnectToSharedFolder(dir, _user, _passwd);
+                    }
+                }
+
+                _stream = new FileStream(_filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+                header = GetHeader();
+
                 if (_stream.Length >= _length)
                 {
                     Token = header.VersionToken;
