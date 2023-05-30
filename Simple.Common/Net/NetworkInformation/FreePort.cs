@@ -33,7 +33,7 @@ namespace Simple.Common.Net.NetworkInformation
             bool isAvailable = true;
 
             var mutex = new Mutex(false,
-                string.Concat("Global/", PortReleaseGuid));
+                string.Concat("Global\\", PortReleaseGuid));
             mutex.WaitOne();
             try
             {
