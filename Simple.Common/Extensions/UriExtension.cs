@@ -9,7 +9,8 @@ namespace Simple.Common.Extensions
     {
         public static string GetBaseUrl(this Uri uri)
         {
-            return uri.Scheme + "://" + uri.Host + ":" + uri.Port;
+            return uri.GetLeftPart(UriPartial.Authority);
+            //return uri.Scheme + "://" + uri.Host + ":" + uri.Port;
         }
     }
 }
