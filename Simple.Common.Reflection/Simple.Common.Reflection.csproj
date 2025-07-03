@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net35;net40;netstandard2.0;netstandard2.1;</TargetFrameworks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Simple.Common\Reflection\VersionUtils.cs" Link="VersionUtils.cs" />
+  </ItemGroup>
+
+</Project>

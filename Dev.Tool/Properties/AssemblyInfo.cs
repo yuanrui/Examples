@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("https://github.com/yuanrui")]
 [assembly: AssemblyProduct("Dev.Tool")]
-[assembly: AssemblyCopyright("Copyright © YuanRui 2019")]
+[assembly: AssemblyCopyright("https://github.com/yuanrui")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

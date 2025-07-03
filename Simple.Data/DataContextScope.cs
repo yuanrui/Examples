@@ -1,4 +1,8 @@
-﻿using System;
+﻿// Copyright (c) 2017 YuanRui
+// GitHub: https://github.com/yuanrui
+// License: Apache-2.0
+
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -45,7 +49,7 @@ namespace Simple.Data
 
             if (ctx == null)
             {
-                ctx = new UnitOfWork(connectionName);
+                ctx = new DataContextScope(connectionName);
                 Local.Value = ctx;
             }
 
@@ -53,11 +57,11 @@ namespace Simple.Data
 #elif NET
             if (HttpContext.Current != null)
             {
-                ctx = HttpContext.Current.Items[key] as UnitOfWork;
+                ctx = HttpContext.Current.Items[key] as DataContextScope;
 
                 if (ctx == null)
                 {
-                    ctx = new UnitOfWork(connectionName);
+                    ctx = new DataContextScope(connectionName);
                     HttpContext.Current.Items[key] = ctx;
                 }
 
@@ -69,7 +73,7 @@ namespace Simple.Data
 
                 if (ctx == null)
                 {
-                    ctx = new UnitOfWork(connectionName);
+                    ctx = new DataContextScope(connectionName);
                     Local.Value = ctx;
                 }
 

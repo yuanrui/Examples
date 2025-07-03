@@ -38,8 +38,8 @@
             this.label2 = new System.Windows.Forms.Label();
             this.cboxKeyFmt = new System.Windows.Forms.ComboBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.txtPlaintext = new System.Windows.Forms.TextBox();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.txtCiphertext = new System.Windows.Forms.TextBox();
             this.txtPublicEncrypt = new System.Windows.Forms.Button();
             this.btnPrivateDecrypt = new System.Windows.Forms.Button();
@@ -159,6 +159,15 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "原文";
             // 
+            // txtPlaintext
+            // 
+            this.txtPlaintext.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.txtPlaintext.Location = new System.Drawing.Point(3, 17);
+            this.txtPlaintext.Multiline = true;
+            this.txtPlaintext.Name = "txtPlaintext";
+            this.txtPlaintext.Size = new System.Drawing.Size(416, 125);
+            this.txtPlaintext.TabIndex = 0;
+            // 
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.txtCiphertext);
@@ -168,15 +177,6 @@
             this.groupBox2.TabIndex = 8;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "密文";
-            // 
-            // txtPlaintext
-            // 
-            this.txtPlaintext.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txtPlaintext.Location = new System.Drawing.Point(3, 17);
-            this.txtPlaintext.Multiline = true;
-            this.txtPlaintext.Name = "txtPlaintext";
-            this.txtPlaintext.Size = new System.Drawing.Size(416, 125);
-            this.txtPlaintext.TabIndex = 0;
             // 
             // txtCiphertext
             // 
@@ -195,6 +195,7 @@
             this.txtPublicEncrypt.TabIndex = 9;
             this.txtPublicEncrypt.Text = "↓公钥加密";
             this.txtPublicEncrypt.UseVisualStyleBackColor = true;
+            this.txtPublicEncrypt.Click += new System.EventHandler(this.txtPublicEncrypt_Click);
             // 
             // btnPrivateDecrypt
             // 
@@ -204,6 +205,7 @@
             this.btnPrivateDecrypt.TabIndex = 10;
             this.btnPrivateDecrypt.Text = "↑私钥解密";
             this.btnPrivateDecrypt.UseVisualStyleBackColor = true;
+            this.btnPrivateDecrypt.Click += new System.EventHandler(this.btnPrivateDecrypt_Click);
             // 
             // RsaForm
             // 

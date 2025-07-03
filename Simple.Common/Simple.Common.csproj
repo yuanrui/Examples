@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="Checksum\Adler32.cs" />
     <Compile Include="Checksum\BZip2Crc.cs" />
+    <Compile Include="Checksum\CRC.cs" />
     <Compile Include="Checksum\Crc32.cs" />
     <Compile Include="Checksum\IChecksum.cs" />
     <Compile Include="Core\DataCache.cs" />

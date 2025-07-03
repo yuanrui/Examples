@@ -1,0 +1,8 @@
+<Project>
+    <PropertyGroup>
+        <Authors>YuanRui</Authors>
+        <Company>YuanRui</Company>
+        <PackageProjectUrl>https://github.com/yuanrui/Examples</PackageProjectUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    </PropertyGroup>
+</Project>

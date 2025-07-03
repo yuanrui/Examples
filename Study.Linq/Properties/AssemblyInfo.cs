@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Study.Linq")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("ebos")]
+[assembly: AssemblyCompany("https://github.com/yuanrui")]
 [assembly: AssemblyProduct("Study.Linq")]
-[assembly: AssemblyCopyright("Copyright © ebos 2015")]
+[assembly: AssemblyCopyright("Copyright © YuanRui 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

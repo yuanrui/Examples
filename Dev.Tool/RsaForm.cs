@@ -18,6 +18,7 @@ namespace Dev.Tool
 {
     public partial class RsaForm : Form
     {
+        private AsymmetricCipherKeyPair _asymmetricCipherKeyPair;
         public RsaForm()
         {
             InitializeComponent();
@@ -68,9 +69,9 @@ namespace Dev.Tool
         {
             IAsymmetricCipherKeyPairGenerator kpGen = GeneratorUtilities.GetKeyPairGenerator("RSA");
             kpGen.Init(new KeyGenerationParameters(new SecureRandom(), strength));
-
-            var privKeyParam = kpGen.GenerateKeyPair().Private;
-            var pubKeyParam = kpGen.GenerateKeyPair().Public;
+            _asymmetricCipherKeyPair = kpGen.GenerateKeyPair();
+            var privKeyParam = _asymmetricCipherKeyPair.Private;
+            var pubKeyParam = _asymmetricCipherKeyPair.Public;
 
             using (StringWriter sw = new StringWriter())
             {
@@ -122,10 +123,10 @@ namespace Dev.Tool
         {
             IAsymmetricCipherKeyPairGenerator kpGen = GeneratorUtilities.GetKeyPairGenerator("RSA");
             kpGen.Init(new KeyGenerationParameters(new SecureRandom(), strength));
-            var pair = kpGen.GenerateKeyPair();
+            _asymmetricCipherKeyPair = kpGen.GenerateKeyPair();
 
-            RSAParameters privKeyParam = DotNetUtilities.ToRSAParameters((RsaPrivateCrtKeyParameters)pair.Private);
-            RSAParameters pubKeyParam = DotNetUtilities.ToRSAParameters((RsaKeyParameters)pair.Public);
+            RSAParameters privKeyParam = DotNetUtilities.ToRSAParameters((RsaPrivateCrtKeyParameters)_asymmetricCipherKeyPair.Private);
+            RSAParameters pubKeyParam = DotNetUtilities.ToRSAParameters((RsaKeyParameters)_asymmetricCipherKeyPair.Public);
             pirvKey = RsaParamToXml(privKeyParam, true);
             pubKey = RsaParamToXml(pubKeyParam, false);
         }
@@ -156,13 +157,42 @@ namespace Dev.Tool
         {
             IAsymmetricCipherKeyPairGenerator kpGen = GeneratorUtilities.GetKeyPairGenerator("RSA");
             kpGen.Init(new KeyGenerationParameters(new SecureRandom(), strength));
-            var pair = kpGen.GenerateKeyPair();
+            _asymmetricCipherKeyPair = kpGen.GenerateKeyPair();
 
-            RSAParameters privKeyParam = DotNetUtilities.ToRSAParameters((RsaPrivateCrtKeyParameters)pair.Private);
-            RSAParameters pubKeyParam = DotNetUtilities.ToRSAParameters((RsaKeyParameters)pair.Public);
+            RSAParameters privKeyParam = DotNetUtilities.ToRSAParameters((RsaPrivateCrtKeyParameters)_asymmetricCipherKeyPair.Private);
+            RSAParameters pubKeyParam = DotNetUtilities.ToRSAParameters((RsaKeyParameters)_asymmetricCipherKeyPair.Public);
             pirvKey = RsaParamToJson(privKeyParam, true);
             pubKey = RsaParamToJson(pubKeyParam, false);
         }
 
+        private void txtPublicEncrypt_Click(object sender, EventArgs e)
+        {
+            if (_asymmetricCipherKeyPair == null)
+            {
+                return ;
+            }
+
+            var privKeyParam = DotNetUtilities.ToRSAParameters((RsaPrivateCrtKeyParameters)_asymmetricCipherKeyPair.Public);
+            //var rsa = RSA.Create();
+            var rsa = new RSACryptoServiceProvider();
+            rsa.ImportParameters(privKeyParam);
+            var buffer = rsa.EncryptValue(Encoding.UTF8.GetBytes(txtPlaintext.Text));
+
+            txtCiphertext.Text = Convert.ToBase64String(buffer);
+        }
+
+        private void btnPrivateDecrypt_Click(object sender, EventArgs e)
+        {
+            if (_asymmetricCipherKeyPair == null)
+            {
+                return;
+            }
+            var pubKeyParam = DotNetUtilities.ToRSAParameters((RsaKeyParameters)_asymmetricCipherKeyPair.Public);
+            var rsa = new RSACryptoServiceProvider();
+            rsa.ImportParameters(pubKeyParam);
+            var buffer = rsa.DecryptValue(Convert.FromBase64String(txtCiphertext.Text));
+
+            txtPlaintext.Text = Encoding.UTF8.GetString(buffer);
+        }
     }
 }

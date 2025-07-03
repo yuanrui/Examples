@@ -127,5 +127,21 @@ namespace Dev.Tool
             childForm.Text = childForm.Text;
             childForm.Show();
         }
+
+        private void md5ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var childForm = new MD5Form();
+            childForm.MdiParent = this;
+            childForm.Text = childForm.Text;
+            childForm.Show();
+        }
+
+        private void HMACSHA256ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var childForm = new HmacSha256Form();
+            childForm.MdiParent = this;
+            childForm.Text = childForm.Text;
+            childForm.Show();
+        }
     }
 }
