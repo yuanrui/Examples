@@ -101,6 +101,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TFS.Webhooks", "TFS.Webhook
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Study.RsaDemo", "Study.RsaDemo\Study.RsaDemo.csproj", "{11863EAE-E1A1-4192-A97C-78DBBB373B71}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Study.Chat.Ollama", "Study.Chat.Ollama\Study.Chat.Ollama.csproj", "{9B314834-D241-4976-AF78-B88C3B72BB92}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -413,6 +415,14 @@ Global
 		{11863EAE-E1A1-4192-A97C-78DBBB373B71}.Release|Any CPU.Build.0 = Release|Any CPU
 		{11863EAE-E1A1-4192-A97C-78DBBB373B71}.Release|x86.ActiveCfg = Release|Any CPU
 		{11863EAE-E1A1-4192-A97C-78DBBB373B71}.Release|x86.Build.0 = Release|Any CPU
+		{9B314834-D241-4976-AF78-B88C3B72BB92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B314834-D241-4976-AF78-B88C3B72BB92}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B314834-D241-4976-AF78-B88C3B72BB92}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9B314834-D241-4976-AF78-B88C3B72BB92}.Debug|x86.Build.0 = Debug|Any CPU
+		{9B314834-D241-4976-AF78-B88C3B72BB92}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B314834-D241-4976-AF78-B88C3B72BB92}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B314834-D241-4976-AF78-B88C3B72BB92}.Release|x86.ActiveCfg = Release|Any CPU
+		{9B314834-D241-4976-AF78-B88C3B72BB92}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -455,9 +465,10 @@ Global
 		{189C14FF-84FF-4B86-93BD-FF00FA3AC283} = {CFEC3686-2123-456A-8302-9380F1526A55}
 		{D1173EDF-0D89-4E35-A17C-DCE5A15D732F} = {6DEB71E1-074C-47F3-B317-BC0580676691}
 		{11863EAE-E1A1-4192-A97C-78DBBB373B71} = {6DEB71E1-074C-47F3-B317-BC0580676691}
+		{9B314834-D241-4976-AF78-B88C3B72BB92} = {6DEB71E1-074C-47F3-B317-BC0580676691}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		EnterpriseLibraryConfigurationToolBinariesPath = packages\Unity.2.1.505.0\lib\NET35;packages\Unity.Interception.2.1.505.0\lib\NET35;packages\EnterpriseLibrary.Common.5.0.505.0\lib\NET35;packages\EnterpriseLibrary.Logging.5.0.505.1\lib\NET35;packages\EnterpriseLibrary.Data.5.0.505.0\lib\NET35;packages\EnterpriseLibrary.Logging.Database.5.0.505.0\lib\NET35
 		SolutionGuid = {59CCCEC5-7A74-4BFC-B2A5-2A6D97BB9E5C}
+		EnterpriseLibraryConfigurationToolBinariesPath = packages\Unity.2.1.505.0\lib\NET35;packages\Unity.Interception.2.1.505.0\lib\NET35;packages\EnterpriseLibrary.Common.5.0.505.0\lib\NET35;packages\EnterpriseLibrary.Logging.5.0.505.1\lib\NET35;packages\EnterpriseLibrary.Data.5.0.505.0\lib\NET35;packages\EnterpriseLibrary.Logging.Database.5.0.505.0\lib\NET35
 	EndGlobalSection
 EndGlobal
