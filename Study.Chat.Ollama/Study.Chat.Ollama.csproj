@@ -10,7 +10,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="OllamaSharp" Version="5.2.6" />
+    <PackageReference Include="Microsoft.SemanticKernel" Version="1.59.0" />
+    <PackageReference Include="Microsoft.SemanticKernel.Abstractions" Version="1.59.0" />
+    <PackageReference Include="Microsoft.SemanticKernel.Connectors.Ollama" Version="1.59.0-alpha" />
+    <PackageReference Include="OllamaSharp" Version="5.2.3" />
   </ItemGroup>
 
 </Project>

@@ -16,7 +16,7 @@ namespace Study.Chat.Ollama.Core
     {
         public bool CanExecute(string input) => input.Equals("/help", StringComparison.OrdinalIgnoreCase);
 
-        public Task ExecuteAsync(string input, OllamaApiClient ollama, List<Message> chatHistory)
+        public Task ExecuteAsync(string input)
         {
             Console.WriteLine("可用命令:\n" +
                             "/list - 列出可用模型\n" +

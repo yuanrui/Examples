@@ -23,7 +23,7 @@ namespace Study.Chat.Ollama.Core
 
         public bool CanExecute(string input) => input.Equals("/list", StringComparison.OrdinalIgnoreCase);
 
-        public async Task ExecuteAsync(string input, OllamaApiClient ollama, List<Message> chatHistory)
+        public async Task ExecuteAsync(string input)
         {
             var models = await _modelManager.GetAvailableModels();
             int selectedIndex = models.IndexOf(_modelManager.CurrentModel);
@@ -54,7 +54,7 @@ namespace Study.Chat.Ollama.Core
                         selectedIndex = (selectedIndex + 1) % models.Count;
                         break;
                     case ConsoleKey.Enter:
-                        _modelManager.SwitchModel(models[selectedIndex]);
+                        _modelManager.SetModel(models[selectedIndex]);
                         Console.WriteLine($"\n已选择模型: {models[selectedIndex]}");
                         return;
                     case ConsoleKey.Escape:

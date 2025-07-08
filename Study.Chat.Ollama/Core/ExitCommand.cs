@@ -16,7 +16,7 @@ namespace Study.Chat.Ollama.Core
     {
         public bool CanExecute(string input) => input.Equals("/exit", StringComparison.OrdinalIgnoreCase);
 
-        public Task ExecuteAsync(string input, OllamaApiClient ollama, List<Message> chatHistory)
+        public Task ExecuteAsync(string input)
         {
             Console.WriteLine("正在退出程序...");
             Environment.Exit(0);

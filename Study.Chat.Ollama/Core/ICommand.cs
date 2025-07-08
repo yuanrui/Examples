@@ -15,6 +15,6 @@ namespace Study.Chat.Ollama.Core
     public interface ICommand
     {
         bool CanExecute(string input);
-        Task ExecuteAsync(string input, OllamaApiClient ollama, List<Message> chatHistory);
+        Task ExecuteAsync(string input);
     }
 }

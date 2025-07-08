@@ -2,6 +2,9 @@
 // GitHub: https://github.com/yuanrui
 // License: Apache-2.0
 
+#pragma warning disable SKEXP0070
+using Microsoft.SemanticKernel.ChatCompletion;
+using Microsoft.SemanticKernel;
 using OllamaSharp;
 using OllamaSharp.Models;
 using System;
@@ -9,6 +12,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Study.Chat.Ollama.Plugins;
 
 namespace Study.Chat.Ollama.Core
 {
@@ -16,17 +21,27 @@ namespace Study.Chat.Ollama.Core
     {
         private readonly OllamaApiClient _ollama;
         private string _currentModel;
+        int _sysChatCount;
+        ChatHistory _chatHistroy;
 
-        public ModelManager(OllamaApiClient ollama)
+        public IChatCompletionService ChatCompletionService { get; private set; }
+        public Kernel SemanticKernel {  get; private set; }
+        
+        
+        public ModelManager(OllamaApiClient ollama, ChatHistory chatHistroy)
         {
             _ollama = ollama;
+            _chatHistroy = chatHistroy;
+            _sysChatCount = _chatHistroy.Count;
+            _currentModel = GetAvailableModels().GetAwaiter().GetResult()?.FirstOrDefault();            
         }
 
-
-        public ModelManager(OllamaApiClient ollama, string defaultModel)
+        public ModelManager(OllamaApiClient ollama, ChatHistory chatHistroy, string defaultModel)
         {
             _ollama = ollama;
-            _currentModel = defaultModel;
+            _chatHistroy = chatHistroy;
+            _sysChatCount = _chatHistroy.Count;
+            _currentModel = defaultModel;            
         }
 
         public string CurrentModel => _currentModel;
@@ -49,9 +64,33 @@ namespace Study.Chat.Ollama.Core
             }
         }
 
-        public void SwitchModel(string modelName)
+        protected void Init(string modelName)
         {
+            var builder = Kernel.CreateBuilder();
+
+            builder.Services.AddOllamaChatCompletion(modelName, _ollama.Config.Uri);
+            if (!modelName.StartsWith("deepseek", StringComparison.OrdinalIgnoreCase))
+            {
+                builder.Plugins
+                    .AddFromType<TimePlugin>()
+                    .AddFromType<NetworkToolsPlugin>();
+            }
+
+            SemanticKernel = builder.Build();
+
+            ChatCompletionService = SemanticKernel.GetRequiredService<IChatCompletionService>();
+        }
+
+        public void SetModel(string modelName)
+        {
+            if (_currentModel == modelName)
+            {
+                return;
+            }
+
             _currentModel = modelName;
+            Init(modelName);
+            ClearCommand.ClearChatHistroy(_chatHistroy, _sysChatCount);
         }
     }
 }

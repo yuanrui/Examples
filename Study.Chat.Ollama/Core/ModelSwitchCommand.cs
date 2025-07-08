@@ -23,10 +23,10 @@ namespace Study.Chat.Ollama.Core
 
         public bool CanExecute(string input) => input.StartsWith("/model ", StringComparison.OrdinalIgnoreCase);
 
-        public Task ExecuteAsync(string input, OllamaApiClient ollama, List<Message> chatHistory)
+        public Task ExecuteAsync(string input)
         {
             var modelName = input.Substring("/model ".Length).Trim();
-            _modelManager.SwitchModel(modelName);
+            _modelManager.SetModel(modelName);
             Console.WriteLine($"已切换到模型: {modelName}");
             return Task.CompletedTask;
         }
