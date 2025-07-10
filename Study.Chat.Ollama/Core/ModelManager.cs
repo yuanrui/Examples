@@ -14,6 +14,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Study.Chat.Ollama.Plugins;
+using Microsoft.SemanticKernel.Plugins.Core;
+using TimePlugin = Microsoft.SemanticKernel.Plugins.Core.TimePlugin;
 
 namespace Study.Chat.Ollama.Core
 {
@@ -21,18 +23,15 @@ namespace Study.Chat.Ollama.Core
     {
         private readonly OllamaApiClient _ollama;
         private string _currentModel;
-        int _sysChatCount;
         ChatHistory _chatHistroy;
 
         public IChatCompletionService ChatCompletionService { get; private set; }
         public Kernel SemanticKernel {  get; private set; }
         
-        
         public ModelManager(OllamaApiClient ollama, ChatHistory chatHistroy)
         {
             _ollama = ollama;
             _chatHistroy = chatHistroy;
-            _sysChatCount = _chatHistroy.Count;
             _currentModel = GetAvailableModels().GetAwaiter().GetResult()?.FirstOrDefault();            
         }
 
@@ -40,7 +39,6 @@ namespace Study.Chat.Ollama.Core
         {
             _ollama = ollama;
             _chatHistroy = chatHistroy;
-            _sysChatCount = _chatHistroy.Count;
             _currentModel = defaultModel;            
         }
 
@@ -72,8 +70,12 @@ namespace Study.Chat.Ollama.Core
             if (!modelName.StartsWith("deepseek", StringComparison.OrdinalIgnoreCase))
             {
                 builder.Plugins
+                    .AddFromType<FileIOPlugin>()
+                    .AddFromType<HttpPlugin>()
+                    .AddFromType<TextPlugin>()
                     .AddFromType<TimePlugin>()
-                    .AddFromType<NetworkToolsPlugin>();
+                    .AddFromType<NetworkToolsPlugin>()
+                    .AddFromType<SystemOperationsPlugin>();
             }
 
             SemanticKernel = builder.Build();
@@ -90,7 +92,7 @@ namespace Study.Chat.Ollama.Core
 
             _currentModel = modelName;
             Init(modelName);
-            ClearCommand.ClearChatHistroy(_chatHistroy, _sysChatCount);
+            ClearCommand.ClearChatHistroy(_chatHistroy);
         }
     }
 }

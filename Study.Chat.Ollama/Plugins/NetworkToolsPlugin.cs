@@ -1,4 +1,8 @@
-﻿using Microsoft.SemanticKernel;
+﻿// Copyright (c) 2025 YuanRui
+// GitHub: https://github.com/yuanrui
+// License: Apache-2.0
+
+using Microsoft.SemanticKernel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -61,6 +65,11 @@ namespace Study.Chat.Ollama.Plugins
                 }
 
                 var successCount = replies.Count(r => r.Status == IPStatus.Success);
+                if (successCount == 0)
+                {
+                    return $"无法访问目标主机:{host}";
+                }
+
                 var avgTime = replies.Where(r => r.Status == IPStatus.Success)
                                     .Average(r => r.RoundtripTime);
                 

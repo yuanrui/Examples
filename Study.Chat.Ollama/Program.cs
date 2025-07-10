@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2025 YuanRui
 // GitHub: https://github.com/yuanrui
 // License: Apache-2.0
+
 #pragma warning disable SKEXP0070
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,7 @@ using Study.Chat.Ollama.Plugins;
 using Microsoft.SemanticKernel.Services;
 using System.Net;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
+using Microsoft.SemanticKernel.Embeddings;
 
 namespace Study.Chat.Ollama
 {
@@ -49,7 +51,7 @@ namespace Study.Chat.Ollama
             var modelManager = new ModelManager(ollama, chatHistory);
             modelManager.SetModel("qwen3:4b");
             ollama.SelectedModel = modelManager.CurrentModel;
-
+            
             var settings = new OllamaPromptExecutionSettings { FunctionChoiceBehavior = FunctionChoiceBehavior.Auto() };
 
             // console command list
