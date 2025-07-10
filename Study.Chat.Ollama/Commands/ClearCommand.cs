@@ -7,23 +7,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Study.Chat.Ollama.Core
+namespace Study.Chat.Ollama.Commands
 {
     public class ClearCommand : ICommand
     {
         ChatHistory _chatHistroy;
 
-        public ClearCommand(ChatHistory chatHistroy) 
+        public ClearCommand(ChatHistory chatHistroy)
         {
             _chatHistroy = chatHistroy;
         }
 
         public bool CanExecute(string input)
         {
-             return input.Equals("/clear", StringComparison.OrdinalIgnoreCase);
+            return input.Equals("/clear", StringComparison.OrdinalIgnoreCase);
         }
 
-        public Task ExecuteAsync(string input)        
+        public Task ExecuteAsync(string input)
         {
             ClearChatHistroy(_chatHistroy);
             //ClearChatHistroy(_chatHistroy, _sysChatCount);

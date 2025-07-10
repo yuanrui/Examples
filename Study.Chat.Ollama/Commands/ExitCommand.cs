@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Study.Chat.Ollama.Core
+namespace Study.Chat.Ollama.Commands
 {
     public class ExitCommand : ICommand
     {

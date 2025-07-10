@@ -16,8 +16,9 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Study.Chat.Ollama.Plugins;
 using Microsoft.SemanticKernel.Plugins.Core;
 using TimePlugin = Microsoft.SemanticKernel.Plugins.Core.TimePlugin;
+using Study.Chat.Ollama.Core;
 
-namespace Study.Chat.Ollama.Core
+namespace Study.Chat.Ollama.Commands
 {
     public class ModelManager
     {
@@ -26,20 +27,20 @@ namespace Study.Chat.Ollama.Core
         ChatHistory _chatHistroy;
 
         public IChatCompletionService ChatCompletionService { get; private set; }
-        public Kernel SemanticKernel {  get; private set; }
-        
+        public Kernel SemanticKernel { get; private set; }
+
         public ModelManager(OllamaApiClient ollama, ChatHistory chatHistroy)
         {
             _ollama = ollama;
             _chatHistroy = chatHistroy;
-            _currentModel = GetAvailableModels().GetAwaiter().GetResult()?.FirstOrDefault();            
+            _currentModel = GetAvailableModels().GetAwaiter().GetResult()?.FirstOrDefault();
         }
 
         public ModelManager(OllamaApiClient ollama, ChatHistory chatHistroy, string defaultModel)
         {
             _ollama = ollama;
             _chatHistroy = chatHistroy;
-            _currentModel = defaultModel;            
+            _currentModel = defaultModel;
         }
 
         public string CurrentModel => _currentModel;
@@ -69,13 +70,15 @@ namespace Study.Chat.Ollama.Core
             builder.Services.AddOllamaChatCompletion(modelName, _ollama.Config.Uri);
             if (!modelName.StartsWith("deepseek", StringComparison.OrdinalIgnoreCase))
             {
+                // Microsoft.SemanticKernel.Plugins.Core
                 builder.Plugins
                     .AddFromType<FileIOPlugin>()
                     .AddFromType<HttpPlugin>()
                     .AddFromType<TextPlugin>()
-                    .AddFromType<TimePlugin>()
-                    .AddFromType<NetworkToolsPlugin>()
-                    .AddFromType<SystemOperationsPlugin>();
+                    .AddFromType<TimePlugin>();
+
+                // self plugins 
+                builder.AutoRegisterPlugins();
             }
 
             SemanticKernel = builder.Build();

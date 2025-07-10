@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using OllamaSharp;
 using OllamaSharp.Models;
 using OllamaSharp.Models.Chat;
-using Study.Chat.Ollama.Core;
+using Study.Chat.Ollama.Commands;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.Ollama;
@@ -19,6 +19,7 @@ using Microsoft.SemanticKernel.Services;
 using System.Net;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using Microsoft.SemanticKernel.Embeddings;
+using Study.Chat.Ollama.Commands;
 
 namespace Study.Chat.Ollama
 {
