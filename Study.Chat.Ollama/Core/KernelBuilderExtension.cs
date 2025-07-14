@@ -39,6 +39,45 @@ namespace Study.Chat.Ollama.Core
             return builder;
         }
 
+        /// <summary>
+        /// 自动注册plugins目录及其子目录中包含KernelFunction方法的类作为插件
+        /// </summary>
+        public static IKernelBuilder AutoRegisterPluginsFromDirectory(
+            this IKernelBuilder builder,
+            string pluginsFolder = "plugins")
+        {
+            var assemblies = new List<Assembly> { Assembly.GetExecutingAssembly() };
+            
+            // 获取 plugins 文件夹路径
+            var pluginsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, pluginsFolder);
+            
+            if (Directory.Exists(pluginsPath))
+            {
+                // 递归搜索所有包含"Plugin"的DLL文件
+                var pluginAssemblies = Directory.GetFiles(pluginsPath, "*Plugin*.dll", SearchOption.AllDirectories)
+                    .Select(pluginPath => 
+                    {
+                        try
+                        {
+                            return Assembly.LoadFrom(pluginPath);
+                        }
+                        catch
+                        {
+                            return null;
+                        }
+                    })
+                    .Where(assembly => assembly != null)
+                    .ToArray();
+
+                if (pluginAssemblies != null && pluginAssemblies.Any())
+                {
+                    assemblies.AddRange(pluginAssemblies);
+                }
+            }
+
+            return builder.AutoRegisterPlugins(assemblies.ToArray());
+        }
+
         private static object CreatePluginInstance(Type type)
         {
             // 尝试无参数构造函数

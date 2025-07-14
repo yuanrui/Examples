@@ -79,6 +79,7 @@ namespace Study.Chat.Ollama.Commands
 
                 // self plugins 
                 builder.AutoRegisterPlugins();
+                builder.AutoRegisterPluginsFromDirectory();
             }
 
             SemanticKernel = builder.Build();
