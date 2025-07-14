@@ -78,7 +78,6 @@ namespace Study.Chat.Ollama.Commands
                     .AddFromType<TimePlugin>();
 
                 // self plugins 
-                builder.AutoRegisterPlugins();
                 builder.AutoRegisterPluginsFromDirectory();
             }
 
