@@ -1,31 +1,31 @@
 ﻿using Microsoft.SemanticKernel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Study.Chat.Ollama.Core
 {
     public static class KernelBuilderExtension
     {
+        private const string PluginDirectory = "plugins";
+
         /// <summary>
-        /// 自动注册所有包含KernelFunction方法的类作为插件
+        /// Automatically registers all classes containing KernelFunction methods as plugins
         /// </summary>
         public static IKernelBuilder AutoRegisterPlugins(
             this IKernelBuilder builder,
             params Assembly[] assemblies)
         {
+            const string ExcludeNamespace = "Microsoft.SemanticKernel.";
+
             if (assemblies.Length == 0)
                 assemblies = new[] { Assembly.GetExecutingAssembly() };
 
-            // 查找包含至少一个KernelFunction方法的非抽象类
+            // Find non-abstract classes containing at least one KernelFunction method
             var pluginTypes = assemblies
                 .SelectMany(a => a.GetTypes())
                 .Where(t => t.IsClass && !t.IsAbstract && !t.IsDefined(typeof(ObsoleteAttribute), inherit: true))
-                .Where(t => t.GetMethods().Any(m =>
-                    m.GetCustomAttribute<KernelFunctionAttribute>() != null));
+                .Where(t => t.GetMethods().Any(m => m.GetCustomAttribute<KernelFunctionAttribute>() != null))
+                .Where(t => t.Namespace == null || !t.Namespace.StartsWith(ExcludeNamespace)) // Exclude specified namespace
+                .Distinct(); // Ensure each type is processed only once
 
             foreach (var type in pluginTypes)
             {
@@ -40,22 +40,22 @@ namespace Study.Chat.Ollama.Core
         }
 
         /// <summary>
-        /// 自动注册plugins目录及其子目录中包含KernelFunction方法的类作为插件
+        /// Automatically registers classes with KernelFunction methods from the plugins directory and subdirectories
         /// </summary>
         public static IKernelBuilder AutoRegisterPluginsFromDirectory(
             this IKernelBuilder builder,
-            string pluginsFolder = "plugins")
+            string pluginsFolder = PluginDirectory)
         {
             var assemblies = new List<Assembly> { Assembly.GetExecutingAssembly() };
-            
-            // 获取 plugins 文件夹路径
+
+            // Get plugins folder path
             var pluginsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, pluginsFolder);
-            
+
             if (Directory.Exists(pluginsPath))
             {
-                // 递归搜索所有包含"Plugin"的DLL文件
+                // Recursively search all DLL files containing "Plugin"
                 var pluginAssemblies = Directory.GetFiles(pluginsPath, "*Plugin*.dll", SearchOption.AllDirectories)
-                    .Select(pluginPath => 
+                    .Select(pluginPath =>
                     {
                         try
                         {
@@ -78,21 +78,78 @@ namespace Study.Chat.Ollama.Core
             return builder.AutoRegisterPlugins(assemblies.ToArray());
         }
 
+        public static IKernelBuilder AutoRegisterPluginsFromDirectories(this IKernelBuilder builder)
+        {
+            return AutoRegisterPluginsFromDirectories(builder, "", PluginDirectory);
+        }
+
+        /// <summary>
+        /// Automatically registers classes with KernelFunction methods from multiple directories and subdirectories
+        /// </summary>
+        public static IKernelBuilder AutoRegisterPluginsFromDirectories(
+            this IKernelBuilder builder,
+            params string[] dirs)
+        {
+            var assemblies = new List<Assembly> { Assembly.GetExecutingAssembly() };
+            var processedPaths = new HashSet<string>();
+
+            foreach (var dir in dirs)
+            {
+                var pluginsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, dir);
+
+                if (Directory.Exists(pluginsPath))
+                {
+                    // Recursively search all DLL files containing "Plugin" and deduplicate paths
+                    var pluginPaths = Directory.GetFiles(pluginsPath, "*Plugin*.dll", SearchOption.AllDirectories)
+                        .Where(path => processedPaths.Add(path)) // Only add unprocessed paths
+                        .ToArray();
+
+                    var pluginAssemblies = pluginPaths
+                        .Select(pluginPath =>
+                        {
+                            try
+                            {
+                                return Assembly.LoadFrom(pluginPath);
+                            }
+                            catch
+                            {
+                                return null;
+                            }
+                        })
+                        .Where(assembly => assembly != null)
+                        .ToArray();
+
+                    if (pluginAssemblies.Any())
+                    {
+                        assemblies.AddRange(pluginAssemblies);
+                    }
+                }
+            }
+
+            // Ensure assemblies are unique
+            var uniqueAssemblies = assemblies
+                .GroupBy(a => a.FullName)
+                .Select(g => g.First())
+                .ToArray();
+
+            return builder.AutoRegisterPlugins(uniqueAssemblies);
+        }
+
         private static object CreatePluginInstance(Type type)
         {
-            // 尝试无参数构造函数
+            // Try parameterless constructor
             var ctor = type.GetConstructor(Type.EmptyTypes);
             if (ctor != null) return ctor.Invoke(null);
 
-            // 尝试获取带Kernel参数的构造函数（支持依赖注入）
+            // Try to get constructor with Kernel parameter (supports dependency injection)
             ctor = type.GetConstructor(new[] { typeof(Kernel) });
             if (ctor != null)
             {
-                // 注意：实际内核实例需稍后设置
+                // Note: Actual kernel instance needs to be set later
                 return ctor.Invoke(new object[] { null! });
             }
 
-            // 尝试第一个公共构造函数（带默认值）
+            // Try first public constructor (with default values)
             var ctors = type.GetConstructors();
             if (ctors.Length > 0)
             {
@@ -103,7 +160,7 @@ namespace Study.Chat.Ollama.Core
                 return ctors[0].Invoke(parameters);
             }
 
-            //throw new InvalidOperationException($"没有合适的构造函数用于类型 {type.Name}");
+            //throw new InvalidOperationException($
             return null;
         }
 
@@ -112,7 +169,7 @@ namespace Study.Chat.Ollama.Core
 
         private static string GetDefaultPluginName(Type type)
         {
-            // 移除常见后缀
+            // Remove common suffixes
             var name = type.Name;
             if (name.EndsWith("Plugin")) name = name[..^6];
             if (name.EndsWith("Service")) name = name[..^7];
@@ -120,6 +177,5 @@ namespace Study.Chat.Ollama.Core
 
             return name;
         }
-
     }
 }
